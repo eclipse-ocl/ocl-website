@@ -60,7 +60,7 @@ releases, that includes the Eclipse Platform 3.7.1 and 3.7.2 releases.
 MDT UML2 may produce interim maintenance releases in addition to these in
 order to satisfy clients requests.
 <html:ul>
-  <html:li>Friday, September 23, 2012 - MDT UML2 3.2.1 maintenance release (Indigo Service Release 1)</html:li>
+  <html:li>Friday, September 23, 2011 - MDT UML2 3.2.1 maintenance release (Indigo Service Release 1)</html:li>
   <html:li>Friday, February 24, 2012 - MDT UML2 3.2.2 maintenance release (Indigo Service Release 2)</html:li>
   <html:li>A list of issues indicated for the 3.2.x maintenance stream can be found in
       bugzilla, or by using links on maintenance stream build pages.</html:li>
