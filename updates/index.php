@@ -13,5 +13,4 @@ function notes()
 	print "<p><i>Use the <a href=\"/modeling/updates/\">Modeling Update Site</a>.</i></p>\n";
 }
 
-update_manager("MDT", "Eclipse Modeling", $PRS, true, true);
 ?>
