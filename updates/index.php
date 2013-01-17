@@ -10,7 +10,7 @@ $PRS = array(
 
 function notes()
 {
-	print "<p><i style=\"color:red\"><b>NOTE:</b>As of Helios (Eclipse 3.6), MDT plugins should be installed from the <a href=\"/modeling/updates/\">Modeling Update Site</a>.</i></p>\n";
+	print "<p><i style=\"color:red\"><b>NOTE:</b> As of Helios (Eclipse 3.6), MDT plugins should be installed from the <a href=\"/modeling/updates/\">Modeling Update Site</a>.</i></p>\n";
 }
 
 update_manager("MDT", "Eclipse Modeling", $PRS, true, true);
