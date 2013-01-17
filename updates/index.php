@@ -15,5 +15,5 @@ function notes()
 	print "<p><i>For MoDisco, use the <a href=\"http://wiki.eclipse.org/MoDisco/Updates\">MoDisco Update Site</a>.</i></p>\n";
 }
 
-update_manager("MDT", "Eclipse Modeling", $PRS, true);
+update_manager("MDT", "Eclipse Modeling", $PRS, true, true);
 ?>
