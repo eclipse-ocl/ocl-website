@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <?xml-stylesheet type="text/xsl" href="http://www.eclipse.org/projects/project-plan.xsl"?>
 <plan plan-format="1.0" xmlns="http://www.eclipse.org/project/plan" xmlns:html="http://www.w3.org/1999/xhtml"
-      name="Project Name">
-   <release projectid="modeling.mdt" version="Kepler"/>
+      name="Eclipse OCL">
+   <release projectid="modeling.mdt.ocl" version="4.1.0 (Kepler)"/>
    <introduction>
      <html:div>
 <html:p>
 This document lays out the feature and API set for the
-seventh annual release of the Eclipse Object Constraint Language (MDT OCL)
+eighth annual release of the Eclipse Object Constraint Language (Eclipse OCL)
 Project, version 4.1.0.
 </html:p>
 <html:p>
@@ -46,7 +46,7 @@ re-use by OCL-derived languages such as QVT. The project team anticipates workin
 to assist in migration to the new APIs.
 </html:p-->
 <html:i><html:b>Note</html:b> that, since the 
-<html:a href="http://www.omg.org/spec/OCL/2.3/Beta2/PDF">OMG OCL 2.3.1</html:a>
+<html:a href="http://www.omg.org/spec/OCL/2.3.1/PDF">OMG OCL 2.3.1</html:a>
 standard suffers from significant ambiguities and conflicts making a compliant implementation impossible,
 <html:b>Eclipse (MDT) OCL 4.1.0</html:b> release is a best endeavours attempt to establish a coherent interpretation
 of the OMG OCL 2.3.1 and to prototype resolutions and auto-generation of the OMG OCL 2.5 standard. Two of the Eclipse (MDT) OCL
