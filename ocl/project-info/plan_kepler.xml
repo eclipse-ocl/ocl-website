@@ -11,40 +11,26 @@ eighth annual release of the Eclipse Object Constraint Language (Eclipse OCL)
 Project, version 4.1.0.
 </html:p>
 <html:p>
-The original plan for a major version increment to 4.0 was abandoned in favour of a 3.2 increment, however tight
-coupling to MDT/UML2, which plans a major increment, mandates the increment to 4.0 for the overall project, features
-and UML-dependent plugins. The non-UML-dependent plugins have a minor increment to 3.2. Newly UI plugins start at 1.0.
+The plan for 4.1 was to complete the prototyping of models and solutions to the UML alignment and many other issues
+in the OMG OCL 2.3.1 specification.
 </html:p>
 <html:p>
-Versions 3.0 and 3.1 saw the introduction of Xtext-based editors and an associated rewrite of the
-meta-models and evaluator to prototype a UML-aligned pivot meta-model on behalf of OCL 2.3.1 and to use a model for
-the OCL Standard Library. This functionality was provided in Examples plugins.
-The planned promotion of these Xtext-based editors and the associated pivot meta-model
-from Examples to Core/Tools plugins has been deferred
-till Kepler since the code was not ready and the timescales for review were totally unreasonable.
+Considerable progress was made, but not enough to permit the examples prototypes to be promoted as replacements for 
+the legacy functionality.
 </html:p>
 <html:p>
-In version 4.1, the Xtext-based editors and pivot meta-model will be promoted from Examples to Core/Tools plugins and the
-very slow process of deprecation of the old Ecore and UML bindings will begin. The Core plugins will provide non-UI
-functionality; the Tools plugins will provide the IDE comprising editors and consoles.
+The OCL to Java code generator was rewritten twice so that it now has a sound underlying model
+making the code simpler and more efficient and permitting optimizations to be realized easily.
 </html:p>
 <html:p>
-Version 4.0 introduces a preliminary OCL to Java code generator so that OCL embedded in Ecore may be directly
-genmodelled and so that OCL-defined well-formedness rules can be used for validation within the editors.
+The support for UML was improved so that the new functionality is now exploited within
+Papyrus for profiles and validation.
 </html:p>
 <html:p>
-Version 4.0 introduces an ability to load Complete OCL documents for use in third party applications such
-as the Ecore generated Editors and Xtext generated editors so that user-defined meta-model constraints
-can augment validation.
+The project should now be in good shape to complete UML alignment and then support accurate
+auto-generation of Java for the many new and changed OCL constraints in the UML 2.5 specification. 
 </html:p>
 <html:p>
-The Examples API has been revisited to facilitate re-use by OCL-derived languages such as QVT.</html:p>
-<html:p>
-<!--html:p>
-As part of the promotion from Examples to Core/Tools the Examples API will be revisited to facilitate
-re-use by OCL-derived languages such as QVT. The project team anticipates working with major consumers
-to assist in migration to the new APIs.
-</html:p-->
 <html:i><html:b>Note</html:b> that, since the 
 <html:a href="http://www.omg.org/spec/OCL/2.3.1/PDF">OMG OCL 2.3.1</html:a>
 standard suffers from significant ambiguities and conflicts making a compliant implementation impossible,
@@ -71,13 +57,13 @@ is found in most Eclipse projects, namely:
 <html:li>OCL examples (downloadable and update site)</html:li-->
 </html:ul>
 <html:p>
-Eclipse (MDT) OCL 4.1 will use GIT rather than CVS for source control.
+Eclipse OCL 4.1 will use GIT for source control.
 </html:p>
 <html:p>
-Eclipse (MDT) OCL 4.1 will primarily target Eclipse 4.3 rather than Eclipse 3.9.
+Eclipse OCL 4.1 will primarily target Eclipse 4.3 rather than Eclipse 3.9.
 </html:p>
 <html:p>
-Eclipse (MDT) OCL 4.1.0  source code will be available as versions tagged "R4_1" in the project's GIT repository.
+Eclipse OCL 4.1.0  source code will be available as versions tagged "Kepler" in the project's GIT repository.
 </html:p>
      </html:div>
    </release_deliverables>
@@ -86,7 +72,7 @@ Eclipse (MDT) OCL 4.1.0  source code will be available as versions tagged "R4_1"
          <html:div>
 Release milestones occur at roughly 6 week intervals and follow the
 Platform milestone releases by approximately 1 week; that is, until the
-final 4.2 release of the Platform, upon which Eclipse OCL and other projects
+final 4.3 release of the Platform, upon which Eclipse OCL and other projects
 will release simultaneously. As Eclipse OCL is a dependency of numerous
 other projects, Eclipse OCL will deliver its Core plugins at the +1
 milestones schedule in accordance with the schedule below. Tools plugins
@@ -110,6 +96,7 @@ will be two days later on the +3 schedule.
    </release_milestones>
    <target_environments>
      <html:div>
+		<html:p>
         In order to remain current, each Eclipse release targets reasonably
         current versions of the underlying operating environments. The Eclipse
         Object Constraint Language (OCL) project depends upon on the
@@ -121,6 +108,17 @@ will be two days later on the +3 schedule.
         Java 5. Eclipse Platform SDK 4.3 will be tested and validated on a
         number of reference platforms. Eclipse OCL will be tested and validated
         against a subset of those listed for the platform.
+		</html:p>
+		<html:p>
+		Indirect dependence on version 6 of the JRE has arisen through use of the
+		third party components such as Google Guava. This may justify raising the
+		lower bound explicitly for Luna. 
+		</html:p>
+		<html:p>
+		A direct dependence on version 6 of the JRE exists on
+		ly when dynamic compilation
+		of auto-generated Java is exploited.
+		</html:p>
      </html:div>
      <internationalization>
           <html:div>
