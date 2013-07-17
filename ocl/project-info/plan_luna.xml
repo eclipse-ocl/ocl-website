@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<?xml-stylesheet type="text/xsl" href="http://www.eclipse.org/projects/project-plan.xsl"?>
+<plan plan-format="1.0" xmlns="http://www.eclipse.org/project/plan" xmlns:html="http://www.w3.org/1999/xhtml"
+      name="Eclipse OCL">
+   <release projectid="modeling.mdt.ocl" version="4.4.0 (Luna)"/>
+   <introduction>
+     <html:div>
+<html:p>
+This document lays out the feature and API set for the
+ninth annual release of the Eclipse Object Constraint Language (Eclipse OCL)
+Project, version 4.4.0 and two intermediate releases 4.2.0 and 4.3.0 that will be contributed
+as the Kepler SR1 and SR2 releases.
+</html:p>
+<html:p>
+The plan for 4.4 was to complete the prototyping of models and solutions to the UML alignment and many other issues
+in the OMG OCL 2.3.1 specification.
+</html:p>
+<html:p>
+Considerable progress was made, but not enough to permit the examples prototypes to be promoted as replacements for 
+the legacy functionality.
+</html:p>
+<html:p>
+The OCL to Java code generator was rewritten twice so that it now has a sound underlying model
+making the code simpler and more efficient and permitting optimizations to be realized easily.
+</html:p>
+<html:p>
+The support for UML was improved so that the new functionality is now exploited within
+Papyrus for profiles and validation.
+</html:p>
+<html:p>
+The project should now be in good shape to complete UML alignment and then support accurate
+auto-generation of Java for the many new and changed OCL constraints in the UML 2.5 specification. 
+</html:p>
+<html:p>
+<html:i><html:b>Note</html:b> that, since the 
+<html:a href="http://www.omg.org/spec/OCL/2.3.1/PDF">OMG OCL 2.3.1</html:a>
+standard suffers from significant ambiguities and conflicts making a compliant implementation impossible,
+<html:b>Eclipse (MDT) OCL 4.4.0</html:b> release is a best endeavours attempt to establish a coherent interpretation
+of the OMG OCL 2.3.1 and to prototype resolutions and auto-generation of the OMG OCL 2.5 standard. Two of the Eclipse (MDT) OCL
+committers are also members of the OMG Revision Task Force that resolves the specification issues.</html:i>
+</html:p>
+<html:p>
+</html:p>
+<html:p>
+</html:p>
+     </html:div>
+   </introduction>
+   <release_deliverables>
+     <html:div>
+The release deliverables for the Eclipse (MDT) OCL 4.4 release have the same form as 
+is found in most Eclipse projects, namely:
+<html:ul>
+<html:li>OCL All-in-One P2 repository (downloadable and update site).</html:li>
+<!--html:li>OCL SDK (includes runtime, sources, examples, and documentation) (downloadable and update site).</html:li>
+<html:li>OCL runtime binary distribution (downloadable and update site).</html:li>
+<html:li>OCL stand-alone binary distribution (downloadable).</html:li>
+<html:li>OCL tests (downloadable)</html:li>
+<html:li>OCL examples (downloadable and update site)</html:li-->
+</html:ul>
+<html:p>
+Eclipse OCL 4.4 will use GIT for source control.
+</html:p>
+<html:p>
+Eclipse OCL 4.4 will primarily target Eclipse 4.3 rather than Eclipse 3.9.
+</html:p>
+<html:p>
+Eclipse OCL 4.4.0  source code will be available as versions tagged "Luna" in the project's GIT repository.
+</html:p>
+     </html:div>
+   </release_deliverables>
+   <release_milestones>
+      <preamble>
+         <html:div>
+Release milestones occur at roughly 6 week intervals and follow the
+Platform milestone releases by approximately 1 week; that is, until the
+final 4.3 release of the Platform, upon which Eclipse OCL and other projects
+will release simultaneously. As Eclipse OCL is a dependency of numerous
+other projects, Eclipse OCL will deliver its Core plugins at the +1
+milestones schedule in accordance with the schedule below. Tools plugins
+will be two days later on the +3 schedule.
+         </html:div>
+      </preamble>
+<milestone date="Monday 19 August 2013" milestone="4.2.0M1"></milestone>
+<milestone date="Friday 27 September 2013" milestone="4.2.0"><html:div>Kepler SR1</html:div></milestone>
+<milestone date="Monday 11 November 2013" milestone="4.3.0M3"></milestone>
+<milestone date="Monday 16 December 2013" milestone="4.3.0M4"></milestone>
+<milestone date="Monday 3 February 2014" milestone="4.3.0M5"></milestone>
+<milestone date="Friday 28 February 2014" milestone="4.3.0"><html:div>Kepler SR2</html:div></milestone>
+<milestone date="Monday 17 March 2014" milestone="4.4.0M6"><html:div>API freeze</html:div></milestone>
+<milestone date="Monday 5 May 2014" milestone="4.4.0M7"><html:div>Feature Freeze</html:div></milestone>
+<milestone date="Monday 19 May 2014" milestone="4.4.0RC1"></milestone>
+<milestone date="Monday 26 May 2014" milestone="4.4.0RC2"></milestone>
+<milestone date="Monday 2 June 2014" milestone="4.4.0RC3"></milestone>
+<milestone date="Monday 9 June 2014" milestone="4.4.0RC4"></milestone>
+<milestone date="Wednesday 25 June 2014" milestone="Luna"></milestone>
+      <postamble><html:div>
+      </html:div></postamble>
+   </release_milestones>
+   <target_environments>
+     <html:div>
+		<html:p>
+        In order to remain current, each Eclipse release targets reasonably
+        current versions of the underlying operating environments. The Eclipse
+        Object Constraint Language (OCL) project depends upon on the
+        Platform and other projects, which are mostly "pure" Java. The 4.4
+        release of the Eclipse Platform Project is written and compiled
+        against version 5.0 of the Java Platform APIs, and targeted to run on
+        version 5.0 of the Java Runtime Environment, Standard Edition. Eclipse OCL
+        will target the same Java version as EMF and UML2, which currently require
+        Java 5. Eclipse Platform SDK 4.3 will be tested and validated on a
+        number of reference platforms. Eclipse OCL will be tested and validated
+        against a subset of those listed for the platform.
+		</html:p>
+		<html:p>
+		Indirect dependence on version 6 of the JRE has arisen through use of the
+		third party components such as Google Guava. This may justify raising the
+		lower bound explicitly for Luna. 
+		</html:p>
+		<html:p>
+		A direct dependence on version 6 of the JRE exists only when dynamic compilation
+		of auto-generated Java is exploited.
+		</html:p>
+     </html:div>
+     <internationalization>
+          <html:div>
+The Eclipse Platform is designed as the basis
+for internationalized products. The user interface elements provided
+by the Eclipse SDK components, including dialogs and error messages,
+are externalized. The English strings are provided as the default
+resource bundles. As a result, the Eclipse OCL
+project will provide English strings in its default bundles and be
+localized to a subset of those locales offered by the Platform.
+          </html:div>
+     </internationalization>
+   </target_environments>
+   <compatibility_with_previous_releases>
+       <html:div>
+The Eclipse OCL 4.4 project
+will be developed in parallel, and released simultaneously, with the
+following projects. 
+<html:ul>
+    <html:li>Eclipse Platform SDK version 4.4</html:li>
+    <html:li>Eclipse Modeling Framework (EMF) version 2.10</html:li>
+    <html:li>Model Development Tools (MDT) UML2 version 4.2</html:li>
+</html:ul>
+<html:p>
+As described above, the Eclipse OCL 4.4.0 release should address usability of the editors.
+The main OCL plugins should be unaffected,
+but the associated examples plugins may be revised significantly.
+</html:p>
+<html:p>
+Again as described above, the Eclipse OCL 4.4.0 release for Luna will introduce significant new APIs
+in a new namespace that replaces the old. The old namespace will be deprecated once all
+Simultaneous Release projects have migrated to the new namespace.  
+</html:p>
+<html:p>
+</html:p>
+       </html:div>
+   </compatibility_with_previous_releases>
+   <themes_and_priorities>
+     <preamble>
+         <html:div>
+A list of project requirements and agreed upon
+implementation time frames is found in this document. For the
+milestones listed in this document, a set of overall themes is used
+to indicate what major set of functionalities is to be concentrated
+on for each. These themes are presented below, while the requirements
+document and associated Bugzilla entries are left to those wanting
+more detailed information on each.
+         </html:div>
+     </preamble>
+        <theme name="Compliance">
+            <description>
+                <html:div>
+This theme addresses issues related to the OMG OCL 2.3.1 specification adoption. The bugs related to the inherited deviations
+of the Eclipse OCL implementation from the OCL 2.0 specification (and consequently, OCL 2.3.1) also appear here.
+                </html:div>
+            </description>
+            <committed
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Compliance&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna%2B&amp;bug_status=RESOLVED&amp;bug_status=VERIFIED&amp;bug_status=CLOSED">
+            </committed>
+            <proposed
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Compliance&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna%2B&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED">
+            </proposed>
+            <deferred
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Compliance&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna-">
+            </deferred>
+        </theme>
+        <theme name="Release Currency">
+            <description>
+                <html:div>
+The Eclipse OCL project will maintain currency with its
+dependencies, in particular with the EMF and MDT UML2 projects.
+                </html:div>
+            </description>
+            <committed
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Release+Currency&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna%2B&amp;bug_status=RESOLVED&amp;bug_status=VERIFIED&amp;bug_status=CLOSED">
+            </committed>
+            <proposed
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Release+Currency&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna%2B&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED">
+            </proposed>
+            <deferred
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Release+Currency&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna-">
+            </deferred>
+        </theme>
+        <theme name="Usability">
+            <description>
+                <html:div>
+This theme addresses the need for extensibility and usability improvements
+of the Eclipse OCL language implementation and APIs.
+                </html:div>
+            </description>
+            <committed
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Usability&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna%2B&amp;bug_status=RESOLVED&amp;bug_status=VERIFIED&amp;bug_status=CLOSED">
+            </committed>
+            <proposed
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Usability&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna%2B&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED">
+            </proposed>
+            <deferred
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Usability&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna-">
+            </deferred>
+        </theme>
+        <theme name="Specification">
+            <description>
+                <html:div>
+This theme addresses issues related to prototyping resolutions of problems in the OMG OCL 2.3.1 specification and enhancements in future specifications. OMG issues
+will be raised and RTF proposed resolutions submitted.  
+                </html:div>
+            </description>
+            <committed
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Specification&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna%2B&amp;bug_status=RESOLVED&amp;bug_status=VERIFIED&amp;bug_status=CLOSED">
+            </committed>
+            <proposed
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Specification&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna%2B&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED">
+            </proposed>
+            <deferred
+                bugzilla="https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced&amp;status_whiteboard_type=substring&amp;status_whiteboard=Specification&amp;classification=Modeling&amp;product=MDT.OCL&amp;field0-0-0=flagtypes.name&amp;type0-0-0=equals&amp;value0-0-0=luna-">
+            </deferred>
+        </theme>
+   </themes_and_priorities>
+   <appendix name="Legal Notices">
+        <html:div>
+<html:ul>
+<html:li>Java is a trademark or a registered trademark of Oracle Corporation.</html:li>
+<html:li>OCL, QVT, UML and OMG are trademarks or registered trademarks of the Object Management Group, Inc.</html:li>
+<html:li>All other products or company names are mentioned for identification purposes only, and
+    may be trademarks or service marks of their respective owners.</html:li>
+</html:ul>
+        </html:div>
+   </appendix>
+</plan>
