@@ -2,13 +2,13 @@
 <?xml-stylesheet type="text/xsl" href="http://www.eclipse.org/projects/project-plan.xsl"?>
 <plan plan-format="1.0" xmlns="http://www.eclipse.org/project/plan" xmlns:html="http://www.w3.org/1999/xhtml"
       name="UML2">
-   <release projectid="modeling.mdt.uml2" version="4.2.0"/>
+   <release projectid="modeling.mdt.uml2" version="5.0.0"/>
    <introduction>
      <html:div>
 <html:p>
 This document lays out the feature and API set for the
 next release of the Eclipse Unified Modeling Language 2.x (UML2)
-Project, version 4.2.0. This project plan inherits from the Modeling
+Project, version 5.0.0. This project plan inherits from the Modeling
 Project Plan, which should be referenced when consulting this
 individual project plan.
 </html:p>
@@ -18,7 +18,7 @@ individual project plan.
      <html:div>
 The release deliverables have the same form as is found in most Eclipse projects, namely:
 <html:ul>
-<html:li>UML2 source code release, available as versions tagged "R4_2" in the project's git repository.</html:li>
+<html:li>UML2 source code release, available as versions tagged "R5_0" in the project's git repository.</html:li>
 <html:li>UML2 SDK (includes runtime, sources, examples, and documentation) (downloadable and update site).</html:li>
 <html:li>UML2 runtime binary distribution (downloadable and update site).</html:li>
 <html:li>UML2 stand-alone binary distribution (downloadable).</html:li>
@@ -97,7 +97,7 @@ the time frame for availability.
    </target_environments>
    <compatibility_with_previous_releases>
        <html:div>
-Compatibility of Release 4.2: The UML2 project
+Compatibility of Release 5.0: The UML2 project
 will be developed in parallel, and released simultaneously, with the
 following projects. As stated above, each milestone release of the
 UML2 project will be compatible with the
