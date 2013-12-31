@@ -2,41 +2,29 @@
 <?xml-stylesheet type="text/xsl" href="http://www.eclipse.org/projects/project-plan.xsl"?>
 <plan plan-format="1.0" xmlns="http://www.eclipse.org/project/plan" xmlns:html="http://www.w3.org/1999/xhtml"
       name="Eclipse OCL">
-   <release projectid="modeling.mdt.ocl" version="4.4.0 (Luna)"/>
+   <release projectid="modeling.mdt.ocl" version="5.0.0 (Luna)"/>
    <introduction>
      <html:div>
 <html:p>
 This document lays out the feature and API set for the
 ninth annual release of the Eclipse Object Constraint Language (Eclipse OCL)
-Project, version 4.4.0 and two intermediate releases 4.2.0 and 4.3.0 that will be contributed
-as the Kepler SR1 and SR2 releases.
+Project, version 5.0.0.
 </html:p>
 <html:p>
-The plan for 4.4 was to complete the prototyping of models and solutions to the UML alignment and many other issues
-in the OMG OCL 2.3.1 specification.
+The direct Java code generator will be improved to support UML 2.5.
 </html:p>
 <html:p>
-Considerable progress was made, but not enough to permit the examples prototypes to be promoted as replacements for 
-the legacy functionality.
+A Validity View will support fine-grained control and display of constraint results.
 </html:p>
 <html:p>
-The OCL to Java code generator was rewritten twice so that it now has a sound underlying model
-making the code simpler and more efficient and permitting optimizations to be realized easily.
-</html:p>
-<html:p>
-The support for UML was improved so that the new functionality is now exploited within
-Papyrus for profiles and validation.
-</html:p>
-<html:p>
-The project should now be in good shape to complete UML alignment and then support accurate
-auto-generation of Java for the many new and changed OCL constraints in the UML 2.5 specification. 
+OCL debugging will be available for constraints shown in the Validity View.
 </html:p>
 <html:p>
 <html:i><html:b>Note</html:b> that, since the 
-<html:a href="http://www.omg.org/spec/OCL/2.3.1/PDF">OMG OCL 2.3.1</html:a>
+<html:a href="http://www.omg.org/spec/OCL/2.4">OMG OCL 2.4</html:a>
 standard suffers from significant ambiguities and conflicts making a compliant implementation impossible,
-<html:b>Eclipse (MDT) OCL 4.4.0</html:b> release is a best endeavours attempt to establish a coherent interpretation
-of the OMG OCL 2.3.1 and to prototype resolutions and auto-generation of the OMG OCL 2.5 standard. Two of the Eclipse (MDT) OCL
+<html:b>Eclipse (MDT) OCL 5.0.0</html:b> release is a best endeavours attempt to establish a coherent interpretation
+of the OMG OCL 2.4 and to prototype resolutions and auto-generation of the OMG OCL 2.5 standard. Two of the Eclipse (MDT) OCL
 committers are also members of the OMG Revision Task Force that resolves the specification issues.</html:i>
 </html:p>
 <html:p>
@@ -47,7 +35,7 @@ committers are also members of the OMG Revision Task Force that resolves the spe
    </introduction>
    <release_deliverables>
      <html:div>
-The release deliverables for the Eclipse (MDT) OCL 4.4 release have the same form as 
+The release deliverables for the Eclipse (MDT) OCL 5.0 release have the same form as 
 is found in most Eclipse projects, namely:
 <html:ul>
 <html:li>OCL All-in-One P2 repository (downloadable and update site).</html:li>
@@ -58,13 +46,13 @@ is found in most Eclipse projects, namely:
 <html:li>OCL examples (downloadable and update site)</html:li-->
 </html:ul>
 <html:p>
-Eclipse OCL 4.4 will use GIT for source control.
+Eclipse OCL 5.0 will use GIT for source control.
 </html:p>
 <html:p>
-Eclipse OCL 4.4 will primarily target Eclipse 4.3 rather than Eclipse 3.9.
+Eclipse OCL 5.0 will primarily target Eclipse 4.4 rather than Eclipse 3.9.
 </html:p>
 <html:p>
-Eclipse OCL 4.4.0  source code will be available as versions tagged "Luna" in the project's GIT repository.
+Eclipse OCL 5.0.0  source code will be available as versions tagged "Luna" in the project's GIT repository.
 </html:p>
      </html:div>
    </release_deliverables>
@@ -81,17 +69,15 @@ will be two days later on the +3 schedule.
          </html:div>
       </preamble>
 <milestone date="Monday 19 August 2013" milestone="4.2.0M1"></milestone>
-<milestone date="Friday 27 September 2013" milestone="4.2.0"><html:div>Kepler SR1</html:div></milestone>
-<milestone date="Monday 11 November 2013" milestone="4.3.0M3"></milestone>
-<milestone date="Monday 16 December 2013" milestone="4.3.0M4"></milestone>
-<milestone date="Monday 27 January 2014" milestone="4.3.0M5"></milestone>
-<milestone date="Friday 28 February 2014" milestone="4.3.0"><html:div>Kepler SR2</html:div></milestone>
-<milestone date="Monday 10 March 2014" milestone="4.4.0M6"><html:div>API freeze</html:div></milestone>
-<milestone date="Monday 5 May 2014" milestone="4.4.0M7"><html:div>Feature Freeze</html:div></milestone>
-<milestone date="Monday 19 May 2014" milestone="4.4.0RC1"></milestone>
-<milestone date="Monday 26 May 2014" milestone="4.4.0RC2"></milestone>
-<milestone date="Monday 2 June 2014" milestone="4.4.0RC3"></milestone>
-<milestone date="Monday 9 June 2014" milestone="4.4.0RC4"></milestone>
+<milestone date="Monday 11 November 2013" milestone="4.2.0M3"></milestone>
+<milestone date="Monday 16 December 2013" milestone="4.2.0M4"></milestone>
+<milestone date="Monday 27 January 2014" milestone="5.0.0M5"></milestone>
+<milestone date="Monday 10 March 2014" milestone="5.0.0M6"><html:div>API freeze</html:div></milestone>
+<milestone date="Monday 5 May 2014" milestone="5.0.0M7"><html:div>Feature Freeze</html:div></milestone>
+<milestone date="Monday 19 May 2014" milestone="5.0.0RC1"></milestone>
+<milestone date="Monday 26 May 2014" milestone="5.0.0RC2"></milestone>
+<milestone date="Monday 2 June 2014" milestone="5.0.0RC3"></milestone>
+<milestone date="Monday 9 June 2014" milestone="5.0.0RC4"></milestone>
 <milestone date="Wednesday 25 June 2014" milestone="Luna"></milestone>
       <postamble><html:div>
       </html:div></postamble>
@@ -103,22 +89,14 @@ will be two days later on the +3 schedule.
         current versions of the underlying operating environments. The Eclipse
         Object Constraint Language (OCL) project depends upon on the
         Platform and other projects, which are mostly "pure" Java. The 4.4
-        release of the Eclipse Platform Project is written and compiled
-        against version 5.0 of the Java Platform APIs, and targeted to run on
-        version 5.0 of the Java Runtime Environment, Standard Edition. Eclipse OCL
-        will target the same Java version as EMF and UML2, which currently require
-        Java 5. Eclipse Platform SDK 4.3 will be tested and validated on a
+        release of the Eclipse Platform Project is mostly written and compiled
+        against version 6.0 of the Java Platform APIs, and targeted to run on
+        version 6.0 of the Java Runtime Environment, Standard Edition. Eclipse OCL
+        used to target the same Java version as EMF and UML2, which was Java 5.
+        Legacy parts of Eclipse OCL may continue to work with Java 5.
+        Eclipse Platform SDK 4.3 will be tested and validated on a
         number of reference platforms. Eclipse OCL will be tested and validated
         against a subset of those listed for the platform.
-		</html:p>
-		<html:p>
-		Indirect dependence on version 6 of the JRE has arisen through use of the
-		third party components such as Google Guava. This may justify raising the
-		lower bound explicitly for Luna. 
-		</html:p>
-		<html:p>
-		A direct dependence on version 6 of the JRE exists only when dynamic compilation
-		of auto-generated Java is exploited.
 		</html:p>
      </html:div>
      <internationalization>
@@ -141,15 +119,15 @@ following projects.
 <html:ul>
     <html:li>Eclipse Platform SDK version 4.4</html:li>
     <html:li>Eclipse Modeling Framework (EMF) version 2.10</html:li>
-    <html:li>Model Development Tools (MDT) UML2 version 4.2</html:li>
+    <html:li>Model Development Tools (MDT) UML2 version 5.0</html:li>
 </html:ul>
 <html:p>
-As described above, the Eclipse OCL 4.4.0 release should address usability of the editors.
+As described above, the Eclipse OCL 5.0.0 release should address usability of the editors.
 The main OCL plugins should be unaffected,
 but the associated examples plugins may be revised significantly.
 </html:p>
 <html:p>
-Again as described above, the Eclipse OCL 4.4.0 release for Luna will introduce significant new APIs
+Again as described above, the Eclipse OCL 5.0.0 release for Luna will introduce significant new APIs
 in a new namespace that replaces the old. The old namespace will be deprecated once all
 Simultaneous Release projects have migrated to the new namespace.  
 </html:p>
@@ -172,8 +150,8 @@ more detailed information on each.
         <theme name="Compliance">
             <description>
                 <html:div>
-This theme addresses issues related to the OMG OCL 2.3.1 specification adoption. The bugs related to the inherited deviations
-of the Eclipse OCL implementation from the OCL 2.0 specification (and consequently, OCL 2.3.1) also appear here.
+This theme addresses issues related to the OMG OCL 2.4 specification adoption. The bugs related to the inherited deviations
+of the Eclipse OCL implementation from the OCL 2.0 specification (and consequently, OCL 2.4) also appear here.
                 </html:div>
             </description>
             <committed
@@ -223,7 +201,7 @@ of the Eclipse OCL language implementation and APIs.
         <theme name="Specification">
             <description>
                 <html:div>
-This theme addresses issues related to prototyping resolutions of problems in the OMG OCL 2.3.1 specification and enhancements in future specifications. OMG issues
+This theme addresses issues related to prototyping resolutions of problems in the OMG OCL 2.4 specification and enhancements in future specifications. OMG issues
 will be raised and RTF proposed resolutions submitted.  
                 </html:div>
             </description>
