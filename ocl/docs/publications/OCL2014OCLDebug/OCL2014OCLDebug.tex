@@ -20,7 +20,7 @@ Edward D. Willink \\ Willink Transformations Ltd.\\
 \maketitle
 
 \begin{abstract}
-The Object Constraint Language (OCL) is a specification language that is also in principle executable. One of the most useful execution tools is a debugger, and last year Dresden OCL introduced support for debugging as an independent application.  In practice, execution may occur within a variety of host applications and so provision of tool support challenging. In this paper we examine the OCL integration needed for embedded applications and see how the Eclipse OCL debugger supports them.  
+The Object Constraint Language (OCL) is a specification language that is also in principle executable. One of the most useful execution tools is a debugger, and last year Dresden OCL introduced support for debugging as an independent application.  In practice, execution may occur within a variety of host applications and so provision of useful OCL tool support is challenging. In this paper we examine the OCL integration needed for embedded applications and see how the Eclipse OCL debugger supports them.  
 %\keywords{OCL, OCL in Ecore, OCL in UML, OCL debugger, OCL integration}
 \end{abstract}
 \vskip 32pt
@@ -28,16 +28,16 @@ The Object Constraint Language (OCL) is a specification language that is also in
 \section{Introduction}
 A debugger animates the execution of a program so that selected execution states can be inspected in order to shed light on unexpected run-time behaviors. A good debugger provides powerful easy-to-use facilities that enable the programmer to resolve problems rapidly and learn from mistakes.
 
-The Object Constraint Language (OCL)  \cite{OCL-2.4} is now over 20 years old, but it was only last year that a true source level OCL debugger became available as part of Dresden OCL \cite{DresdenOCL-Debug}. This is despite consistent observations that a debugger was one of the most important omissions in OCL tool sets \cite{Chimiak-Opaka}.
+The Object Constraint Language (OCL)\cite{OCL-2.4} is now over 20 years old, but it was only last year that a true source level OCL debugger became available as part of Dresden OCL\cite{DresdenOCL-Debug}. This is despite consistent observations that a debugger was one of the most important omissions in OCL tool sets\cite{Chimiak-Opaka}.
 
 OCL 1.x was originally specified as part of UML 1.x. OCL 2.0 was separated from UML 2.0 in recognition of the more general utility of OCL, however this leaves OCL by itself incomplete and almost useless. Without models to navigate there is no point in having powerful navigation capabilities. OCL only becomes useful once embedded in a model-providing application.
 
 A variety of tools support development and animation of OCL source text. Very few support use as part of a larger application. This is the focus of this paper. The larger model-providing application may be based on 
 
 \begin{itemize}
-\item UML \cite{UML-2.5} (or Ecore\cite{EMF}) models enriched by OCL invariants, operation bodies and property initializers
-\item a model transformation language such as QVT \cite{QVT-1.2} or MOFM2T\cite{MOFM2T} with OCL queries
-\item proprietary applications that exploit compact side effect free OCL queries
+\item UML\cite{UML-2.5} (or Ecore\cite{EMF}) models enriched by OCL invariants, operation bodies and property initializers
+\item a model transformation language such as QVT\cite{QVT-1.2} or MOFM2T\cite{MOFM2T} with OCL queries
+\item proprietary applications that exploit compact side-effect-free OCL queries
 \end{itemize}
 
 %OCL tool developers cannot easily control the embedding applications and so additional independent OCL-only tools such as an interactive OCL Console provide useful learning and practicing capabilities.
@@ -64,7 +64,7 @@ Host Debugger: Although no debugger may be available for OCL, a debugger may be 
 
 None of the above debugging approaches are very satisfactory and so it is hardly surprising that IDE4OCL\cite{Chimiak-Opaka} stresses the need for a debugger.
 
-Dresden OCL\cite{DresdenOCL-Debug} and Eclipse OCL now provide a debugger, but is it usable? For OCL students it surely is. For more general OCL usage we need to dig deeper.
+Dresden OCL\cite{DresdenOCL-Debug} and Eclipse OCL\cite{OCL-Luna} now provide a debugger, but is it usable? For OCL students it surely is. For more general OCL usage we need to dig deeper.
 
 In Section  \ref{OCL-Integration} we look at a variety of ways in which OCL may be used with or without the help of framework facilities such as those described in Section \ref{Framework-Integration}. In Section \ref{Launching} we examine different ways in which a debugger may be launched.  Section \ref{Related-Work} examines related work and Section \ref{Conclusion} concludes.
 
@@ -114,7 +114,7 @@ Alternatively, the user may select a metamodel class as context, type a query in
 
 This form of integration can be provided as part of an OCL toolkit independent of other modeling applications.
 
-Essential OCL expression cannot be independent. However the support for independent Complete OCL may allow an Essential OCL expression to be evaluated interactively.
+Essential OCL expression cannot be independent. However, the support for independent Complete OCL may allow an Essential OCL expression to be evaluated interactively.
 
 \subsection{Integrated Complete OCL}
 
@@ -197,7 +197,18 @@ UML provides powerful support for structural modeling using the  familiar concep
 
 EMOF is a simplified (Essential) form of UML that retains the structural capabilities in a more efficient form but discards the behavioral capabilities.
 
-EMF's Ecore is very similar to EMOF and so for many years the only way to define the behavioral aspects of an Ecore model was to write custom Java code. Four years ago in the Helios release EMF introduced an extensibility mechanism for behavior. Although this mechanism was motivated by the clunkiness of earlier attempts to integrate OCL, it is equally applicable to alternative languages such as ALF or JavaScript. The underlying principle is to delegate functionality that EMF cannot support directly to another facility that can.
+EMF's Ecore is very similar to EMOF and so for many years the only way to define the behavioral aspects of an Ecore model was to write custom Java code. Four years ago in the Helios release, EMF introduced an extensibility mechanism for behavior. Although this mechanism was motivated by the clunkiness of earlier attempts to integrate OCL, it is equally applicable to alternative languages such as ALF or JavaScript. 
+
+Figure \ref{fig:InvocationDelegate} shows the underlying principle whereby the invocation of `myOperation' at bottom left is delegated to a registered facility that can do what EMF cannot. 
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=6.75in]{InvocationDelegate.png}
+  \end{center}
+  \caption{Invocation Delegate example.}
+  \label{fig:InvocationDelegate}
+\end{figure}
+
 
 The mechanism is not particularly elegant since it is a protocol for the pre-existing EMF extension capability, without any additional model elements. The body of an Ecore operation can be realized using `MyLanguage':
 
@@ -219,7 +230,7 @@ The `source' of the EAnnotation identifies the purpose of the EAnnotation which 
 
 Defining an  \url{http://www.eclipse.org/emf/2002/Ecore} EAnnotation signals the use of an EMF protocol. The subsequent detail informs EMF that `MyLanguage' is usable as an invocationDelegate.
 
-These declarations contribute to behavior whenever EMF attempts to invoke `myOperation'. This occurs at runtime when an application calls `myOperation' or at generate time when EMF converts a model to Java code. In both cases the invocation of `myOperation' is delegated to support for `MyLanguage' that may be registered using an Eclipse extension point.
+These declarations contribute to behavior whenever EMF attempts to invoke `myOperation'. This occurs at runtime when an application calls `myOperation' or at generate time when EMF converts a model to Java code. In both cases the invocation of `myOperation' is delegated to the support for `MyLanguage' that may be registered using an Eclipse extension point.
 
 \begin{verbatim}
 <extension point="org.eclipse.emf.ecore.invocation_delegate">
@@ -275,9 +286,9 @@ Launching an OCL debugger to animate the execution of a non-trivial OCL expressi
 
 (We assume that the model element is supplied by a powerful modeling environment such as EMF so that knowledge of a single model element provides access to all other elements in the same model and to the metamodel of all those elements.) 
 
-This may be compared with a more conventional language, where we may need to know only piece of information: the program to execute. The program takes responsibility for acquiring further information through an appropriate user interface. Activating a conventional program can therefore be as simple as select and run. Activating a debugger can be nearly as easy; select and debug.
+This may be compared with a more conventional language, where we may need to know only one piece of information: the program to execute. The program takes responsibility for acquiring further information through an appropriate user interface. Activating a conventional program can therefore be as simple as select and run. Activating a debugger can be nearly as easy; select and debug.
 
-For OCL we may need a double selection to start an independent debugging session. However when problems arise with OCL embedded in another application, we would like to take the OCL debugger to the user's context rather than require the user to reproduce the problem in an independent debugger. Wherever the user's context can be reused the fidelity of the debugging improves and the additional context needed by the debugger decreases.
+For OCL we may need a double selection to start an independent debugging session. However when problems arise with OCL embedded in another application, we would like to take the OCL debugger to the user's context rather than require the user to reproduce the problem in an independent debugger. Wherever the user's context can be reused, the fidelity of the debugging improves and the additional context needed by the debugger decreases.
 
 In practice there are many ways in which the launch can be achieved with different trade-offs in ease of use and fidelity. These options are summarised in Table \ref{LaunchOptions}.
 
@@ -297,7 +308,7 @@ The execution of the OCL may be supervised by an OCL debugger or a host debugger
 \hline
 Type & Model & OCL & Invocation & Execution\\ \hline \hline
 Independent & load & load & - & OCL debug\\ \hline
-Contextual & reuse & load & replica & OCL debug\\ \hline
+Contextual & load & reuse & replica & OCL debug\\ \hline
 Console & reuse & manual & replica & OCL debug\\ \hline
 Validity View & \multicolumn{2}{|c|}{reuse} & replica & OCL debug\\ \hline
 Automatic & use & use & use & no/OCL debug\\ \hline
@@ -354,7 +365,7 @@ We can successfully re-use the user's model context but must re-type our OCL exp
 
 A common practical use of OCL involves many model elements that must observe the constraints imposed by many OCL invariants. The formulation of the OCL invariants is assisted by helper operations and derived properties that also involve OCL expressions.
 
-For this use case, the user invokes some form of full or partial Validate action to check that all model elements comply with their constraints. All appropriate constraints are executed on all relevant model elements and the failures are reported to the user. A small number of errors can be reported as a simple list or as decorations on a model diagram or tree. For a larger number of errors and particularly those associated with a defective OCL constraint rather than a defective model, the simple display may not be that helpful. Eclipse OCL therefore provides a Validity View that provides a finer-grained display of both all Constraints per Model Element and all Model Elements per Constraint. Validation results are reported individually for each Model Element, Constraint combination. In Figure \ref{fig:ValidityView} red/amber/green error/warning/tick icons show the status; the tick boxes are part of the elements of interest filtering.
+For this use case, the user invokes some form of full or partial Validate action to check that all model elements comply with their constraints. All appropriate constraints are executed on all relevant model elements and the failures are reported to the user. A small number of errors can be reported as a simple list or as decorations on a model diagram or tree. For a larger number of errors and particularly those associated with a defective OCL constraint rather than a defective model, the simple display may not be that helpful. Eclipse OCL therefore provides a Validity View that provides a finer-grained display of both all Constraints per Model Element and all Model Elements per Constraint. Validation results are reported individually for each Model Element, Constraint combination. In Figure \ref{fig:ValidityView} red/amber/green error/warning/tick icons show the status; the tick boxes are part of the elements-of-interest filtering.
 
 \begin{figure}
   \begin{center}
@@ -404,7 +415,7 @@ Enhancing the Eclipse Java debugger to provide an OCL view of the auto-generated
 
 The three preceding host approaches all involve launching an outer language host debugger and attempting to use it to debug inner OCL. Quite apart from the need to enhance the outer language debugger, a debugger has to be launched in order to have it available when the user problem is encountered. For major Eclipse applications this may require that the entire Eclipse application is run under the control of a debugger in another Eclipse session. It is not possible to run the outer application normally and start an OCL debugger automatically for an OCL problem.
 
-EMF delegates provide an alternative solution. The program control flow from the outer application to the inner OCL is orchestrated by the EMF delegates and so an alternative delegation implementation may activate an OCL debugger. The outer code may be run normally and since it is unaware of the underlying delegate implementation approach, the outer code is unaffected by the `activation' of the debugger. The debugger for the inner starts supervision as soon as the inner OCL is invoke. Execution may stop immediately or at a breakpoint. In practice enabling/disabling debug in outer applications can be achieved by adjusting the user preference to redirect the virtual OCL delegate to the debug delegate.
+EMF-delegates provide an alternative solution. The program control flow from the outer application to the inner OCL is orchestrated by the EMF delegates and so an alternative delegation implementation may activate an OCL debugger. The outer code may be run normally and since it is unaware of the underlying delegate implementation approach, the outer code is unaffected by the `activation' of the debugger. The debugger for the inner OCL starts supervision as soon as the inner OCL is invoked. Execution may stop immediately or at a breakpoint. In practice enabling/disabling debug in outer applications can be achieved by adjusting the user preference to redirect the virtual OCL delegate to the debug delegate.
 
 \url{http://www.eclipse.org/emf/2002/Ecore/OCL/Debug}
 
@@ -414,9 +425,11 @@ The EMF delegates functionality is over four years old but write ups have been l
 
 Dresden OCL\cite{DresdenOCL-Debug} introduced the first OCL debugger exploiting the Eclipse Debugger Framework. Although Dresden OCL uses EMF, it does not exploit the integration opportunities outlined in Section \ref{OCL-Integration}. Dresden OCL tooling is therefore limited to the independent use case. Larger applications such as MagicDraw may make use of the APIs.
 
-The Eclipse OCL debugger also exploits the Eclipse Debugger Framework and so has many similarities to the Dresden OCL debugger including deferring more challenging facilities such as Watchpoints to a future release. Eclipse OCL does exploit the EMF integration opportunities and so the Eclipse OCL debugger may be used in embedded applications. The Luna release \cite{OCL-Luna} supports the Independent, Contextual, Console and Validity View use cases outlined in Table \ref{LaunchOptions}. Support for the Automatic use case was developed while writing this paper.
+The Eclipse OCL debugger also exploits the Eclipse Debugger Framework and so has many similarities to the Dresden OCL debugger including deferring more challenging facilities such as Watchpoints to a future release. Eclipse OCL does exploit the EMF integration opportunities and so the Eclipse OCL debugger may be used in embedded applications. The Luna release \cite{OCL-Luna} supports the Independent, Integrated, Extended and Compiled use cases outlined in Table \ref{IntegrationOptions} and the Independent, Contextual, Console and Validity View use cases outlined in Table \ref{LaunchOptions}. Support for the Automatic use case was developed while writing this paper.
 
 A third widely used OCL tool, USE \cite{USE}, does not use EMF; USE provides its own framework with which it provides interesting tools including an OCL stepper; a precursor to an OCL debugger.
+
+The need for a debugger was highlighted by IDE4OCL\cite{Chimiak-Opaka}, but perhaps because it was so obvious that a debugger was required, little attention was paid to how a debugger might actually be used.
 
 \section{Conclusions}\label{Conclusion}
 We have identified a variety of ways in which OCL may be used in practice, and noted that those that support integration with applications require the application to either exploit OCL toolkit APIs explicitly or to use a more generally extensible framework.
@@ -449,9 +462,9 @@ for the Object Constraint Language, OCL 2013, International Workshop on OCL and 
 
 \bibitem{MOFM2T} MOF Model to Text Transformation Language,  v1.0, {OMG Document Number}: formal/2008-01-16, Object Management Group (2008), \url{http://www.omg.org/spec/MOFM2T/1.0"}
 
-\bibitem{OCLinEcore} OCLinEcore Wiki page, 2010, \url{http://wiki.eclipse.org/index.php?title=OCL/OCLinEcore}
-
 \bibitem{OCL-Luna} Eclipse OCL 5.0.1, Luna release, June 2014, \url{http://www.eclipse.org/modeling/download.php?file=/modeling/mdt/ocl/downloads/drops/5.0.1/R201406230143/mdt-ocl-Update-5.0.1.zip}
+
+\bibitem{OCLinEcore} OCLinEcore Wiki page, 2010, \url{http://wiki.eclipse.org/index.php?title=OCL/OCLinEcore}
 
 \bibitem{USE} UML-based Specification Environment, \url{http://sourceforge.net/projects/useocl/}
 
