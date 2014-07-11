@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_zzTCkAjiEeSNmYu8hvFigA" name="model">
+  <packagedElement xmi:type="uml:Class" xmi:id="_8KSisAjiEeSNmYu8hvFigA" name="EOperation"/>
+  <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_-Tm_oAjiEeSNmYu8hvFigA" name="'myOperation'" classifier="_8KSisAjiEeSNmYu8hvFigA"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_GqvpsAjjEeSNmYu8hvFigA" name="EAnnotation">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_J1qtkAjjEeSNmYu8hvFigA" name="name">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_mEhI8AjjEeSNmYu8hvFigA" name="body">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_OciLAAjjEeSNmYu8hvFigA" name="'MyLanguage'" classifier="_GqvpsAjjEeSNmYu8hvFigA">
+    <ownedComment xmi:type="uml:Comment" xmi:id="_yydbMAjjEeSNmYu8hvFigA">
+      <body>body => ...</body>
+    </ownedComment>
+  </packagedElement>
+  <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_bWYLQAjjEeSNmYu8hvFigA" name="'MyLanguage'" classifier="_Rno_oAjkEeSNmYu8hvFigA">
+    <ownedComment xmi:type="uml:Comment" xmi:id="_tahQsAjkEeSNmYu8hvFigA">
+      <body>class => my.InvocationDelegateFactory</body>
+    </ownedComment>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_Rno_oAjkEeSNmYu8hvFigA" name="InvocationDelegateFactory"/>
+  <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_5pz4EAjkEeSNmYu8hvFigA" name="'my.InvocationDelegateFactory'" classifier="__SlecAjkEeSNmYu8hvFigA"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="__SlecAjkEeSNmYu8hvFigA" name="JavaClass"/>
+  <packagedElement xmi:type="uml:Dependency" xmi:id="_Xb5AwAjlEeSNmYu8hvFigA" name="invoke" client="_8KSisAjiEeSNmYu8hvFigA" supplier="_-Tm_oAjiEeSNmYu8hvFigA"/>
+  <packagedElement xmi:type="uml:Dependency" xmi:id="_dGTl4AjlEeSNmYu8hvFigA" name="delegate" client="_-Tm_oAjiEeSNmYu8hvFigA" supplier="_5pz4EAjkEeSNmYu8hvFigA"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_k3DlYAjlEeSNmYu8hvFigA" name="InvocationDelegate"/>
+  <packagedElement xmi:type="uml:InstanceSpecification" xmi:id="_mN74wAjlEeSNmYu8hvFigA" name="'MyLanguage'" classifier="_k3DlYAjlEeSNmYu8hvFigA"/>
+  <packagedElement xmi:type="uml:Dependency" xmi:id="_4bbj8AjlEeSNmYu8hvFigA" name="" client="_OciLAAjjEeSNmYu8hvFigA" supplier="_mN74wAjlEeSNmYu8hvFigA"/>
+  <packagedElement xmi:type="uml:Dependency" xmi:id="_5ucrAAjlEeSNmYu8hvFigA" name="" client="_mN74wAjlEeSNmYu8hvFigA" supplier="_bWYLQAjjEeSNmYu8hvFigA"/>
+</uml:Model>
