@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ex:Node xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ex="http://www.example.org/example"
+    xsi:schemaLocation="http://www.example.org/example OCL2014Debug.ecore"
+    name="parent">
+  <kids name="child1">
+    <kids name="grandchild"/>
+  </kids>
+</ex:Node>
