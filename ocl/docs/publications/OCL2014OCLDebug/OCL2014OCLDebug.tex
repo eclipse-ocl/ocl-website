@@ -37,12 +37,12 @@ A variety of tools support development and animation of OCL source text. Very fe
 \begin{itemize}
 \item UML\cite{UML-2.5} (or Ecore\cite{EMF}) models enriched by OCL invariants, operation bodies and property initializers
 \item a model transformation language such as QVT\cite{QVT-1.2} or MOFM2T\cite{MOFM2T} with OCL queries
-\item proprietary applications that exploit compact side-effect-free OCL queries
+\item proprietary applications that exploit the rigor of compact side-effect-free OCL queries
 \end{itemize}
 
 %OCL tool developers cannot easily control the embedding applications and so additional independent OCL-only tools such as an interactive OCL Console provide useful learning and practicing capabilities.
 
-The limitations of OCL do not change when we have a debugger. OCL by itself is almost useless and so an OCL debugger too is almost useless. The user has an OCL related problem in their larger application, the user therefore wants a debugger that works to solve the problem where it occurs. If the user is required to recreate the problem in a standalone OCL debugger, difficult to reproduce problems vanish and so the user is only slightly better off than the following debugging approaches.
+The limitations of OCL do not change when we have a debugger. OCL by itself is almost useless and so an OCL debugger too is almost useless. The user has an OCL related problem in their larger application, the user therefore wants a debugger that works to solve the problem where it occurs. If the user is required to recreate the problem in a standalone OCL debugger, difficult to reproduce problems vanish and so the user is only slightly better off than with the following debugging approaches.
 
 \subsection{OCL Debugging approaches}
 
@@ -52,7 +52,7 @@ Trial and Error: Try, try again until it works.
 
 Divide and Conquer: Try something simpler that works and then elaborate.
 
-Printf: Unfortunately OCL has no `printf' capability and so the traditional approach of adding debug print out until the problem is obvious is not available to OCL programmers\footnote{Eclipse OCL provides oclLog() for this purpose}.
+Printf: Unfortunately OCL has no `printf' capability and so the traditional approach, of adding debug print out until the problem manifests itself, is not available to OCL programmers\footnote{Eclipse OCL provides oclLog() for this purpose}.
 
 Interactive Console: An interactive console allows an OCL expression to be entered and evaluated and so makes the divide and conquer approach more practical. The user practices the first part of an OCL expression, then extends to include a second part and so forth till the problem is solved. However this requires the user to at least `re-type' the OCL and recreate the problem context in the console tool.
 
@@ -64,7 +64,7 @@ Host Debugger: Although no debugger may be available for OCL, a debugger may be 
 
 None of the above debugging approaches are very satisfactory and so it is hardly surprising that IDE4OCL\cite{Chimiak-Opaka} stresses the need for a debugger.
 
-Dresden OCL\cite{DresdenOCL-Debug} and Eclipse OCL\cite{OCL-Luna} now provide a debugger, but is it usable? For OCL students it surely is. For more general OCL usage we need to dig deeper.
+Dresden OCL\cite{DresdenOCL-Debug} and Eclipse OCL\cite{OCL-Luna} now provide a debugger, but is it usable? For OCL students, it surely is. For more general OCL usage, we need to dig deeper.
 
 In Section  \ref{OCL-Integration} we look at a variety of ways in which OCL may be used with or without the help of framework facilities such as those described in Section \ref{Framework-Integration}. In Section \ref{Launching} we examine different ways in which a debugger may be launched.  Section \ref{Related-Work} examines related work and Section \ref{Conclusion} concludes.
 
@@ -87,7 +87,7 @@ inv NoGrandChildren: kids.kids->isEmpty()
 endpackage
 \end{verbatim}
 
-OCL is of very limited use by itself and so it must be embedded in some application to make OCL usable. In this section we consider various forms of integration within an embedding application that enable OCL to be executed and so add value to the embedding application. These options are summarized in Table \ref{IntegrationOptions} where the columns show applicability to Essential OCL or Complete OCL, whether the approach can contribute to an embedding application and whether embedding can use an OCL Toolkit Application Programming Interface (API) or a general modeling Framework.
+OCL is of very limited use by itself and so it must be embedded in some application to make OCL usable. In this section we consider various forms of integration within an embedding application that enable OCL to be executed and so add value to the embedding application. These options are summarized in Table \ref{IntegrationOptions} where the first two columns show applicability to Essential OCL or Complete OCL and the subsections in which the approach is discussed further. The remaining columns indicate whether the approach can contribute to an embedding application and whether embedding can use an OCL Toolkit Application Programming Interface (API) or a general modeling Framework.
 
 \begin{table}[ht]
 \begin{center}
@@ -96,15 +96,15 @@ OCL is of very limited use by itself and so it must be embedded in some applicat
 \begin{tabular}{|l|c|c|c|c|c|}
 \hline
 Integration Approach & Essential OCL & Complete OCL & Embedded & API & Framework\\ \hline \hline
-Independent & (\ding{52}) & \ding{52} & - & - & -\\ \hline
-Integrated & \ding{52} & \ding{52} & \ding{52} & \ding{52} & \ding{52}\\ \hline
-Extended & \ding{52} & (\ding{52}) & \ding{52} & \ding{52} & \ding{54}\\ \hline
-Compiled & \ding{52} & (\ding{52}) & \ding{52} & \ding{52} & \ding{52}\\ \hline
+Independent & (\ref{IndependentCompleteOCL}) &\ref{IndependentCompleteOCL} & - & - & -\\ \hline
+Integrated & \ref{IntegratedEssentialOCL} & \ref{IntegratedCompleteOCL} & \ding{52} & \ding{52} & \ding{52}\\ \hline
+Extended & \ref{ExtendedEssentialOCL} & (\ref{ExtendedEssentialOCL}) & \ding{52} & \ding{52} & \ding{54}\\ \hline
+Compiled & \ref{CompiledEssentialOCL} & (\ref{CompiledEssentialOCL}) & \ding{52} & \ding{52} & \ding{52}\\ \hline
 \end{tabular}
 \end{center}
 \end{table}
 
-\subsection{Independent Complete OCL (or  Essential OCL)}
+\subsection{Independent Complete OCL (or  Essential OCL)}\label{IndependentCompleteOCL}
 
 The simplest form of integration is to provide a tool that loads the Complete OCL document, the complemented metamodel and a model comprising conforming instances. 
 
@@ -116,7 +116,15 @@ This form of integration can be provided as part of an OCL toolkit independent o
 
 Essential OCL expression cannot be independent. However, the support for independent Complete OCL may allow an Essential OCL expression to be evaluated interactively.
 
-\subsection{Integrated Complete OCL}
+\subsection{Integrated Essential OCL}\label{IntegratedEssentialOCL}
+
+Essential OCL expressions can be embedded in models such as UML or Ecore to define their behavioral aspects. These may then be used when the embedding application that uses the models also uses an OCL-defined facility.
+
+An OCL toolkit may provide an API to enable an embedding application to exploit OCL. OCL can then be used in embedding applications that choose to use the API. Since there is no standard for the API, the embedding application must explicitly commit to a particular OCL toolkit.
+
+Alternatively an embedding application may use a framework that provides the flexibility for the OCL toolkit to make contributions. OCL is then usable in all embedding applications that use the framework even if they had no intention of supporting OCL.
+
+\subsection{Integrated Complete OCL}\label{IntegratedCompleteOCL}
 
 A Complete OCL document may be used to add value to a embedding application if that application provides support for OCL.
 
@@ -124,33 +132,33 @@ Invariants may contribute to model validation performed by the embedding applica
 
 Queries may define the behavior of operations and properties for the embedding application.
 
-An OCL toolkit may provide an API to enable an embedding application to exploit OCL. OCL can then be used in embedding applications that choose to use the API. Since there is no standard for the API, the embedding application must commit to a particular OCL toolkit.
+As with Essential OCL integration, an OCL toolkit may provide an extensibility API for explicit use by the embedding application or implicit use as a consequence of underlying framework extensibility.
 
-Alternatively an embedding application may use a framework that provides the flexibility for the OCL toolkit to make contributions. OCL is then usable in all embedding applications the use the framework even if they had no intention of supporting OCL. The way in which the Eclipse Modeling Framework (EMF)  enables Eclipse OCL to contribute additional validations to Xtext is discussed in Section \ref{ResourceSet}.
+The way in which the Eclipse Modeling Framework (EMF)  enables Eclipse OCL to contribute additional validations to Xtext is discussed in Section \ref{ResourceSet}.
 
-\subsection{Integrated Essential OCL}
+\subsection{Extended Essential OCL (or Complete OCL)}\label{ExtendedEssentialOCL}
 
-Essential OCL expressions can be embedded in models such as UML or Ecore to define their behavioral aspects. These may then be used when the embedding application that uses the models uses an OCL-defined facility.
-
-As with Complete OCL integration an OCL toolkit may provide an extensibility API for explicit use by the embedding application or implicit use as a consequence of underlying framework extensibility.
-
-\subsection{Extended Essential OCL (or Complete OCL)}
-
-A language, such as QVT that extends OCL, exploits OCL queries as  part of the extended language. Usage of OCL therefore occurs whenever the extended language needs to evaluate one of these queries.
+A language, such as QVT that extends OCL, exploits OCL queries as  part of the extended language. Usage of OCL therefore occurs explicitly whenever the extended language needs to evaluate one of these queries.
 
 An extended OCL application is inherently using OCL and so must exploit an API provided by an OCL toolkit. It may also be able to exploit or even extend the code generator provided by an OCL toolkit.
 
 Complete OCL could also form the basis of an extended language, however Complete OCL is something of a dead end. The syntax is not suitable for extension and the behavior requires a further application to complement.
 
-\subsection{Compiled Essential OCL (or Complete OCL)}
+\subsection{Compiled Essential OCL (or Complete OCL)}\label{CompiledEssentialOCL}
 
-Direct embedding of OCL in an application requires the embedding application to incur the parsing costs of the OCL on at least the first use, and potentially the limited execution speed of interpreted execution on every use. If the OCL is compiled to perhaps Java or C++ the parsing costs are incurred during preparation of the embedding application and the execution can be much faster.
+Direct embedding of OCL in an application requires the embedding application to incur the parsing costs of the OCL on at least the first use, and potentially the limited execution speed of interpreted execution on every use. If the OCL is compiled to perhaps Java or C++, the parsing costs are incurred during preparation of the embedding application and the execution can be much faster.
 
-An OCL toolkit may provide an OCL to Java code generator with an appropriate API for the embedding application to support. Alternatively the OCL toolkit may arrange for the generated code to be useful to an extensible framework that a more general embedding application exploits.
+An OCL toolkit may provide an OCL to Java code generator with an appropriate API for the embedding application to support OCL explicitly. Alternatively the OCL toolkit may arrange for the generated code to be useful to an extensible framework that a more general embedding application exploits and so supports OCL implicitly.
 
 \section{Framework Integration}\label{Framework-Integration}
 
-As noted above, integration of OCL with an embedding application may be achieved by explicit use of an OCL toolkit API by the embedding application, or by extensibility offered by a framework used by many applications. In this section we outline facilities provided by Eclipse and, more particularly, the Eclipse Modeling Framework (EMF). This enables Eclipse OCL to contribute automatically  to Eclipse modeling applications.
+As noted above, integration of OCL with an embedding application may be achieved by explicit use of an OCL toolkit API by the embedding application, or by extensibility offered by a framework used by many applications.
+
+Explicit use of an OCL toolkit requires the application to provide the explicit support and to make a choice among competing toolkits.
+
+In contrast, a framework such as EMF may provide a variety of useful modeling services for an application and so, support for OCL may require no explicit support and no choice amongst competitors.
+
+In this section we outline facilities provided by Eclipse and, more particularly, the Eclipse Modeling Framework (EMF). These facilities enable Eclipse OCL to contribute implicitly to Eclipse modeling applications, they could be used by EMF-based competitors as well.
 
 \subsection{The Mouse Selection}
 
@@ -209,7 +217,6 @@ Figure \ref{fig:InvocationDelegate} shows the underlying principle whereby the i
   \label{fig:InvocationDelegate}
 \end{figure}
 
-
 The mechanism is not particularly elegant since it is a protocol for the pre-existing EMF extension capability, without any additional model elements. The body of an Ecore operation can be realized using `MyLanguage':
 
 \begin{verbatim}
@@ -267,15 +274,17 @@ The Eclipse OCL project supports injecting additional validations defined by Com
 
 Eclipse OCL contributes three different `MyLanguage' handlers for the EMF delegates.
 
-\begin{itemize}
-\item \url{http://www.eclipse.org/emf/2002/Ecore/OCL/LPG}: The Classic Eclipse OCL preserves some traditional Eclipse OCL semantics.
-\item \url{http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot}: The Unified or Pivot Eclipse OCL prototypes evolution towards OCL 2.5.
-\item \url{http://www.eclipse.org/emf/2002/Ecore/OCL}: This virtual handler redirects to one of the above according to a user preference.
-\end{itemize}
+\url{http://www.eclipse.org/emf/2002/Ecore/OCL/LPG}: The Classic Eclipse OCL preserves some traditional Eclipse OCL semantics.
+
+\url{http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot}: The Unified or Pivot Eclipse OCL prototypes evolution towards OCL 2.5.
+
+\url{http://www.eclipse.org/emf/2002/Ecore/OCL}: This virtual handler redirects to one of the above according to a user preference.
 
 Eclipse OCL extends the EMF code generation capabilities to support automatic synthesis of Java code for OCL in expressions within Java code.
  
 \section{Launching}\label{Launching}
+
+In this section we look at how OCL debugger support can be provided for the OCL integration use cases identified in Section \ref{OCL-Integration} and show how the framework facilities described in Section \ref{Framework-Integration} enable a debugger to be useful.
 
 Launching an OCL debugger to animate the execution of a non-trivial OCL expression requires (at least) two pieces of information
 \begin{itemize}
@@ -307,17 +316,18 @@ The execution of the OCL may be supervised by an OCL debugger or a host debugger
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 Type & Model & OCL & Invocation & Execution\\ \hline \hline
-Independent & load & load & - & OCL debug\\ \hline
-Contextual & load & reuse & replica & OCL debug\\ \hline
-Console & reuse & manual & replica & OCL debug\\ \hline
-Validity View & \multicolumn{2}{|c|}{reuse} & replica & OCL debug\\ \hline
-Automatic & use & use & use & no/OCL debug\\ \hline
-Host & use & use & use & host/host debug\\ \hline
+Independent (\ref{IndependentLaunch}) & load & load & - & OCL debug\\ \hline
+Contextual (\ref{ContextualLaunch}) & load & reuse & replica & OCL debug\\ \cline{2-3}
+ & reuse & load & & \\ \hline
+Console (\ref{ConsoleLaunch}) & reuse & manual & replica & OCL debug\\ \hline
+Validity View (\ref{ValidityViewLaunch}) & \multicolumn{2}{|c|}{reuse} & replica & OCL debug\\ \hline
+Host (\ref{HostLaunch}) & use & use & use & host/host debug\\ \hline
+Automatic (\ref{DelegatedLaunch}) & use & use & use & no/OCL debug\\ \hline
 \end{tabular}
 \end{center}
 \end{table}
  
-\subsection{Independent Launch Dialog}
+\subsection{Independent Launch Dialog}\label{IndependentLaunch}
 
 The most general launch approach is a launch dialog that supports the following workflow.
 
@@ -330,11 +340,11 @@ The most general launch approach is a launch dialog that supports the following 
 
 The selections can be facilitated by appropriate browsers that may tailor the available selections to those that exhibit consistent model/metamodel conformance.
 
-The debugger loads model and expression and so may fail to reproduce the user scenario accurately.
+The debugger loads the model and the expression and so may fail to reproduce the user scenario accurately.
 
-\subsection{Contextual Launch Dialog}
+\subsection{Contextual Launch Dialog}\label{ContextualLaunch}
 
-An abbreviated workflow is available by activating the dialog from an existing model. For instance selecting a particular Constraint in a UML Diagram and then activating a Debug dialog from the Context menu.
+An abbreviated workflow is available by activating the dialog from an existing model. For instance, selecting a particular Constraint in a UML Diagram and then activating a Debug dialog from the Context menu.
 
 \begin{itemize}
 \item Select an Expression within some modeling application
@@ -347,7 +357,7 @@ For this to work, we require the selection in `some modeling application' to be 
 
 This contextual launch is more powerful than the independent launch since it re-uses the user's context for one of the two pieces of information. The other piece may need to be reloaded and so may fail to reproduce.
 
-\subsection{Console Launch}
+\subsection{Console Launch}\label{ConsoleLaunch}
 
 The ability to discover a user context from a selection underpins the operation of an Interactive OCL Console.
 
@@ -359,13 +369,13 @@ The ability to discover a user context from a selection underpins the operation 
 
 This workflow is easily changed by replacing `Execute' with `Debug'.
 
-We can successfully re-use the user's model context but must re-type our OCL expressions. If the user's models are evolving or there is any uncertainty as to which model element or expression is causing trouble, this approach sill suffers from some loss of the user's problem context.
+We can successfully re-use the user's model context but must re-type our OCL expressions. If the user's models are evolving or there is any uncertainty as to which model element or expression is causing trouble, this approach still suffers from some loss of the user's problem context.
 
-\subsection{Validity View Launch}
+\subsection{Validity View Launch}\label{ValidityViewLaunch}
 
 A common practical use of OCL involves many model elements that must observe the constraints imposed by many OCL invariants. The formulation of the OCL invariants is assisted by helper operations and derived properties that also involve OCL expressions.
 
-For this use case, the user invokes some form of full or partial Validate action to check that all model elements comply with their constraints. All appropriate constraints are executed on all relevant model elements and the failures are reported to the user. A small number of errors can be reported as a simple list or as decorations on a model diagram or tree. For a larger number of errors and particularly those associated with a defective OCL constraint rather than a defective model, the simple display may not be that helpful. Eclipse OCL therefore provides a Validity View that provides a finer-grained display of both all Constraints per Model Element and all Model Elements per Constraint. Validation results are reported individually for each Model Element, Constraint combination. In Figure \ref{fig:ValidityView} red/amber/green error/warning/tick icons show the status; the tick boxes are part of the elements-of-interest filtering.
+For this use case, the user invokes some form of full or partial Validate action to check that all model elements comply with their constraints. All appropriate constraints are executed on all relevant model elements and the failures are reported to the user. A small number of errors can be reported as a simple list or as decorations on a model diagram or tree. For a larger number of errors and particularly those associated with a defective OCL constraint rather than a defective model, the simple display may not be that helpful. Eclipse OCL therefore provides a Validity View that provides a finer-grained display of both all Constraints per Model Element and all Model Elements per Constraint. Validation results are reported individually for each ModelElement-Constraint combination. In Figure \ref{fig:ValidityView} red/amber/green error/warning/tick icons show the status; the tick boxes are part of the elements-of-interest filtering.
 
 \begin{figure}
   \begin{center}
@@ -379,7 +389,7 @@ This fine-grained display provides no doubt as to where the problem lies and sup
 
 \begin{itemize}
 \item Optionally Run Validation in the Validity View
-\item Select a Model Element, Constraint combination
+\item Select a ModelElement-Constraint combination
 \item Debug
 \end{itemize}
 
@@ -387,7 +397,7 @@ Validation is not normally performed while models are evolving and so this form 
 
 (The Validity View is an extensible facility for which OCL is just an extension. This approach is therefore applicable to other constraint/validation technologies.)
 
-\subsection{Host Debugger Launch}
+\subsection{Host Debugger Launch}\label{HostLaunch}
 
 Real applications are far too big for users to supervise their invocation and progress. We therefore rely on the use of breakpoints to allow a large application to run and only stop when it reaches an area of interest to the user.
 
@@ -411,7 +421,7 @@ Eclipse OCL provides an OCL to Java code generator and so the inner OCL may be e
 
 Enhancing the Eclipse Java debugger to provide an OCL view of the auto-generated code has not yet been attempted.
 
-\subsection{Automatic Delegated Launch}
+\subsection{Automatic Delegated Launch}\label{DelegatedLaunch}
 
 The three preceding host approaches all involve launching an outer language host debugger and attempting to use it to debug inner OCL. Quite apart from the need to enhance the outer language debugger, a debugger has to be launched in order to have it available when the user problem is encountered. For major Eclipse applications this may require that the entire Eclipse application is run under the control of a debugger in another Eclipse session. It is not possible to run the outer application normally and start an OCL debugger automatically for an OCL problem.
 
@@ -423,7 +433,7 @@ EMF-delegates provide an alternative solution. The program control flow from the
 
 The EMF delegates functionality is over four years old but write ups have been limited to Wiki pages\cite{OCLinEcore} and Eclipse OCL documentation.
 
-Dresden OCL\cite{DresdenOCL-Debug} introduced the first OCL debugger exploiting the Eclipse Debugger Framework. Although Dresden OCL uses EMF, it does not exploit the integration opportunities outlined in Section \ref{OCL-Integration}. Dresden OCL tooling is therefore limited to the independent use case. Larger applications such as MagicDraw may make use of the APIs.
+Dresden OCL\cite{DresdenOCL-Debug} introduced the first OCL debugger exploiting the Eclipse Debugger Framework. Although Dresden OCL uses EMF, it does not exploit the integration opportunities outlined in Section \ref{Framework-Integration}. Dresden OCL tooling is therefore limited to the independent use case. Larger applications such as MagicDraw may make use of the APIs.
 
 The Eclipse OCL debugger also exploits the Eclipse Debugger Framework and so has many similarities to the Dresden OCL debugger including deferring more challenging facilities such as Watchpoints to a future release. Eclipse OCL does exploit the EMF integration opportunities and so the Eclipse OCL debugger may be used in embedded applications. The Luna release \cite{OCL-Luna} supports the Independent, Integrated, Extended and Compiled use cases outlined in Table \ref{IntegrationOptions} and the Independent, Contextual, Console and Validity View use cases outlined in Table \ref{LaunchOptions}. Support for the Automatic use case was developed while writing this paper.
 
@@ -432,7 +442,7 @@ A third widely used OCL tool, USE \cite{USE}, does not use EMF; USE provides its
 The need for a debugger was highlighted by IDE4OCL\cite{Chimiak-Opaka}, but perhaps because it was so obvious that a debugger was required, little attention was paid to how a debugger might actually be used.
 
 \section{Conclusions}\label{Conclusion}
-We have identified a variety of ways in which OCL may be used in practice, and noted that those that support integration with applications require the application to either exploit OCL toolkit APIs explicitly or to use a more generally extensible framework.
+We have identified a variety of ways in which OCL may be used in practice, and noted that those that support integration with applications require the application to either exploit OCL toolkit APIs explicitly or to use a more generally extensible framework that may support implicit use of OCL.
 
 We have identified characteristics of EMF that support extension by OCL toolkits.
 
@@ -440,6 +450,9 @@ We have identified how an OCL debugger can be launched for different OCL use cas
 
 We have explained how Eclipse OCL exploits the extensibility of EMF to support embedding OCL within larger applications and how the Eclipse OCL debugger may be used to debug these larger embedded applications.
 
+\paragraph{Acknowledgements}
+
+Many thanks to Adolfo Sanchez-Barbudo Herrera for helpful comments.
 
 %\bibliographystyle{alpha} 
 %\bibliography{samplebib}
