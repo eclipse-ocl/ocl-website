@@ -1,0 +1,99 @@
+import 'CS.ecore'
+import 'AS.ecore'
+import 'Lookup.ocl'
+import 'Disambiguation.ocl'
+
+package oclCS
+
+context TypeCS 
+def :ast() :  oclAS::Type =
+	null
+	
+context ExpCS
+def :ast() : oclAS::OclExpression =
+	null
+
+
+context CollectionLiteralPartCS	
+def : ast() : oclAS::CollectionLiteralPart = 
+  oclAS::CollectionItem {
+        item = first.ast(),	
+        type = first.ast().type
+       }
+  
+context CollectionRangeCS	
+def : ast() : oclAS::CollectionRange = 
+  oclAS::CollectionRange {
+        first = first.ast(),
+        last = last.ast(),
+        type = first.ast().type.commonType(last.ast().type)
+       }
+       
+context LetExpCS
+def : ast() : oclAS::LetExp = 
+  oclAS::LetExp {
+    variable = variable.ast(),
+    _'in' = inExpression.ast(),
+    type = inExpression.ast().type
+}
+
+context VariableDeclarationCS
+def : ast() : oclAS::Variable = 
+  oclAS::Variable {
+    name = varName,
+    initExpression = initExp.ast(),
+    type = if varType = null
+           then if initExp = null
+                then null
+                else initExp.ast().type
+                endif
+           else varType.ast().type
+           endif
+}
+
+--context VariableExpCS
+--def : ast() : ocl::VariableExp =
+--  let variable = ast().lookupVariable(varName)
+--  in ocl::VariableExp {
+--       name = varName
+--       referredVariable = variable
+--       type = if variable = null
+--              then null
+--       	      else variable.type
+--       	      endif
+--  }
+
+context NameExpCS
+def : ast() : oclAS::OclExpression =
+  if isAVariableExp() 
+  then
+    let variable = ast().lookupVariable(self)
+    in oclAS::VariableExp {
+        name = name,
+        referredVariable = variable,
+        type = if variable = null
+               then null
+               else variable.type
+               endif
+    }
+  else 
+    let property = ast().lookupProperty(self)
+    in oclAS::PropertyCallExp {
+        name = name,
+        referredProperty = property,
+        type = if property = null
+               then null
+               else property.type
+               endif
+    }
+  endif	
+
+endpackage
+
+package oclAS
+
+context Type
+def : commonType(otherType : Type) : Type =
+	null
+	
+endpackage

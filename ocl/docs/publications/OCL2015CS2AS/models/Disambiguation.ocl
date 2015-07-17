@@ -1,0 +1,12 @@
+import 'CS.ecore'
+import 'AS.ecore'
+import 'Lookup.ocl'
+
+package oclCS
+
+context NameExpCS
+def : isAVariableExp() : Boolean =
+	let variable = ast().lookupVariable(self)
+	in variable <> null
+
+endpackage

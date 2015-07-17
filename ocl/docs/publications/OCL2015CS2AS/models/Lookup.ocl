@@ -1,0 +1,6 @@
+import 'CS.ecore'
+import 'AS.ecore'
+
+package oclAS
+	
+endpackage

@@ -18,15 +18,22 @@
   <eClassifiers xsi:type="ecore:EClass" name="VariableExpCS">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="varName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="CollectionLiteralPartCS">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="first" lowerBound="1" eType="#//ExpCS.1"
-        containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="last" eType="#//ExpCS.1"
+  <eClassifiers xsi:type="ecore:EClass" name="CollectionRangeCS" eSuperTypes="#//CollectionLiteralPartCS">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="last" lowerBound="1" eType="#//ExpCS.1"
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CollectionRangeCS"/>
-  <eClassifiers xsi:type="ecore:EClass" name="ExpCS" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ExpCS" abstract="true" eSuperTypes="#//CollectionLiteralPartCS"/>
   <eClassifiers xsi:type="ecore:EClass" name="TypeCS" eSuperTypes="#//ExpCS">
     <eStructuralFeatures xsi:type="ecore:EReference" name="EReference0" eType="#//ExpCS"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CollectionLiteralPartCS">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="first" lowerBound="1" eType="#//ExpCS.1"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EClass0"/>
+  <eClassifiers xsi:type="ecore:EClass" name="NameExpCS">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isMarkedAsPre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
 </ecore:EPackage>
