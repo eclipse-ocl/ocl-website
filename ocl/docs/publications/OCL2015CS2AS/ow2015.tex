@@ -26,39 +26,41 @@ Richard F. Paige\inst{1}}
 
 \institute{
 Department of Computer Science, University of York, UK.\\
-\email{\{asbh500, richard.paige\}@york.ac.uk}
+\email{\{asbh500, richard.paige\}\_at\_york.ac.uk}
 \and 
 Willink Transformations Ltd. 
-\email{ed@willink.me.uk}
+\email{ed\_at\_willink.me.uk}
 }
 \maketitle
 
 \begin{abstract}
-One of the challenges that tool builders must address when dealing with Object Management Group (OMG) specifications for textual languages is bridging the language's concrete syntax (CS) and abstract syntax (AS). Though there has been work aiming to facilitate the generation of tooling (e.g. parsers, model transformations, etc.) for bridging this gap, and some OMG standards (e.g., OCL) attempt to describe bridges (e.g., via attribute grammars), there as yet does not exist an established, vendor-independent language that: helps OMG specification designers clearly define the CS2AS bridge; provides machine checking; and helps vendors build specification-compliant implementations. In this paper, we propose an OCL-based internal domain specific language (DSL) with the aim of effectively defining CS2AS bridges of a language. The proposed DSL provides a basis for OMG specification designers to describe ways to implement parts of their specifications, and at the same time, it provides certain challenges to tool vendors to produce more compliant implementations. %, and a prototype tool in charge of consuming instances of that language to produce a working implementation
+The problem of converting human readable programming languages into executable machine representations is an old one. EBNF and Attribute grammars provide solutions, but unfortunately they have failed to contribute effectively to model-based Object Management Group (OMG)  specifications. Consequently the OCL and QVT specifications provide examples of specifications with significant errors and omissions.  We describe an OCL-based internal domain specific language (DSL) with which we can re-formulate the problematic parts of the specifications as complete, checkable, re-useable models.
+
+%One of the challenges that tool builders must address when dealing with Object Management Group (OMG) specifications for textual languages is bridging the language's concrete syntax (CS) and abstract syntax (AS). Though there has been work aiming to facilitate the generation of tooling (e.g. parsers, model transformations, etc.) for bridging this gap, and some OMG standards (e.g., OCL) attempt to describe bridges (e.g., via attribute grammars), there as yet does not exist an established, vendor-independent language that: helps OMG specification designers clearly define the CS2AS bridge; provides machine checking; and helps vendors build specification-compliant implementations. In this paper, we propose an OCL-based internal domain specific language (DSL) with the aim of effectively defining CS2AS bridges of a language. The proposed DSL provides a basis for OMG specification designers to describe ways to implement parts of their specifications, and at the same time, it provides certain challenges to tool vendors to produce more compliant implementations. %, and a prototype tool in charge of consuming instances of that language to produce a working implementation
 % These set of languages resolve the syntactical vagueness of OCL's own specification.
 \end{abstract}
 
 \section{Introduction}
 
-The Object Management Group (OMG) is a consortium whose members produce open technology standards. Some of these target the Model-Driven Engineering (MDE) community. OMG provides the specifucations for languages such as UML \cite{omg2012uml}, MOF \cite{omg2013mof}, OCL \cite{omg2013ocl} and QVT \cite{omg2014qvt}.
+The Object Management Group (OMG) is a consortium whose members produce open technology standards. Some of these target the Model-Driven Engineering (MDE) community. OMG provides the specifications for languages such as UML \cite{omg2012uml}, MOF \cite{omg2013mof}, OCL \cite{omg2013ocl} and QVT \cite{omg2014qvt}.
 
 The specifications for textual languages such as OCL and QVT define a textual language and an information model using
 \begin{itemize}
-\item an EBNF compliant grammar to define the textual language
-\item a UML compliant metamodel to define the abstract syntax (AS) of the language
+\item an EBNF grammar to define the textual language
+\item a UML metamodel to define the abstract syntax (AS) of the language
 \end{itemize}
-The textual language is used by humans and for source interchange between compliant tools. The information model facilitates interchange between producing tools such as editors and compilers and consuming tools such as evaluators and program checkers.
+The textual language is suitable for users and for source interchange between compliant tools. The information model facilitates model interchange between producing tools such as editors or compilers and consuming tools such as program checkers or  evaluators.
 
-The conversion between these two representations must also be specified and may make use of an additional intermediate concrete syntax (CS) metamodel whose elements correspond to the grammar productions and terminals. 
+The conversion between these two representations must also be specified and may make use of an additional intermediate concrete syntax (CS) metamodel whose elements correspond to the productions and terminals of the grammar. 
 
 %Specification of the conversion currently uses semi-formal approaches with limited tool checking. As a result there is significant variation in the completeness and accuracy of specifications and of course further variation as tool implementors use their intuition to resolve the specification limitations.
 
 \subsection{The OMG specification problem}
 
-The OCL \cite{omg2013ocl} and QVT \cite{omg2014qvt} specifications define four languages, OCL, QVTc(Core), QVTo (Operational Mappings) and QVTr (Relations)%\footnote{QVTr language has a graphical CS as well.}
-. The specifications all provide fairly detailed grammars and metamodels of their respective concrete and abstract syntaxes.
+The OCL \cite{omg2013ocl} and QVT \cite{omg2014qvt} specifications define four languages, OCL, QVTc (Core), QVTo (Operational Mappings), and QVTr (Relations)%\footnote{QVTr language has a graphical CS as well.}
+. The specifications all provide fairly detailed grammars and metamodels of their respective abstract syntaxes.
 
-Unfortunately the grammar to abstract syntax conversion is poorly specified.
+Unfortunately the grammar to AS conversion is poorly specified.
 
 In OCL, a CS is provided and the grammar is partitioned into ambiguous productions for each CS element. Semi-formal rules define the grammar to CS correspondence, the CS to AS correspondence, name resolution and disambiguation.
 
@@ -68,15 +70,15 @@ QVTc has a single grammar but no CS and no semi-formal rules.
 
 QVTo similarly has a single grammar, but no CS and no semi-formal rules. Instead, notation sections suggest a correspondence between source text and AS elements by way of examples. 
 
-Since none of the conversions are modeled, tools cannot be used to check the many details in the specifications. As a result the major omissions identified above are augmented by more subtle oversights and inaccuracies. The specifications fail to provide the complete, consistent and accurate details necessary for tool vendors to provide compliant implementations of the text to AS conversions. 
+Since none of the conversions are modeled, tools cannot be used to check the many details in the specifications. As a result, the major omissions identified above are augmented by more subtle oversights and inaccuracies. The specifications fail to provide the complete, consistent and accurate details necessary for tool vendors to provide compliant implementations of the text to AS conversions. 
 
 %Modern  ; it would be beneficial for all such specifications to provide consistent and systematic support for CS2AS bridges. To accomplish this, we will further analyze the OCL specification to better understand its support: the OCL specification does a more systematic job at the CS2AS bridge, by providing a specific clause (Clause 9.3 from \cite{omg2013ocl}) to describe mappings.
 
 \subsection{Our solution}
 
-The intermediate CS metamodel is close to the grammar and this gap is now bridged quite satisfactorily by modern Annotated EBNF (FIXME ASBH. Does this term even exist ? reference ?) tooling such as Xtext. It is in the CS to AS conversion that greater challenges arise. 
+The intermediate CS metamodel is close to the grammar and this gap is now bridged quite satisfactorily by modern Annotated EBNF tooling such as Xtext. It is in the CS to AS conversion that greater challenges arise. 
 
-In this paper, we take inspiration from the substantial semi-formal exposition of the OCL conversions (Clause 9.3 of \cite{omg2013ocl};) and introduce a fully modeled CS2AS bridge. The models can variously be used to check and even auto-generate a consistent specification and also to auto-generate compliant tooling. In addition to conventional CS and AS metamodels, we introduce new CS2AS mapping models, CS name resolution models and CS disambiguation models. We demonstrate in a running example how OCL itself can be used to provide a suitable internal DSL for these new models.
+In this paper, we take inspiration from the substantial semi-formal exposition of the OCL conversions (Clause 9.3 of \cite{omg2013ocl}) and introduce a fully modeled CS2AS bridge. The models can be used to variously check and even auto-generate a consistent specification and also to auto-generate compliant tooling. In addition to conventional CS and AS metamodels, we introduce new CS2AS mapping models, name resolution models and CS disambiguation models. We demonstrate how OCL itself can be used to provide a suitable internal DSL for these new models.
 
 %Whilst OMG specifications usually include an exhaustive\footnote{We do not mean correct and free of errors} definition of language (or languages) abstract syntax (AS), there is substantial variation in how specifications present concrete syntax (CS): whereas we can find a fairly detailed CS for OCL, the same level of detail can't be found across the languages defined in the QVT specification.
 
@@ -86,7 +88,7 @@ In this paper, we take inspiration from the substantial semi-formal exposition o
 
 %In this paper we propose means to bridge the textual CS and the corresponding AS of a language, exposing the problem from two specific OMG specifications -- OCL and QVT -- while showing a solution for a running example. The main technical contribution of this paper is thus an OCL-based internal Domain Specific Language (DSL) \cite{fowler2010dsl} to declaratively express those CS2AS bridges which tackle cross-cutting concerns, such as name resolution and concrete syntax disambiguation.
 
-The paper is structured as follows. Section~\ref{sec:example} presents a small running example. Section~\ref{sec:semi-formal-solution} demonstrates the semi-formal solution adopted by the OCL specification. Section~\ref{sec:solution} explains the proposed solution, i.e. an OCL-based internal DSL. Section~\ref{sec:relatedWork} will describe related work and Section~\ref{sec:limitations} will talk about the current shortcomings of the approach. Section~\ref{sec:futureWork} will outline some future work, including how tool implementors can benefit from the internal DSL. Finally, Section~\ref{sec:conclusions} will gather the paper conclusions.
+The paper is structured as follows. Section~\ref{sec:example} presents an example to introduce the grammar and metamodels. Section~\ref{sec:semi-formal-solution} demonstrates the semi-formal solution adopted by the OCL specification. Section~\ref{sec:solution} explains the proposed solution, i.e. an OCL-based internal DSL. Section~\ref{sec:relatedWork} describes related work and Section~\ref{sec:limitations} talks about the current shortcomings of the approach. Section~\ref{sec:futureWork} outlines some future work, including how tool implementors can benefit from the internal DSL. Finally, Section~\ref{sec:conclusions} concludes.
 
 %\section{Challenges with OMG specifications}
 %\label{sec:problem}
@@ -115,49 +117,71 @@ The paper is structured as follows. Section~\ref{sec:example} presents a small r
 %\item The OCL and QVT-Relations specifications provide some explanations as to how the CS can be mapped to the language AS; in other words, a CS2AS bridge.
 %\end{itemize}
 
-\section{Running example}
+\section{Example}
 \label{sec:example}
 
-In this section we introduce a running example, in which different excerpts of the OCL CS and AS are depicted. The rationale of choosing these specific examples are two-fold: they are rich enough to be used for explaining the main three concerns that will be covered by the CS2AS internal DSL (Section~\ref{sec:solution}): CS2AS mappings, name resolution and disambiguation; secondly, they are small enough to be understood by the reader given space restrictions.
+Our first example is a collection literal expression. This provides a simple example of the grammars and models in use. In Section~\ref{sec:semi-formal-solution} we show the semi-formal usage of these concepts by the OCL specification. In Section~\ref{sec:solution} we provide a contrast with our fully-modeled internal DSL solution. This example is too simple to demonstrate more than the CS2AS characteristics of our solution. We therefore introduce a further more relevant example later.
+%In this section we introduce a running example, in which different excerpts of the OCL CS and AS are depicted. The rationale of choosing these specific excerpts are two-fold: they are rich enough to be used for explaining the main three concerns that are covered by the CS2AS internal DSL (Section~\ref{sec:solution}): CS2AS mappings, name resolution and disambiguation; secondly, they are small enough to be understood by the reader given space restrictions.
 
-The AS of our running example is given in terms of a metamodel, so that we can depict the example-relevant metaclasses, properties, and relationships as they are defined in the AS by the OMG specification. Figure~\ref{fig:exampleAS} depicts the OCL abstract syntax relevant to the running example. 
+%The AS of our running example is given in terms of a metamodel, so that we can depict the example-relevant metaclasses, properties, and relationships as they are defined in the AS by the OMG specification. Figure~\ref{fig:exampleAS} depicts the OCL abstract syntax relevant to the running example. 
 
-The CS is exposed in terms of an EBNF grammar and a corresponding CS metamodel. Each grammar rule relates to a CS metaclass. In the following subsections, we will individually introduce the different expressions of the running example, as well as rationale as to why they are considered here.
+%\begin{figure}[htbp]
+%	\centering
+%	\includegraphics[scale=0.75]{images/RunningaExampleAS.png}
+%	\caption{OCL Abstract Syntax partial Metamodel}
+%	\label{fig:exampleAS}
+%\end{figure}
+
+%The CS is exposed in terms of an EBNF grammar and a corresponding CS metamodel. Each grammar rule relates to a CS metaclass. In the following subsections, we individually introduce the different expressions of the running example, as well as rationale as to why they are considered here.
+
+
+
+%\subsection{Collection literal part}
+
+%The parts of a \textit{collection literal expression} in OCL are provided by \textit{collection literal part}s. 
+The listing in Figure~\ref{fig:CollectionLiteralPartAS} is an example of a \textit{collection literal expression} comprising three comma-separated collection literal parts. The adjacent diagram shows the corresponding AS metamodel elements. \emph{CollectionLiteralExp} contains many abstract \emph{CollectionLiteralPart}s. \emph{CollectionItem} and \emph{CollectionRange} are derived to support the two cases of a single value or a two-ended integer range. The example text must be converted to instances of the AS metamodel elements.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[scale=0.75]{images/RunningaExampleAS.png}
-\caption{OCL abstract syntax partial Metamodel}
-\label{fig:exampleAS}
+\begin{subfigure}{0.354\textwidth}
+  \centering
+\begin{lstlisting}[label=lst:CollectionLiteralExpExample, language=OCL]
+Sequence{1, 1+1, 3..9+1}
+
+-- equivalent to:
+
+-- Sequence{1,2,3,4,5,
+--       6,7,8,9,10}
+\end{lstlisting} 
+\end{subfigure}%
+\begin{subfigure}{0.65\textwidth}
+  \centering
+  \includegraphics[scale=0.5]{images/CollectionLiteralPartAS.png}
+\end{subfigure}
+\caption{CollectionLiteral Example and partial AS Metamodel}
+\label{fig:CollectionLiteralPartAS}
 \end{figure}
 
-\subsection{Collection literal part}
-
-The parts of a collection literal expression in OCL are provided by \textit{collection literal part}s. Listing~\ref{lst:CollectionLiteralExpExample} is an example of a collection literal expression comprising three comma-separated collection literal parts.
-
-\begin{lstlisting}[label=lst:CollectionLiteralExpExample, language=OCL]
-Sequence{1, 1+1, 3..9+1} -- equivalent to Sequence{1,2,3,4,5,6,7,8,9,10}
-\end{lstlisting}
-
-To be more specific, a collection literal part could either be a simple element (i.e comprising one expression) of a collection, or a collection range which represents an integer range between two expressions. The rationale of choosing this particular OCL construct is two fold: it will be used to show why the OMG specification is faulty, thus, motivate the need for a better DSL to declare CS2AS bridges (Section~\ref{sec:semi-formal-solution}); and we can show the essence of the CS2AS mappings description (Subsection~\ref{subsec:mappings}). Figure~\ref{fig:CollectionLiteralPartCS} shows the CS definitions related to a collection literal expression.
+The listing in Figure~\ref{fig:CollectionLiteralPartCS} shows the EBNF grammar that parses a \textit{collection literal part} as a \emph{CollectionLiteralPartCS} comprising one direct \emph{OclExpressionCS} or a \emph{CollectionRangeCS} comprising two \emph{OclExpressionCS}s. The adjacent diagram shows the intermediate CS model, which is similar to the AS but which omits a `redundant' \emph{CollectionItemCS} preferring to share a single/first expression from the non-abstract \emph{CollectionLiteralPartCS}.
+%To be more specific, a collection literal part could either be a simple element (i.e comprising one expression) of a collection, or a collection range which represents an integer range between two expressions. This syntax element in OCL is interesting because it priovides a very simple example of another concern for our CS2AS bridge; CS disambiguation. In this case, a \emph{CollectionLiteralPartCS} can be disambiguated either to a \emph{CollectionItem} or to a \emph{CollectionRange}, depending on how many expressions were used in the collection literal part: one expression disambiguates to a \emph{CollectionItem}; two expressions separated by \emph{..} diamiguate to a \emph{CollectionRange}. Figure~\ref{fig:CollectionLiteralPartCS} shows the CS definition related to a collection literal part. 
 
 \begin{figure}[htbp]
 \centering
-\begin{subfigure}{0.5\textwidth}
+\begin{subfigure}{0.55\textwidth}
   \centering
 \begin{lstlisting}[language=Xtext]
 CollectionLiteralPartCS:
-   ExpCS | CollectionRangeCS
-
+   OclExpressionCS | CollectionRangeCS
+   
 CollectionRangeCS:
-   ExpCS '..' ExpCS
+   OclExpressionCS '..' OclExpressionCS
 \end{lstlisting} 
 %  \caption{CollectionLiteralPartCS grammar }
 %  \label{fig:CollectionLiteralPartCS:a}
 \end{subfigure}%
-\begin{subfigure}{0.5\textwidth}
+\begin{subfigure}{0.45\textwidth}
   \centering
-  \includegraphics[scale=0.75]{images/CollectionLiteralPartCS.png}
+  \includegraphics[scale=0.5]{images/CollectionLiteralPartCS.png}
 %  \caption{CollectionLiteralPartCS metamodel }
 %  \label{fig:CollectionLiteralPartCS:b}
 \end{subfigure}
@@ -165,92 +189,30 @@ CollectionRangeCS:
 \label{fig:CollectionLiteralPartCS}
 \end{figure}
 
-
-\subsection{Let expression}
-
-A \textit{let expression} is used in OCL in order to declare a variable to be used inside another OCL expression. The following listing shows an example of the notation:
-
-\begin{lstlisting}[label=lst:letExpExample, language=OCL]
-let var : String = 'something' in var.oclIsTypeOf(String)
-\end{lstlisting}
-
-This expression is interesting because it's related to one of the main activities of the CS2AS DSL: name resolution. Whilst a let expression declares a new variable, the \emph{'in'} expression contains a variable expression referring to that variable (note the reference from VariableExp to Variable in the AS excerpt depicted by Figure~\ref{fig:exampleAS}). This activity of creating  references between elements of the AS based on a name lookup is called name resolution (Subsection~\ref{subsec:nameReso}). Figure~\ref{fig:LetExpCS} shows the CS definitions related to a let expression.
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.5\textwidth}
-  \centering
-  \begin{lstlisting}[label=lst:letExpEBNF, language=Xtext]
-LetExpCS:
-    'let' VariableDeclarationCS 
-  	'in' ExpCS
-  	
-VariableDeclarationCS:
-    simpleName (':' TypeCS)?
-    ('=' ExpCS)?	
-  \end{lstlisting} 
-%  \caption{LetExpCS and VariableDeclarationCS grammar excerpts}
-%  \label{fig:LetExpCS:a}
-\end{subfigure}%
-\begin{subfigure}{0.5\textwidth}
-  \centering
-  \includegraphics[scale=0.75]{images/LetExpCS.png}
-%  \caption{LetExpCS metamodel excerpt}
-%  \label{fig:LetExpCS:b}
-\end{subfigure}
-\caption{LetExpCS Grammar and partial CS Metamodel}
-\label{fig:LetExpCS}
-\end{figure}
-
-\subsection{Variable expression}
-
-A \textit{variable expression} in OCL references a variable defined elsewhere. The reference may explicitly or implictly refer to the \emph{self} context variable or to an iterator variable, or explicitly to a variable defined in an outer let expression or to a parameter of an operation definition. Discovering and prioritizing the candidate definitions is performed by the name resolution activity. The \emph{varName} provided by a \emph{VariableExpCS} in the concrete syntax is used to look up a \emph{Variable} in the AS. 
-
-Likewise, \textit{variable expression} will be also used to introduce the concern of CS disambiguation in Subection\ref{subsec:disamb}.  Figure~\ref{fig:VariableExpCS} shows the CS definitions related to a variable expression. 
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}{0.5\textwidth}
-  \centering
- \begin{lstlisting}[label=lst:VariableExpEBNF, language=Xtext]
- VariableExpCS:
- 	simpleName | 'self'
- \end{lstlisting} 
-%  \caption{VariableExpCS grammar excerpt}
-%  \label{fig:VariableExpCS:a}
-\end{subfigure}%
-\begin{subfigure}{0.5\textwidth}
-  \centering
-  \includegraphics[scale=0.75]{images/VariableExpCS.png}
-%  \caption{VariableExp metamodel excerpt}
-%  \label{fig:VariableExpCS:b}
-\end{subfigure}
-\caption{VariableExpCS Grammar and partial CS Metamodel}
-\label{fig:VariableExpCS}
-\end{figure}
-
-
-
 \section{Semi-formal solution: OCL Clause 9.3}
 \label{sec:semi-formal-solution}
 
-The OCL specification provides a full attribute grammar in which inherited and synthesized attributes are used to describe how the AS is computed from the CS. Figure~\ref{fig:CollectionLiteralPartOMG} shows an example. The specification uses OCL expressions to express how the different attributes are computed. Attribute grammar are a suitable mechanism to describe a CS2AS bridge; however, we will add some critics about it. 
+The OCL specification provides a full attribute grammar in which inherited and synthesized attributes are used to describe how the AS is computed from the CS. Figures~\ref{fig:CollectionLiteralPartOMG} and \ref{fig:CollectionRangeOMG} shows our first example. The specification uses OCL expressions to express how the different attributes are computed. %Attribute grammar are a suitable mechanism to describe a CS2AS bridge; however, we will add some critics about it. 
 
 \begin{figure}[htbp]
-\centering
-\includegraphics[scale=0.45]{images/CollectionLiteralPartOMG.png}
-\caption{OCL specification for CollectionLiteralPartCS to CollectionLiteralPart}
-\label{fig:CollectionLiteralPartOMG}
+	\centering
+	\includegraphics[scale=0.45]{images/CollectionLiteralPartOMG.png}
+	\caption{OCL specification for CollectionLiteralPartCS to CollectionLiteralPart}
+	\label{fig:CollectionLiteralPartOMG}
 \end{figure}
+
+
+
 The first section defines the EBNF production(s). The example merges two alternate productions and so many of the rules have an with \verb$[A]$ or \verb$[B]$ prefix to accommodate the alternative rules.
 
-The AS mapping declares the type of the resulting AS element as the type of a special property of the CS element; \emph{ast}.
+The AS mapping declares the type of the resulting AS element as the type of a special property of the CS element: \emph{ast}.
 
-The synthesized attributes populate the AS element using a simple assignment for \verb$[A]$. \verb$[B}$ worksaround OCL 2.4's inability to construct objects by imposing constraints on a hypothetical \emph{CollectionItem}.
+The synthesized attributes populate the AS element using an assignment for \verb$[A]$. The more complex \verb$[B]$ worksaround OCL 2.4's inability to construct a  \emph{CollectionItem} by imposing constraints on a hypothetical \emph{CollectionItem}.
 
-The inherited attributes contribute to the name resolution by flowing down an Environment hierachy of all available name-element pairs from parent to child nodes using another special CS property; \emph{env}. In this case all names visible in the parent are passed with out modification to the children.
+The inherited attributes contribute to the name resolution by flowing down an \textit{Environment} hierachy of all available name-element pairs from parent to child nodes using another special CS property: \emph{env}. In this case all names visible in the parent are passed without modification to the children.
 
 The disambiguating rules provide guidance on the resolution of ambiguities. In this simple example, there is no ambiguity.
+
 
 \begin{figure}[htbp]
 \centering
@@ -258,9 +220,12 @@ The disambiguating rules provide guidance on the resolution of ambiguities. In t
 \caption{OCL specification for CollectionRangeCS to CollectionRange}
 \label{fig:CollectionRangeOMG}
 \end{figure}
-The rules for collection ranges follow a single pattern. There is now just one grammar production whose two OclExpressions are distinguished by \verb$[1]$ and \verb$[2]$ suffixes. The synthesized attributes have two properties to populate.
+The rules for collection range follow a similar pattern. There is now just one grammar production whose two \emph{OclExpression}s are distinguished by \verb$[1]$ and \verb$[2]$ suffixes. The synthesized attributes have two properties to populate.
 
-\textbf{Critique} The presentation comes quite close to specifying what is needed, but uses an intuitive mix of five sub-languages without any tool assistance. In Figure~\ref{fig:CollectionLiteralPartOMG}, the typo whereby the final line of the synthesized attributes uses \emph{CollectionItem::OclExpression} rather than \emph{CollectionItem::item} has gone unreported for over 10 years.
+\subsection{Critique}
+The presentation comes quite close to specifying what is needed, but uses an intuitive mix of five sub-languages without any tool assistance. In Figure~\ref{fig:CollectionLiteralPartOMG}, the typo whereby \emph{CollectionItem::OclExpression} rather than \emph{CollectionItem::item} is used in the final line of the synthesized attributes has gone unreported for over 10 years.
+
+The lack of tooling also obscures the modeling challenge for the inheritances between CollectionLiteralPartCS, CollectionRangeCS and OclExpressionCS. The [B] grammar production in Figure \ref{fig:CollectionLiteralPartOMG} requires OclExpressionCS to inherit from CollectionLiteralPartCS, if CollectionLiteralPartCS is to be the polymorphic type of any collection literal part in the CS.
 
 The lack of any underlying models makes it impossible for tool vendors to re-use the rules. Tool vendors must transcribe and risk introducing further errors.
 
@@ -278,7 +243,7 @@ The lack of any underlying models makes it impossible for tool vendors to re-use
 \section{Modeled Solution: CS2AS internal DSL}
 \label{sec:solution}
 
-The critique of the semi-formal exposition highlighted the lack of checkable or re-useable models. In this section we will formalize the semi-formal approach using a DSL to declare the bridge between the CS and the AS of a language. The DSL is  internal\cite{fowler2010dsl} and uses only the facilities proposed for OCL 2.5. The DSL constrains the use of the general purpose OCL language to define  a set of idioms that express CS2AS bridges.
+The critique of the semi-formal exposition highlights the lack of checkable or re-useable models. In this section we formalize the semi-formal approach using a DSL to declare the bridge between the CS and the AS of a language. The DSL is  internal\cite{fowler2010dsl} and uses only facilities proposed for OCL 2.5. The DSL constrains the use of the general purpose OCL language to define  a set of idioms that express CS2AS bridges.
 
 Our rationale for choosing OCL as the host language is as follows:
 \begin{itemize}
@@ -293,14 +258,14 @@ to separate the distinct mapping, name-resolution, and disambiguation concerns o
 \subsection{Shadow Object Construction}
 \label{subsec:ShadowExp}
 
-The internal DSL uses the proposed\footnote{Shadow object construction was called as type construction in the Aachen report \cite{brucker2013aachenReport}} side-effect-free solution to the problem of constructing types in OCL. This avoids the need for the hypothecated objects used by the semi-formal approach. The proposed syntax re-uses the existing syntax for constructing a Tuple by replacing the \emph{Tuple} keyword by the name of the type to be constructed. A \verb$Complex$ number with \verb$x$ and \verb$y$ parts might therefore be constructed as \verb$Complex{x=1.0,y=2.0}$. %The subtleties of ensuring that construction is side-effect-free are not relevant to this paper.
+The internal DSL uses the proposed\footnote{Shadow object construction was called type construction in the Aachen report \cite{brucker2013aachenReport}} side-effect-free solution to the problem of constructing types in OCL. This avoids the need for the hypothetical objects used by the semi-formal approach. The proposed syntax re-uses the existing syntax for constructing a Tuple. The \emph{Tuple} keyword is replaced by the name of the type to be constructed. A \verb$Complex$ number with \verb$x$ and \verb$y$ parts might therefore be constructed as \verb$Complex{x=1.0,y=2.0}$. %The subtleties of ensuring that construction is side-effect-free are not relevant to this paper.
 
 \subsection{CS2AS mappings}
 \label{subsec:mappings}
 
-In this subsection we will explain the main CS2AS mappings description language. We start by introducing an instance of the language so that the reader can have an indication of the DSL used to describe the bridge. Listings ~\ref{lst:exampleCS2ASdescA} and ~\ref{lst:exampleCS2ASdescB} correspond to the CS2AS descriptions of the OCL constructs introduced in the running example (Section~\ref{sec:example}).
+In this subsection we explain the main CS2AS mappings description language. We start by introducing an instance of the language so that the reader can have an indication of the DSL used to describe the bridge. Listing ~\ref{lst:exampleCS2ASdesc} corresponds to the CS2AS description of the OCL constructs introduced in Section~\ref{sec:example}. The listing should be contrasted with the semi-formal equivalent in Figures~\ref{fig:CollectionLiteralPartOMG} and \ref{fig:CollectionRangeOMG}.
 
-\begin{lstlisting}[caption=CS2AS description for a collection literal part, label=lst:exampleCS2ASdescA, language=OCL]
+\begin{lstlisting}[caption=CS2AS description for a collection literal part, label=lst:exampleCS2ASdesc, language=OCL]
 context CollectionLiteralPartCS	
 def : ast() : ocl::CollectionLiteralPart = 
   ocl::CollectionItem {
@@ -317,31 +282,179 @@ def : ast() : ocl::CollectionRange =
        }
 \end{lstlisting}
 
-The mapping is performed by invoking the \emph{ast()} operation on a CS element. Polymorphic dispatch ensures that the CS element-specific operation is used unlike the \emph{ast} property of the semi-formal approach. The `abstract syntax mapping' and `synthesized attributes' of the semi-formal approach are modeled by the the shadow construction of the appropriate AS type and initialization of its properties. (The initialiization includes the \emph{type} property omitted by the OCL specification.)
+The mapping is performed by invoking the \emph{ast()} operation on a CS element. Polymorphic dispatch ensures that the CS element-specific operation is used unlike the \emph{ast} property of the semi-formal approach. The `abstract syntax mapping' and `synthesized attributes' of the semi-formal approach are modeled by the the shadow construction of the appropriate AS type and initialization of its properties. (The initialization includes the \emph{type} property omitted by the OCL specification.)
 
-\begin{lstlisting}[caption=CS2AS description for let and variable expressions, label=lst:exampleCS2ASdescB, language=OCL]
-context LetExpCS
-def : ast() : ocl::LetExp = 
-  ocl::LetExp {
-    variable = variable.ast(),
-    _'in' = inExpression.ast(),
-    type = inExpression.ast().type
-}
+%In this Complete OCL document we have declared the CS2AS bridge to define how AS elements are obtained from CS elements. The bridge is expressed by the means of a correspondence between CS types and AS types. This correspondence is given in terms of operation definitions, so that the operation context type -- an element type in the CS -- is the source of the correspondence, and the operation returned type -- an element type in the AS -- is the target of the correspondence. The actual characteristic function of the correspondence will be described by the body of those operations. For instance, taking as reference Listing~\ref{lst:exampleCS2ASdesc}, the \emph{ast} operation at line 2 defines the correspondence between \emph{LetExp} elements and \emph{LetExpCS} elements. The body of that operation, at lines 3-7, describes how \emph{LetExp} elements (AS) are actually computed from \emph{LetExpCS} elements (CS).
 
-context VariableDeclarationCS
-def : ast() : ocl::Variable = 
-  ocl::Variable {
-    name = varName,
-    initExpression = initExp.ast(),
-    type = if varType = null
-           then if initExp = null
-                then null
-                else initExp.ast().type
-                endif
-           else varType.ast().type
-           endif
-}
+%A more detailed explanation of the whole DSL, as well as the rationale about its design decisions, follows. All the listing and line references below correspond to Listing~\ref{lst:exampleCS2ASdesc}:
 
+\textbf{Declarativeness:} An important characteristic of the DSL is that it comprises declarative OCL constraints. The OCL constraints specify only true correspondences between AS and CS after a valid conversion. Discovery of a suitable order in which to perform CS to AS conversions requires an implementing tool to analyze the OCL constraints and exploit their inter-dependencies. (This was also the unstated policy of the semi-formal approach.) An automated analysis is desirable since they are almost too complicated for an accurate manual formulation as a multi-pass conversion.
+
+\textbf{Operations:} The CS2AS bridge is described using operation definitions. The underlying rationale is that operation definitions on a potentially complex class hierarchy of the CS can be overridden. Due to this overriding mechanism, we provide some flexibility to cope with language extensions such as QVT. The operation name is not relevant, but we propose the name \emph{"ast"} since it is aligned with the name used in the attribute grammar exposed in the OCL specification.
+
+\textbf{Shadow object construction:} Shadow object constructions express how AS elements are constructed and how their properties are initialized. %This kind of expression allows the specification of which concrete type is used to bridge towards to (it might differ - be a subtype - from the returned type of the \emph{ast} operation), but also to express how all the corresponding properties of the AS element will be computed. Lines 4-6 shows how a \emph{LetExp} is created from a \emph{LetExpCS}, as well as how the \emph{LetExp::variable}, \emph{LetExp::in} and \emph{LetExp::type} properties are computed.
+
+\textbf{Operation Calls:} To compute properties of any AS element, we  need to access the AS elements to determine a CS to AS correspondence.
+%Given that we are using \emph{ast} operations to set a correspondence between CS and AS elements, an \emph{ast} operation call expression (OCE) is used to denote that we want to obtain the AS element corresponding to the CS element source of that OCE.
+Since \emph{ast()} is a side-effect-free query, we may invoke  \emph{ast()} as many times as necessary to obtain the appropriate AS element.
+For example, at line 4, in order to initialize the \emph{CollectionItem::item} property, we use the \emph{ast()} to obtain the \emph{OclExpression} corresponding to the \emph{first} \emph{ExpCS} of the context \emph{CollectionLiteralPartCS}.
+
+\textbf{Self-contained:} With the goal in mind of using the proposed internal DSL to rewrite part of the OMG specifications, the declaration of the CS2AS bridge for a particular CS element is complete and self-contained. The computations for all non-default-valued properties of the corresponding AS element are expressed directly in the shadow type expression since there is no constructor to share inherited computations.
+
+\textbf{Reusable computations:} Having OCL as the  host language for our internal DSL, we can factor out and define more complex and reusable expressions in new operation definitions. The operations can be reused, by just introducing operation call expressions, across the different computations of the AS element properties. At line 11, \emph{commonType} is a reusable operation
+%\footnote{The body of the operation is not relevant, hence, not described in this paper}
+ to compute the common supertype of source and argument types.
+
+%\textbf{Name resolution:} As a special case of reusable computation, we want to highlight one which links with Subsection~\ref{subsec:nameReso}: name resolution. It's common a situation in which an AS element refers to a different one based a named-based lookup. In our example, at line 11, we have such scenarios, so that in the context of a \emph{VariableExp} element, there is a lookup activity triggered by the \emph{lookupVariable} OCE, which aim to find a \emph{Variable} to be referred by that \emph{VariableExp}.
+
+%\textbf{Disambiguation:} A CS element doesn't necessarily need to be bridged to just one type of AS element. It's a common situation that preliminary ambiguous CS elements are disambiguated to different AS elements. Subsection~\ref{subsec:disamb} elaborates on this topic. %We can find varied examples in the OCL specification but \emph{CollectionLiteralPartCS} is an easy to understand one. To describe this scenario in our DSL, we will cascade a set of \emph{IfExp} in the body of the \emph{ast} operation: every condition would comprise a disambiguation rule; the \emph{then} and \emph{else} expressions comprise the shadow type expressions denoting the AS element to which the disambiguation would take place. In our running example, lines 23-33 depicts the mentioned scenario and more details about the called \emph{mapsToCollectionItem} operation will be given in Subsection~\ref{subsec:disamb}: disambiguation.
+
+\subsection{Name resolution description}
+\label{subsec:nameReso}
+In this subsection, we explain how name resolution is described when defining CS2AS bridges by the means of our OCL-based internal DSL. In a name resolution activity we can typically find two main roles:
+\begin{itemize}
+\item a producer provides a name-to-element map for all possible elements in its producing scope. 
+\item a consumer looks up a specific element corresponding to a name in its consuming context
+\end{itemize}
+
+Our previous example had no need to resolve names, so we will now introduce a new example with a name producer and a consumer. The listing in Figure~\ref{fig:LetExpAS} is an example of a \textit{let expression} that declares and initializes a variable named \emph{var} for use within the \emph{'in'} of the \textit{let expression}. In this example the  \emph{'in'} comprises just a \textit{variable expression} that references  \emph{var}. The adjacent diagram shows the corresponding AS metamodel elements. A \emph{LetExp} contains the produced \emph{Variable} and an arbitrary \emph{OclExpression}  \emph{'in'}. For our simple example the  \emph{'in'} is just a \emph{VariableExp}. The complexity of the example lies in the initialization of the consuming \emph{VariableExp.referred Variable} to reference the producing \emph{LetExp.variable}.
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{lstlisting}[label=lst:letExpExample, language=OCL]
+let var : String = 'something'
+in var
+  \end{lstlisting} 
+%  \caption{LetExpCS and VariableDeclarationCS grammar excerpts}
+%  \label{fig:LetExpCS:a}
+\end{subfigure}%
+\begin{subfigure}{0.55\textwidth}
+  \centering
+  \includegraphics[scale=0.5]{images/LetExpAS.png}
+%  \caption{LetExpCS metamodel excerpt}
+%  \label{fig:LetExpCS:b}
+\end{subfigure}
+\caption{LetExp/VariableExp Example and partial AS Metamodel}
+\label{fig:LetExpAS}
+\end{figure}
+
+%The \textit{let expression} declares a new variable \emph{var}, and the \emph{'in'} expression contains a  \textit{variable expression} referring to that variable. This is represented in the AS by the reference from VariableExp to Variable in Figure~\ref{fig:exampleAS}).  
+
+%This expression is interesting because it's related to one of the main activities of the CS2AS DSL: name resolution. Whilst a let expression declares a new variable, the \emph{'in'} expression contains a variable expression referring to that variable (note the reference from VariableExp to Variable in the AS excerpt depicted by Figure~\ref{fig:exampleAS}). This activity of creating  references between elements of the AS based on a name lookup is called name resolution (Subsection~\ref{subsec:nameReso}). 
+Figure~\ref{fig:LetExpCS} shows the corresponding grammar and CS definitions. A \emph{LetExpCS} contains a \emph{VariableDeclarationCS} and \emph{OclExpressionCS} which for our example is just a \emph{VariableExpCS}. 
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \begin{lstlisting}[label=lst:letExpEBNF, language=Xtext]
+LetExpCS:
+  'let' VariableDeclarationCS 
+  'in' OclExpressionCS
+  	
+VariableDeclarationCS:
+  simpleName (':' TypeCS)?
+  ('=' OclExpressionCS)?	
+
+VariableExpCS:
+  simpleName | 'self'
+  \end{lstlisting} 
+%  \caption{LetExpCS and VariableDeclarationCS grammar excerpts}
+%  \label{fig:LetExpCS:a}
+\end{subfigure}%
+\begin{subfigure}{0.55\textwidth}
+  \centering
+  \includegraphics[scale=0.5]{images/LetExpCS.png}
+%  \caption{LetExpCS metamodel excerpt}
+%  \label{fig:LetExpCS:b}
+\end{subfigure}
+\caption{LetExpCS/VariableExpCS Grammar and partial CS Metamodel}
+\label{fig:LetExpCS}
+\end{figure}
+
+%\subsubsection{Variable expression}
+
+%A \textit{variable expression} in OCL references a variable defined elsewhere. The reference may explicitly or implictly refer to the \emph{self} context variable or to an iterator variable, or explicitly to a variable defined in an outer let expression or to a parameter of an operation definition. Discovering and prioritizing the candidate definitions is performed by the name resolution activity. The \emph{varName} provided by a \emph{VariableExpCS} in the concrete syntax is used to look up a \emph{Variable} in the AS. 
+
+In typical programming languages every use of a variable has a corresponding declaration. The variable declaration is the producer of a name-to-variable mapping. The variable usage consumes the variable by referencing its name. Name resolution searches the hierarchy of producing contexts that surround the consuming context to locate a name-element mapping for the required name.
+
+In our example, the required cross-reference in the AS is represented in the CS by the distinct \emph{VariableDeclarationCS.varName} and \emph{VariableExpCS.varName} properties. These are both parsed with the value \emph{var} and so, when consumption of the \emph{VariableExpCS.varName} is analyzed, the analysis must discover the corresponding \emph{VariableDeclarationCS.varName} production.
+
+The semi-formal approach adopted by the OCL specification re-uses the containment hierarchy of the CS as the scope hierarchy for its `inherited attributes'. The name-to-element mappings are maintained in an Environment hierarchy. The mappings flow down from the root CS element to all the leaf elements which accumulate additional name-to-element mappings and/or nested environments at each intermediate CS element in the CS tree.
+
+In Section \ref{sec:semi-formal-solution} we saw the very simple unmodified flow-down for a CollectionLiteralPart. The equivalent exposition for a LetExp in the OCL specification is complicated by performing the CS2AS mapping of multiple comma-separated let-variables with respect to the CS rather than the AS. We therefore present its logical equivalent in Listing~\ref{lst:semi-formal-letexpcs}.
+
+\begin{lstlisting}[caption=Semi-formal LetExpCS equivalent, label=lst:semi-formal-letexpcs, language=OCL]
+LetExpCS ::= ‘let’ VariableDeclarationCS ‘in’ OclExpressionCS
+
+VariableDeclarationCS.env = LetExpCS.env
+OclExpressionCS.env = LetExpCS.env.nestedEnvironment().addElement(VariableDeclarationCS.ast)
+\end{lstlisting}
+
+The environment of the LetExpCS is passed unchanged to the VariableDeclarationCS so that name resolution within the VariableDeclarationCS initializer sees the same names as the LetExpCS.
+
+The environment for the OclExpressionCS is more interesting. A nested Environment is created containing the name-to-variable mapping for the let-variable. The use of a nested environment ensures that the let-variable name occludes any same-named mapping in the surrounding environment.
+
+%ASBH
+%A imperative-declarative approach discussion doesn´t seem to resemble to this. Not needed. Remove
+%Although the use of the nestedEnvironment() and addElement() appears to be imperative, a declarative interpretation is possible since addElement() returns a copy of its immutable source environment with an additional name-to-element mapping.
+
+
+Our modeled approach is very similar but re-uses the AS tree rather than the CS tree as the scope hierarchy. 
+%ASBH Very vague. I don´t even know what you want to say. Not needed. Rescued an argument commented in related work section
+%This avoids the complications that arise when syntax sugar such as comma-separated let-variables also needs resolution.
+The rationale is that we might be interested in looking up AS elements for which we don't have the corresponding CS elements (e.g OCL Standard library model elements).
+
+%In the OCL specification, Clause 9, we might find some hints related to the names resolution activity: On one hand, in Clause 9.4, an \emph{Environment} definition is provided, including some operations to deal with this concept of environment (i.e. a list of named elements); on the other hand in Clause 9.3, the attribute grammar makes uses of those definitions so the environments can be modified, propagated and queried in the CS2AS bridge declaration in order to perform the lookup activities. In the OCL attribute grammar we can spot how the consumers and producers of the lookup activity are interfaced: when an \emph{Environment::addElement/s} operation is invoked we are dealing with a producer, whilst when any form of \emph{lookup} operation is invoked we are dealing with a consumer.
+
+%In essence, an environment comprises a list of named element which can be looked up in other parts of textual  and they can be nested so a child environment can occlude a contribution of a named element with the same name as another contribution done in the parent environment.
+
+%We now explain how name resolution is described in our OCL-based CS2AS DSL. Listing~\ref{lst:exampleNameResodesc} is the name resolution description\footnote{Due to space constraints, just context definitions are included} for our running example; it will be used as a reference when explaining the language design decisions and rationale.
+
+\begin{lstlisting}[caption=Name resolution producers, label=lst:exampleNameResodesc, language=OCL]  
+context OclAny
+def : env : env::Environment 
+  if oclContainer() <> null
+  then oclContainer().childEnv(self)
+  else env::Environment{}
+  endif
+
+def : childEnv(child : OclAny) : env::Environment =
+  env
+
+context LetExp
+def : childEnv(child : OclAny) : env::Environment =
+  if child = variable
+  then env
+  else env.nestedEnv().addElement(variable)
+  endif
+\end{lstlisting}
+
+Listing~\ref{lst:exampleNameResodesc} presents the name resolution description of our OCL-based internal DSL. Line 2 declares an \emph{env} property to hold the immutable Environment of the AS element. \emph{env} is initialized by a containment tree descent that uses \emph{oclContainer()}\footnote{oclContainer() returns the containing element which is null at the root.}. Line 5 provides an empty environment at the root, otherwise Line 4 uses \emph{childEnv(child)} to request the parent to compute the child-specific environment. 
+
+The default definition of \emph{childEnv(child)} on lines 8-9 flows down the prevailing environment to all its children. This can be inherited by the many AS elements that do not enhance the environment.
+
+The non-default override of \emph{childEnv(child)} for LetExp on lines 12-16 uses the \emph{child} argument to compute different environments for the \emph{Variable} and \emph{OclExpression} children. As we saw for the semi-formal approach, the environment for the \emph{Variable} is unmodified. The environment for the \emph{OclExpression} is extended by the addition of the variable in a nested environment. 
+
+The environment is exploited by consumers to satisfy their requirement to convert a textual name into the corresponding model element. The conversion comprises three steps
+\begin{itemize}
+\item locate all candidate elements
+\item apply a filtering predicate to select only the candidates of interest
+\item return the selected candidate or candidates
+\end{itemize}
+
+The first stage is performed by the environment propagation described above.
+
+The filtering predicate invariably selects just those elements whose name matches a required name. It may often provide further discrimination such as only considering Variables, Properties or Namespaces. For operations, the predicate may also match argument and parameter lists.
+
+The final return stage returns the one successfully selected candidate which is the only possibility for a well-formed conversion. For practical tools a lookup may fail to find a candidate or may find ambiguous candidates and may provide helpful diagnostics to the user. This may use proprietary approaches such as invalid or error objects. %In the example below unsatisfactory candidates are replaced by a null value.
+
+The specification is made more readable if the three stages are wrapped up in helper functions such as \emph{lookupVariable} or \emph{lookupProperty}\footnote{A practical implementation may provide alternative helper implementations that exploit the symmetry of the declarative exposition to search up through the containment hierarchy examining only candidates that satisfy the filtering predicate. This avoids the costs of flowing complete environments down to every AS leaf element where at most one element of the environment is of interest.}.
+
+List \ref{lst:VariableExpCSast} shows the polymorphic \emph{ast()} operation to map \emph{VariableExpCS} to \emph{VariableExp}. The  \emph{lookupVariable} helper function is used to discover the appropriate variable to be referenced by \emph{referredVariable}.
+
+\begin{lstlisting}[caption=CS2AS description for VarableExpCS to VariableExp, label=lst:VariableExpCSast, language=OCL]
 context VariableExpCS
 def : ast() : ocl::VariableExp =
   let variable = ast().lookupVariable(varName)
@@ -355,179 +468,125 @@ def : ast() : ocl::VariableExp =
    	}
 \end{lstlisting}
 
-%In this Complete OCL document we have declared the CS2AS bridge to define how AS elements are obtained from CS elements. The bridge is expressed by the means of a correspondence between CS types and AS types. This correspondence is given in terms of operation definitions, so that the operation context type -- an element type in the CS -- is the source of the correspondence, and the operation returned type -- an element type in the AS -- is the target of the correspondence. The actual characteristic function of the correspondence will be described by the body of those operations. For instance, taking as reference Listing~\ref{lst:exampleCS2ASdesc}, the \emph{ast} operation at line 2 defines the correspondence between \emph{LetExp} elements and \emph{LetExpCS} elements. The body of that operation, at lines 3-7, describes how \emph{LetExp} elements (AS) are actually computed from \emph{LetExpCS} elements (CS).
-
-%A more detailed explanation of the whole DSL, as well as the rationale about its design decisions, follows. All the listing and line references below correspond to Listing~\ref{lst:exampleCS2ASdesc}:
-
-\textbf{Declarativeness:} An important characteristic of the DSL is that it comprises declarative OCL constraints. The OCL constraints specify only true correspondences between AS and CS after a valid conversion (FIXME ASBH. Be careful I think this is not true with the ShadowExp usages. I'd not include this sentence). Discovery of a suitable order in which to perform CS to AS conversions requires an implementing tool to analyze the OCL constraints and exploit their inter-dependencies. (This was also the unstated policy of the semi-formal approach.)
-
-\textbf{Operations:} The CS2AS bridge is described by the means of operation definitions. The underlying rationale is that those definitions on a potentially complex class hierarchy of the CS can be overridden. Due to this overriding mechanism, we are providing some flexibility to cope with special cases such as those involving language extensions, as they occur in the OCL and QVT specifications. The operation name is not relevant, but we propose the name \emph{"ast"} because it is aligned with the name used in the attribute grammar exposed in the OCL specification.
-
-\textbf{Shadow object construction:} Shadow object constructions express how AS elements are constructed and how their properties are initialized. %This kind of expression allows the specification of which concrete type is used to bridge towards to (it might differ - be a subtype - from the returned type of the \emph{ast} operation), but also to express how all the corresponding properties of the AS element will be computed. Lines 4-6 shows how a \emph{LetExp} is created from a \emph{LetExpCS}, as well as how the \emph{LetExp::variable}, \emph{LetExp::in} and \emph{LetExp::type} properties are computed.
-
-\textbf{Operation Calls:} To compute properties of any AS element we will normally need to access to other AS elements corresponding to the CS ones. Given that we are using \emph{ast} operations to set a correspondence between CS and AS elements, an \emph{ast} operation call expression (OCE) will be used to denote that we want to obtain the AS element corresponding to the CS element source of that OCE. For example, at line 4, in order to initialize the \emph{LetExp::variable} property, we use the \emph{ast} OCE to obtain the \emph{Variable} corresponding to the \emph{VariableDeclarationCS} belonging to the context \emph{LetExpCS} element (via the \emph{LetExpCS::variable} property).
-
-\textbf{Self-contained:} With the goal in mind of using the proposed internal DSL to rewrite part of the OMG specifications, the declaration of the CS2AS bridge for a particular CS element will be complete and self-contained. This means that the computations for all the properties of the corresponding AS element are expressed in the shadow type expression, even though those properties belong to any of the AS element supertypes. Admitting that the creation of more modularized and reusable declarations is convenient when designing CS2AS bridges, Section~\ref{sec:futureWork} will add additional comments to this topic.
-NB ASBH. Perhaps, including the comments in the limitations section (6).
-
-\textbf{Reusable computations:} Having OCL as the  host language for our internal DSL, we could factor out and define more complex and reusable expressions in new operation definitions. Those operations could be reused, by just introducing operation call expressions, across the different computations of the AS element properties. At line 31, we can spot an OCE named \emph{commonType}, which is a reusable operation\footnote{The body of the operation is not relevant, hence, not described in this paper} in charge of computing the common supertype between the source of the OCE, and the provided operation call argument.
-
-\textbf{Name resolution:} As a special case of reusable computation, we want to highlight one which links with Subsection~\ref{subsec:nameReso}: name resolution. It's common a situation in which an AS element refers to a different one based a named-based lookup. In our example, at line 11, we have such scenarios, so that in the context of a \emph{VariableExp} element, there will be a lookup activity triggered by the \emph{lookupVariable} OCE, which aim to find a \emph{Variable} to be referred by that \emph{VariableExp}.
-
-\textbf{Disambiguation:} A CS element doesn't necessarily need to be bridged to just one type of AS element. It's a common situation that preliminary ambiguous CS elements are disambiguated to different AS elements. Subsection~\ref{subsec:disamb} will elaborate on this topic. %We can find varied examples in the OCL specification but \emph{CollectionLiteralPartCS} is an easy to understand one. To describe this scenario in our DSL, we will cascade a set of \emph{IfExp} in the body of the \emph{ast} operation: every condition would comprise a disambiguation rule; the \emph{then} and \emph{else} expressions comprise the shadow type expressions denoting the AS element to which the disambiguation would take place. In our running example, lines 23-33 depicts the mentioned scenario and more details about the called \emph{mapsToCollectionItem} operation will be given in Subsection~\ref{subsec:disamb}: disambiguation.
-
-\subsection{Name resolution description}
-\label{subsec:nameReso}
-In this subsection, we will explain how name resolution is described when defining CS2AS bridges by the means of our OCL-based internal DSL. In a name resolution activity we can typically find two main roles:
-\begin{itemize}
-\item a producer provides a name-to-element mapping for all possible elements in its producing scope. 
-\item a consumer looks up a specific element corresponding to a name in its consuming context
-\end{itemize}
-In typical programming languages the use of a variable should have a corresponding declaration. The variable declaration is the be the producer of a name-to-variable mapping. The variable usage consumes the variable by referencing its name. Name resolution searches the hierarchy of producing contexts that surround the consuming context to locate a name-element mapping for the required name.
-
-The semi-formal approach adopted by the OCL specification re-uses the containment hierarchy of the CS as the scope hierarchy for its `inherited attributes'. The name-to-element mappings are mainitained in an Environment hierarchy which flows down from the root CS element to all the leaf elements accumulating additional name-to-element mappings and/or nested environments at each intermediate CS element in the CS tree.
-
-In Section \ref{sec:semi-formal-solution} we saw the very simple unmodified flow-down for a CollectionLiteralPart. The equivalent exposition for a LetExp in the OCL specification is complicated by performing the CS2AS mapping of multiple comma-separated let-variables with respect to the CS rather than the AS. We therefore present its logical equivalent.
-
-\begin{lstlisting}[caption=Semi-formal LetExpCS equivalent, label=lst:semi-formal-letexpcs, language=OCL]
-LetExpCS ::= ‘let’ VariableDeclarationCS ‘in’ OclExpressionCS
-
-VariableDeclarationCS.env = LetExpCS.env
-OclExpressionCS.env = LetExpCS.env.nestedEnvironment().addElement(VariableDeclarationCS.ast)
-\end{lstlisting}
-
-The environment of the LetExpCS is passed unchanged to the VariableDeclarationCS so that name resolution within the VariableDeclarationCS initializer sees the same names as the LextExpCS.
-
-The environment for the OclExpressionCS is more interesting. A nested Environment is created containing the name-to-variable mapping for the let-variable. The use of a nested environment ensures that the let-variable name occludes any same-named mapping in the nested environment.
-
-Although the use of the nestedEnvironment() and addElement() appears to be imperative, a declarative interpretation is possible since addElement() returns a copy of its source environment with an additional name-to-element mapping.
-
-Our modeled approach is very similar but re-uses the AS tree rather than the CS tree as the scope hierarchy. This avoids the complications that arise when resolving syntax sugar such as comma-separated let-variables concurrently.
-
-%In the OCL specification, Clause 9, we might find some hints related to the names resolution activity: On one hand, in Clause 9.4, an \emph{Environment} definition is provided, including some operations to deal with this concept of environment (i.e. a list of named elements); on the other hand in Clause 9.3, the attribute grammar makes uses of those definitions so the environments can be modified, propagated and queried in the CS2AS bridge declaration in order to perform the lookup activities. In the OCL attribute grammar we can spot how the consumers and producers of the lookup activity are interfaced: when an \emph{Environment::addElement/s} operation is invoked we are dealing with a producer, whilst when any form of \emph{lookup} operation is invoked we are dealing with a consumer.
-
-%In essence, an environment comprises a list of named element which can be looked up in other parts of textual  and they can be nested so a child environment can occlude a contribution of a named element with the same name as another contribution done in the parent environment.
-
-%We now explain how name resolution is described in our OCL-based CS2AS DSL. Listing~\ref{lst:exampleNameResodesc} is the name resolution description\footnote{Due to space constraints, just context definitions are included} for our running example; it will be used as a reference when explaining the language design decisions and rationale.
-
-\begin{lstlisting}[caption=Name resolution producers, label=lst:exampleNameResodesc, language=OCL]
-context LetExp
-def : childEnv(child : OclAny) : env::Environment =
-  if child = variable
-  then selfEnv()
-  else selfEnv().nestedEnv().addElement(variable)
-  endif
-  
-context OclAny
-def : _env(child : OclAny) : env::Environment =
-  parentEnv()	
-\end{lstlisting}
-
-The polymorphic operation \emph{\_env(child)} declares the environment flow down from the LetExp parent to the Variable or OclExpression child using a \emph{child} argument to select which environment is returned.
-
-The default definition of \emph{\_env(child)} flows down the environment to all children. This can be inherited by most AS elements so that only those AS elements such as LetExp that modify the environment need specification.
-
-If each AS element has an \emph{env} property for its Environment, and if the \emph{parentEnv()} helper function just returns \emph{self.env}, the hierarchy of \emph{\_env(child)} operations can be used to flow down the environments from AS root to all AS leaves. In practice this declarative flow down provides large environment hierarchies at each AS leaf where at most one name is actually of interest.
-
-An alternative practical implementation of  the \emph{parentEnv()} helper function and the Environment can exploit the declarative symmetry to search up through the AS hierarchy to ignoring elements that fail to satisfy search criteria such as name or type.
-
-\begin{lstlisting}[caption=Name resolution description for running example, label=lst:exampleNameResodesc, language=OCL]
--- Producers (Environment computation)
-context OclAny
-def : env() : env::Environment =
-  _env(null)
-def : _env(child : OclAny) : env::Environment =
-  parentEnv()	
-def : parentEnv() : env::Environment =
-  let parent = oclContainer() 
-  in if parent = null 
-     then env::Environment { } 
-     else parent._env(self) 
-     endif
+%\begin{lstlisting}[caption=Name resolution description for running example, label=lst:exampleNameResodesc, language=OCL]
+%-- Producers (Environment computation)
+%context OclAny
+%def : env() : env::Environment =
+%  _env(null)
+%def : _env(child : OclAny) : env::Environment =
+%  parentEnv()	
+%def : parentEnv() : env::Environment =
+%  let parent = oclContainer() 
+%  in if parent = null 
+%     then env::Environment { } 
+%     else parent._env(self) 
+%     endif
 	
-context VariableExp
-def : _env(child : ocl::OclAny) : env::Environment =
-  parentEnv() -- By default, the computed environment is always parentEnv()
-                  -- (see line 5) so this declaration might be suppressed
+%context VariableExp
+%def : _env(child : ocl::OclAny) : env::Environment =
+%  parentEnv() -- By default, the computed environment is always parentEnv()
+%                  -- (see line 5) so this declaration might be suppressed
 
--- Consumers(Lookup computation).
-context OclAny 
-def : _lookupVariables(env : env::Environment, vName : String) : OrderedSet(Variable) =  	
-  let foundVs = env.namedElements->selectByKind(Variable)->select(name=vName) 
-  in if foundVs->isEmpty() and not env.parentEnv = null
-     then _lookupVariables(env.parentEnv, vName)
-     else foundVs 
-     endif
+%-- Consumers(Lookup computation).
+%context OclAny 
+%def : _lookupVariables(env : env::Environment, vName : String) : OrderedSet(Variable) =  	
+%  let foundVs = env.namedElements->selectByKind(Variable)->select(name=vName) 
+%  in if foundVs->isEmpty() and not env.parentEnv = null
+%     then _lookupVariables(env.parentEnv, vName)
+%     else foundVs 
+%     endif
      
-def : _lookupVariable(vName : String) : Variable =
-  let foundVs = _lookupVs(env(), vName)
-  in if foundVs->isEmpty()
-     then null
-     else foundVs->first() 
-     endif
+%def : _lookupVariable(vName : String) : Variable =
+%  let foundVs = _lookupVs(env(), vName)
+%  in if foundVs->isEmpty()
+%     then null
+%     else foundVs->first() 
+%     endif
      
-context VariableExp
-def : lookupVariable(varExpCS : oclcs::VariableExpCS) : Variable =
-  if varExpCS.varName = null
-  then null 
-  else _lookupVariable(varExpCS.varName) 
-  endif
+%context VariableExp
+%def : lookupVariable(varExpCS : oclcs::VariableExpCS) : Variable =
+%  if varExpCS.varName = null
+%  then null 
+%  else _lookupVariable(varExpCS.varName) 
+%  endif
          
--- Environment related ops
-context Environment
-def : nestedEnv() : Environment = 
-  Environment { 
-    parentEnv = self
-  }
-def : addElements(elements : Collection(ocl::NamedElement)) : Environment =
-  Environment {
-    parentEnv = parentEnv,
-    namedElements = namedElements->includingAll(elements)
-  }
-def : addElement(element : ocl::NamedElement) : Environment =
-  Environment {
-    parentEnv = parentEnv,
-    namedElements = namedElements->including(element)
-  }
-\end{lstlisting}
+%-- Environment related ops
+%context Environment
+%def : nestedEnv() : Environment = 
+%  Environment { 
+%    parentEnv = self
+%  }
+%def : addElements(elements : Collection(ocl::NamedElement)) : Environment =
+%  Environment {
+%    parentEnv = parentEnv,
+%    namedElements = namedElements->includingAll(elements)
+%  }
+%def : addElement(element : ocl::NamedElement) : Environment =
+%  Environment {
+%    parentEnv = parentEnv,
+%    namedElements = namedElements->including(element)
+%  }
+%\end{lstlisting}
 
-\textbf{Declarativeness}: the definition of consumers and producers of named element lookups is declarative.
+\textbf{Declarative}: The definition of consumers and producers of named element lookups is declarative.
 
-\textbf{Bottom up environment computation:} Whereas in the OCL specification the proposed grammar exposes a top down environment computation (in the form of inherited attributes specification), for our internal DSL, the environment computation exposes a bottom up approach. Although declaratively speaking, the approach is irrelevant, in practice the bottom up exposition enables the interpretation or generation of more efficient implementations: in essence, we don't need to carry down the computation of environments along with the entire containment hierarchy (from parents to children); we just need to enable the computation of the environment from the consumer looking for producers above in the containment hierarchy (from children to parents). Lines 2-12 show how an environment is computed by default for an arbitrary element: the bottom line of the algorithm is that, by default, the environment of an element will be the parent (container) element's environment. For a root element (no parent), by default, its environment will comprise an empty list of named elements. 
+\textbf{Top down / Bottom up:} The semi-formal inherited attributes specify a top down environment flow. Our modeled solution uses a similar approach but also supports a more efficient implementation that uses a bottom up search.
 
-\textbf{Producer contributions:} In our DSL, a producer will just have to specify an \emph{\_env} operation to declare how it will specifically contribute named elements to the environment. The environment \emph{addElement/s} operations will be used to perform such contribution, being the argument expression the one to express how the contributions are obtained from the producer. Lines 18-23 shows how a \emph{LetExp} producer contributes a \emph{Variable} element to the environment. The \emph{child} parameter of the \emph{\_env} operation is important, since it represents the child element from which a bottom up lookup is being performed. Although not all \emph{\_env} need it, in this case, it is used for \emph{LetExp} at line 20, because we only want to add a \emph{Variable} to the environment in the case that the lookup is performed from the inner \emph{in} expression.
+%Whereas in the OCL specification the proposed grammar exposes a top down environment computation (in the form of inherited attributes specification), for our internal DSL, the environment computation exposes a bottom up approach. Although declaratively speaking, the approach is irrelevant, in practice the bottom up exposition enables the interpretation or generation of more efficient implementations: in essence, we don't need to carry down the computation of environments along with the entire containment hierarchy (from parents to children); we just need to enable the computation of the environment from the consumer looking for producers above in the containment hierarchy (from children to parents). Lines 2-12 show how an environment is computed by default for an arbitrary element: the bottom line of the algorithm is that, by default, the environment of an element will be the parent (container) element's environment. For a root element (no parent), by default, its environment will comprise an empty list of named elements. 
 
-\textbf{Nested environments:} As we can find in many programming languages, a common situation when achieving name resolution is the creation of scopes. Scopes allow name producers to contribute names which might already be defined in outer scopes. In OCL, scopes are represented by the own environments, but we need a way to specify when we want to open a new scope, i.e. create a new nested environment. In our example, \emph{LetExp}  will create a new lookup scope from its parent environment, so that a \emph{nestedEnv} operation call is used at line 21. The \emph{nestEnv} operation is defined at line 50. This producer contribution definition would let variable declarations occlude variables declared by outer \emph{LetExp}, so that the expression in Listing~\ref{lst:nestedEnvExample} would be valid and would return 4 as a result.
+%\textbf{Producer contributions:} In our DSL, a producer just specifies an \emph{childEnv} operation to declare how it contributes named elements to the environment of each of its children, using the environment \emph{addElement/s} operations to add contributions. %, being the argument expression the one to express how the contributions are obtained from the producer. Lines 18-23 shows how a \emph{LetExp} producer contributes a \emph{Variable} element to the environment. The \emph{child} parameter of the \emph{\_env} operation is important, since it represents the child element from which a bottom up lookup is being performed. Although not all \emph{\_env} need it, in this case, it is used for \emph{LetExp} at line 20, because we only want to add a \emph{Variable} to the environment in the case that the lookup is performed from the inner \emph{in} expression.
 
-\begin{lstlisting}[caption=LetExp variables occlude outer variables, label=lst:nestedEnvExample, language=OCL]
-context OclAny
-def : a() : Integer =
-	let a = 1
-	in let a = 2
-	   in a + a
-\end{lstlisting}
+%\textbf{Nested environments:} As we can find in many programming languages, a common situation when achieving name resolution is the creation of scopes. Scopes allow name producers to contribute names which might already be defined in outer scopes. In OCL, scopes are represented by the own environments, but we need a way to specify when we want to open a new scope, i.e. create a new nested environment. In our example, \emph{LetExp}  will create a new lookup scope from its parent environment, so that a \emph{nestedEnv} operation call is used at line 21. The \emph{nestEnv} operation is defined at line 50. This producer contribution definition would let variable declarations occlude variables declared by outer \emph{LetExp}, so that the expression in Listing~\ref{lst:nestedEnvExample} would be valid and would return 4 as a result.
+
+%\begin{lstlisting}[caption=LetExp variables occlude outer variables, label=lst:nestedEnvExample, language=OCL]
+%context OclAny
+%def : a() : Integer =
+%	let a = 1
+%	in let a = 2
+%	   in a + a
+%\end{lstlisting}
 	   
-\textbf{Consumer lookups:} \emph{lookup} operations are defined in the context of the consumers for which a lookup needs to be performed (see lines 41-46). Those operations will receive, as an argument, the corresponding CS element from which syntactic information will be retrieved to perform a lookup. In our example, the lookup input corresponds to the String valued \emph{VarExpCS::varName}. The usual lookup inputs will normally be String values, but they can be more complex CS structures such as a PathNameCS (Clause 9.3.7 of \cite{omg2013ocl}) which is used in the OCL specification to perform qualified name lookups. 
+%\textbf{Consumer lookups:} \emph{lookup} operations are defined in the context of the consumers for which a lookup needs to be performed (see lines 41-46). Those operations will receive, as an argument, the corresponding CS element from which syntactic information will be retrieved to perform a lookup. In our example, the lookup input corresponds to the String valued \emph{VarExpCS::varName}. The usual lookup inputs will normally be String values, but they can be more complex CS structures such as a PathNameCS (Clause 9.3.7 of \cite{omg2013ocl}) which is used in the OCL specification to perform qualified name lookups. 
 
-The actual lookup is triggered when invoking generic (defined on any OclAny) \emph{\_lookup} operations, which basically consist in computing the environment for the consumer and filtering the resulting list of named elements with the lookup input and the kind of element to look up. In our running example, when looking up \emph{Variable}s, the environment is computed at line 35 and the resulting list of named elements is filtered at line 28.
+%The actual lookup is triggered when invoking generic (defined on any OclAny) \emph{\_lookup} operations, which basically consist in computing the environment for the consumer and filtering the resulting list of named elements with the lookup input and the kind of element to look up. In our running example, when looking up \emph{Variable}s, the environment is computed at line 35 and the resulting list of named elements is filtered at line 28.
 
-\textbf{Bottom up lookup computations:} As the reader might have noted, the \emph{\_lookup} operations are designed to be split into two different operations. The rationale is that although we only compute the environment once, an indeterminate number of nested environments might be created. If the looked up element is not found in the list of named elements of the most deep environment, the search must be (transitively) performed in the list of named elements of its parent environment. In our example, the transitive search is exposed at line 30.
-\textbf{}
+%\textbf{Bottom up lookup computations:} As the reader might have noted, the \emph{\_lookup} operations are designed to be split into two different operations. The rationale is that although we only compute the environment once, an indeterminate number of nested environments might be created. If the looked up element is not found in the list of named elements of the most deep environment, the search must be (transitively) performed in the list of named elements of its parent environment. In our example, the transitive search is exposed at line 30.
+%\textbf{}
 
 \subsection{Disambiguation}
 \label{subsec:disamb}
 
-As we commented in the introduction, CS disambiguation is another important concern which needs to be addressed during the CS2AS bridge. To explain the need of disambiguation rules, let's focus on the following simple OCL expression:
+As we commented in the introduction, CS disambiguation is another important concern which needs to be addressed during the CS2AS bridge. To explain the need of disambiguation rules, we consider the simple OCL expression \verb$x.y$.
 
-\begin{lstlisting}[language=OCL]
-x.y
-\end{lstlisting}
+At first glance, the \emph{'y'} property of the \emph{'x'} variable is accessed using a \textit{property call expression} and a \textit{variable expression}. However \emph{'x'} is not necessarily a variable name. It could be that there is no \emph{'x'} variable. Rather \emph{'x'} may be a property of the implicit source variable, \emph{self}, since the original expression could be a short form for \emph{self.x.y}. Semantic resolution is required to disambiguate the alternatives and arbitrate any conflict.
 
-In a first glance, \emph{'y'} is a property call expression over an \emph{'x'} variable expression. However, whilst \emph{'y'} is certainly a property call expression , \emph{'x'} doesn't necessarily have to be a variable expression. It actually depends on the context in which that OCL expression is used, because \emph{'x'} could also be another property call expression over the implicit variable \emph{self}, i.e. \emph{self.x.y}. As commented in Section X, The OCL specification doesn't help to clarify this situation, because they provide a wrong (ambiguous) grammar. FIXME ASBH, I'm unsure if the problem with the ambiguous grammar (VariableExpCS[A] and PropertyCallExpCS[B] rules) should be explained here or previously
+The OCL specification provides disambiguation rules to 'resolve' grammar ambiguities. Clause 9.1 states : ``Some of the production rules are syntactically ambiguous. For such productions disambiguating rules have been defined. Using these rules, each production and thus the complete grammar becomes nonambiguous.''. Figure~\ref{fig:varExpGrammar} and Figure~\ref{fig:propCallExpGrammar} are extracted from the OCL specification. It can be seen that a \emph{simpleNameCS} with no following \verb$@pre$ matches the \verb$[A]$ production of a \emph{VariableExpCS} and the \verb$[B]$ production of a \emph{PropertyCallExpCS}. 
 
-To sort out this situation, we need to make use of unambiguous CS elements, plus additional disambiguation rules. These rules will specify towards which elements of the AS, an ambiguous CS element will be disambiguated. 
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[scale=0.49]{images/VariablExpGrammar.PNG}
+	\caption{Partial OCL Specification for VariableExpCS to VariableExp}
+	\label{fig:varExpGrammar}
+\end{figure}
 
-For this particular OCL example, the specification would need to introduce a concept such as \emph{NameExpCS} which simply comprises a name. Figure~\ref{fig:NameExpCS} shows the CS definitions related to an ambiguous name expression. 
+\begin{figure}[htbp]
+%	\centering
+	\includegraphics[scale=0.5]{images/PropertyCallExpGrammar.PNG}
+	\caption{Partial OCL Specification for PropertyCallExpCS to PropertyCallExp}
+	\label{fig:propCallExpGrammar}
+\end{figure}
+
+The disambiguation rule for \emph{VariableExpCS} is relatively simple delegating to the \emph{lookup} helper and imposing a constraint that the result must be a \emph{VariableDeclaration}. This is potentially correct, although unfortunately the specification that \emph{VariableDeclaration} is the supertype of \emph{Variable} and \emph{Parameter} is missing.
+
+The disambiguation rule for \emph{PropertyCallExpCS} has some ambiguous wording and many details that do not correspond to the ``In OCL''. This requires intuition by the implementor who may also wish to consider how the rules apply to implicit opposite properties in EMOF.
+
+Both of these disambiguation rules require semantic information which is not available when the syntactic parser requires it. The problem can be avoided by unifying the ambiguous alternatives as unambiguous productions that can be parsed to create a unified CS tree. Once parsing has completed, semantic analysis of the unified CS can resolve the unified CS elements into their  disambiguated forms.
+
+We therefore introduce additional unifying CS elements that can be resolved without semantic information.  A unifying \emph{NameExpCS} element replaces the ambiguous \emph{PropertyCallExpCS} and \emph{VariableExpCS}.
+Figure~\ref{fig:NameExpCS} shows the unified CS definitions.
+%\footnote{Just CS information related to Variable ExpCS [A] and PropertyCallExpCS [B] is depicted} related to an ambiguous name expression.
+
+%For this particular OCL example, the specification needs to introduce a concept such as \emph{NameExpCS} which simply comprises a name. 
 
 \begin{figure}[htbp]
 \centering
@@ -550,14 +609,15 @@ For this particular OCL example, the specification would need to introduce a con
 \label{fig:NameExpCS}
 \end{figure}
 
-Then, additional disambiguation rules can make use of information from the CS and/or AS, in order to discern which AS element is created from that \emph{NameExpCS} i.e a \emph{VariableExp}, otherwise a \emph{PropertyCallExp}. For instance, Listing~\ref{lst:nameExpDisambiguation} shows the definition for the CS2AS mapping of a \emph{NameExpCS}, in which \emph{isAVariableExp()} operation call is introduced at line 3 and the referenced operation will comprise the disambiguation rule. The reader should not that:
+%Then, additional disambiguation rules can make use of information from the CS and/or AS, in order to discern which AS element is created from that \emph{NameExpCS} i.e a \emph{VariableExp}, otherwise a \emph{PropertyCallExp}. For instance, 
+Listing~\ref{lst:nameExpDisambiguation} shows the definition for the CS2AS mapping of a \emph{NameExpCS}, in which the \emph{isAVariableExp()} at line 3 is a call of the operation providing the disambiguation rule. The return selects whether the equivalent mapping for \emph{VariableExpCS} occurs on lines 5-13 or \emph{PropertyCallExpCS} occurs on lines 15-23.
 
-\begin{itemize}
-\item VariableExpCS and PropertyCallExpCS metaclasses wouldn't be needed any more. The corresponding VariableExp and PropertyCallExp would be obtained from this ambiguous NameExpCS
-\item The ambiguous grammar issue commented before would vanish, since now we have only one grammar rule for NameExpCS. In other words, we have created a CS disambiguation to be resolved in the CS2AS bridge, rather than having an ambiguous grammar.
-\end{itemize}
+%\begin{itemize}
+%\item VariableExpCS and PropertyCallExpCS metaclasses are not needed any more. The corresponding VariableExp and PropertyCallExp are obtained from this ambiguous NameExpCS
+%\item The ambiguous grammar issue commented before vanishes, since we now have only one grammar rule for NameExpCS. In other words, we have created a CS disambiguation to be resolved in the CS2AS bridge, rather than having an ambiguous grammar.
+%\end{itemize}
 
-NB ASBH. Problem with this definition, is that we need to define a lookupProperty. It is incorrect/incomplete , and we might to get into a new mess. Omitting the then/else expression might an alternative, but I don't like it....
+%NB ASBH. Problem with this definition, is that we need to define a lookupProperty. It is incorrect/incomplete , and we might to get into a new mess. Omitting the then/else expression might an alternative, but I don't like it....
 \begin{lstlisting}[caption=CS2AS description for an ambiguous name expression, label=lst:nameExpDisambiguation, language=OCL]
 context NameExpCS
 def : ast() : ocl::OclExpression =
@@ -585,9 +645,7 @@ def : ast() : ocl::OclExpression =
   endif	
 \end{lstlisting}
 
-Disambiguation rules might be simple ones which rely on CS information -- syntactic information --, or more complex ones which also involve AS information -- semantic information --. In the introduced example, we need to rely on AS information to conclude if \emph{'x'} corresponds to a \emph{VariableExp} otherwise a \emph{PropertyCallExp}. Specifically, a lookup using the name comprised by the \emph{NameExpCS} is needed. If we found a \emph{Variable} with that name, we would disambiguate \emph{NameExpCS} towards a \emph{VariableExp}; otherwise towards a \emph{PropertyCallExp}. 
-
-Listing~\ref{lst:nameExpDisambiguationRule} shows the definition of the disambiguation rule for an ambiguous CS element such as \emph{NameExpCS}. The reader should note that we don't consider the case where \emph{'x'} is not neither a variable nor a property of the implicit \emph{self} context variable (an element is not found in the lookup process). We want to provide a declarative and clean CS2AS bridge for the OMG specification. A strict interpretation of the proposed CS2AS bridge for \emph{NameExpCS}, would end up with a \emph{PropertyCallExp} with a null value for the referred property.
+This approach has the benefit of localizing the disambiguation in the \emph{isAVariableExp()} operation and associated control logic and so making \emph{VariableExpCS} and \emph{PropertyCallExpCS} redundant. The simple two-way disambiguation decision is shown in \ref{lst:nameExpDisambiguationRule}
 
 \begin{lstlisting}[caption=NameExpCS disambigutation rule, label=lst:nameExpDisambiguationRule, language=OCL]
 context NameExpCS
@@ -595,6 +653,12 @@ def : isAVariableExp() : Boolean =
 	let variable =  ast().lookupVariable(self),
 	in variable <> null
 \end{lstlisting}
+
+Simple choices such as the various forms of \emph{CollectionLiteralPartCS} can be resolved syntactically. Semantic decisions are required for the unified name example above. The conflicts between the use of parentheses for template arguments, operation calls and iteration calls can be resolved in the same way but with a more complex semantic decision tree.
+
+%Disambiguation rules might be simple ones which rely on CS information -- syntactic information --, or more complex ones which also involve AS information -- semantic information --. In the introduced example, we need to rely on AS information to conclude if \emph{'x'} corresponds to a \emph{VariableExp} or to a \emph{PropertyCallExp}. Specifically, a lookup using the name comprised by the \emph{NameExpCS} is needed. If we find a \emph{Variable} with that name, we disambiguate \emph{NameExpCS} to a \emph{VariableExp}; otherwise to a \emph{PropertyCallExp}. 
+
+%Listing~\ref{lst:nameExpDisambiguationRule} shows the definition of the disambiguation rule for an ambiguous CS element such as \emph{NameExpCS}. The reader should note that we don't consider the case where \emph{'x'} is not neither a variable nor a property of the implicit \emph{self} context variable (an element is not found in the lookup process). We want to provide a declarative and clean CS2AS bridge for the OMG specification. A strict interpretation of the proposed CS2AS bridge for \emph{NameExpCS}, ends up with a \emph{PropertyCallExp} with a null value for the referred property.
 
 %To conclude the explanation of the proposed OCL based internal DSL, we briefly discuss the CS disambiguation rules which let us produce different AS elements from ambiguous CS element. Disambiguation is a concern different to name resolution, but it is similarly used across the CS2AS mappings definition. The OCL-based descriptions can be defined in their own file and therefore comprise the disambiguation rules for the OMG specification. 
 
@@ -616,23 +680,23 @@ def : isAVariableExp() : Boolean =
 \section{Related work}
 \label{sec:relatedWork}
 
-In this section we will briefly discuss how the proposed OCL-based CS2AS bridge relates to previous work. To the best of our knowledge there does not exist a DSL approach based on OMG specifications to describe bridges between CS and AS. The Complete OCL document based approach was introduced in \cite{sanchez2014enhancingXtext} and this paper aims to explain the whole approach (i.e. the internal DSL).
+In this section we briefly discuss how the proposed OCL-based CS2AS bridge relates to previous work. To the best of our knowledge there does not exist a DSL approach based on OMG specifications to describe bridges between CS and AS. The Complete OCL document based approach was introduced in \cite{sanchez2014enhancingXtext} and this paper aims to explain the whole approach (i.e. the internal DSL).
 
 We can find languages conceived to sort out the CS2AS bridges in other contexts, i.e in the context of some specific tools. %Although our OCL-based internal DSL is appropriate to be used in OMG specifications, we admit that some related works create more convenient constructs for instance, when defining names resolution, or when dealing with reusable bridges defined on abstract classes in the corresponding CS/AS classes hierarchy. 
 We highlight two of them:
 
-\textbf{NaBL \cite{konat2013decNameRes} \& Stratego \cite{visser2004stratego}:} These are two separate languages for different purposes used by the Spoofax language workbench \cite{spoofaxOnline}. The former is used to declare name resolution and the latter to declare syntax rewrites (tree based structure transformations). As a main difference with respect to our approach, these languages are completely unrelated: whereas the former is integrated during the parsing activities in order to resolve cross-references when producing the CS tree, the latter is a general purpose program transformation language further used to obtain the potentially different AS tree. In our approach, we integrate the name resolution language into a further CS2AS activity, provided that the parsing activity produces a first CS tree. The reason for not integrating name resolution during the parsing activity is that for the OCL language, we will be interested in looking up AS elements for which we don't have the corresponding input file, just a model conforming to the AS syntax (e.g the OCL Standard library model).
+\textbf{NaBL \cite{konat2013decNameRes} \& Stratego \cite{visser2004stratego}:} These are two separate languages for different purposes used by the Spoofax language workbench \cite{spoofaxOnline}. The former is used to declare name resolution and the latter to declare syntax rewrites (tree based structure transformations). As a main difference with respect to our approach, these languages are completely unrelated: whereas the former is integrated during the parsing activities in order to resolve cross-references when producing the CS tree, the latter is a general purpose program transformation language further used to obtain the potentially different AS tree. In our approach, we integrate the name resolution language into a further CS2AS activity, provided that the parsing activity first produces a CS tree. As it was commented in Section~\ref{subsec:nameReso}, the name lookups are performed on AS elements rather than on CS ones.
 
-\textbf{Gra2Mol \cite{canovas2012gra2mol}:}  Gra2Mol is an approach that is closer in objective to the approach presented in this paper. It is a domain specific transformation language conceived to define those bridges, and as our approach does, the name resolution activity is also declared as part of the transformation language. However, whilst their name resolution relies on explicitly specifying a direct search (thus, the name consumer needs to know where the name producer is located in the syntax tree), our approach for specifying name resolution is more declarative based on a independent declaration of name producers and consumer (thus, the name consumer doesn't need to know where the producer is located in the syntax tree). Another difference is that whilst we use OCL as the expression language to express the bridges, they define a structure-shy\footnote{Xpath is an example of this kind of languages} query language instead. They claim that the usage of their query language is more compact and less verbose when compared to using OCL expressions. However, that kind of languages are not suitable from the point of view of OMG specifications. Besides, we can add that structure-shy languages are more error prone or sensitive to changes in the involved metamodels (metamodel evolution): when having a static typed language such OCL, supporting tools can better assist in a metamodel evolution scenario.
+\textbf{Gra2Mol \cite{canovas2012gra2mol}:}  Gra2Mol is an approach that is closer in objective to the approach presented in this paper. It is a domain specific transformation language conceived to define those bridges, and as our approach does, the name resolution activity is also declared as part of the transformation language. However, whilst their name resolution relies on explicitly specifying a direct search (thus, the name consumer needs to know where the name producer is located in the syntax tree), our approach for specifying name resolution is more declarative based on an independent declaration of name producers and consumer (thus, the name consumer doesn't need to know where the producer is located in the syntax tree). Another difference is that whilst we use OCL as the expression language to express the bridges, they define a structure-shy\footnote{Xpath is an example of this kind of language} query language instead. They claim that the usage of their query language is more compact and less verbose when compared to using OCL expressions. However such languages are not suitable from the point of view of OMG specifications. Besides, we can add that structure-shy languages are more error prone or sensitive to changes in the involved metamodels (metamodel evolution): when having a static typed language such OCL, supporting tools can better assist with metamodel evolution.
 
 \section{Limitations and shortcomings}
 \label{sec:limitations}
 
-From the point of view of the OMG specification, we do not identify limitations of the proposed internal DSL. Having OCL as the host language is an ideal solution for OMG specifications, because the instances of the DSL can be directly ported to those specifications in order to precisely define the corresponding CS2AS bridges. Likewise, the flexibility and modularity that Complete OCL documents provide has promise in addressing very large CS2AS gap scenarios.
+From the point of view of the OMG specification, we do not see any limitations of the proposed internal DSL. Having OCL as the host language is a good solution for OMG specifications, because the instances of the DSL can be directly ported to those specifications in order to precisely define the corresponding CS2AS bridges. Likewise, the flexibility and modularity that Complete OCL documents provide has promise in addressing very large CS2AS gaps.
 
 On the other hand, from the final user point of view, i.e the user of the DSL, and specially when comparing with related work, we perceive that having an external DSL fully designed to deal with concepts related to name resolution (e.g. NaBL) or disambiguation may be more convenient. We discuss this further in the next section when talking about future work.
 
-Another shortcoming to mention is that the DSL is based on the concept of shadow type expression, which is not part of the last version of the OCL specification (2.4), though it is planned to be included in the next OCL version (2.5) \cite{brucker2013aachenReport}\footnote{It's cited in the report as type construction expression, Section 3.1}. The number of OCL tools which can currently be used to validate the CS2AS bridges is limited (we are using Eclipse OCL\cite{eclipseOclOnline} which supports some future OCL 2.5 features).
+Another shortcoming to mention is that the DSL is based on the concept of shadow type expression, which is not yet part of the OCL specification, although it is planned to be included in the next OCL version (2.5) \cite{brucker2013aachenReport}\footnote{It is cited in the report as type construction expression, Section 3.1}. The number of OCL tools which can currently be used to validate the CS2AS bridges is therefore limited (we are using Eclipse OCL\cite{eclipseOclOnline} which prototypes some proposed OCL 2.5 features).
 
 \section{Ongoing and future work}
 \label{sec:futureWork}
@@ -643,9 +707,11 @@ compiler.tests/src/org/eclipse/qvtd/cs2as/compiler/tests/OCL2QVTiTestCases.java}
 In terms of future work, we highlight the following.
 
 \begin{itemize}
-\item \textbf{Definition of CS2AS bridges for OCL and QVT.} We will apply the proposed OCL-based internal DSL to provide complete CS2AS bridge descriptions for the whole OCL and the three QVT languages. We expect these CS2AS bridges will be included as part of the future OCL and QVT specifications. Likewise, since we can generate executable code, we plan  -- in the context of Eclipse OCL and QVTd projects -- to replace some hand-written source code by auto-generated source code produced from the same CS2AS bridge descriptions.
+\item \textbf{Definition of CS2AS bridges for OCL and QVT.} We will apply the proposed OCL-based internal DSL to provide complete CS2AS bridge descriptions for the whole OCL and the three QVT languages. We expect these CS2AS bridge specifications to be included as part of the future OCL and QVT specifications. Likewise, we expect auto-generated code from from these bridge specifications to be used in future releases of the Eclipse OCL and QVTd projects. This should elimnate errors attributable to hand-written conversion source code.
 
-\item \textbf{Creation of an external DSL.} By bringing together the good aspects of other related languages such as NaBL or Gra2Mol, we want to create an external DSL with a higher level of abstraction than the one presented here, to ease even more the creation of those bridges. This external DSL would embed the OCL expressions language, and the supporting tooling would include a code generator to modularly produce the instances of the internal DSL presented in this paper.
+\item \textbf{Incremental CS2AS bridges.} Since generation of code from the declarative CS2AS bridges requires a detailed dependency analysis to identify a valid conversion schedule, we plan to exploit this analysis to synthesize incremental code for use in interactive contexts such as OCL editors. This should improve accuracy and performance dramatically since accurate efficient incremental code is particularly hard to write manually and pessimistic simplifications to improve accuracy are not always sound.
+
+\item \textbf{Creation of an external DSL.} By bringing together the good aspects of other related languages such as NaBL or Gra2Mol, we plan to create an external DSL with a higher level of abstraction than the one presented here, to ease even more the creation of those bridges. This external DSL can embed the OCL expressions language, and the supporting tooling can include a code generator to modularly produce the instances of the internal DSL presented in this paper.
 
 \item \textbf{Integration with existing language workbenches.} As added value of the DSL and to provide more proofs about how tool vendors may benefit from it (not covered in this paper), we want to exploit the proposed DSL in the context of a modern language workbench called Xtext.
 
@@ -656,7 +722,24 @@ In terms of future work, we highlight the following.
 \section{Conclusions}
 \label{sec:conclusions}
 
-OMG specifications, comprising textual languages, can be improved by providing  DSLs to express how the CS can be bridged to the AS. Although some specifications attempt to define those bridges, for instance, by the means of an attribute grammar formalism, these CS2AS bridge definitions contain errors or are incomplete, introducing the motivation to improve the existing means to define them. We have proposed an OCL-based internal DSL for that purpose, and explained, along with a running example, the different aspects of the language. Given the flexibility, modularity and reuse facilities the OCL host language provides, we have showed how CS2AS mappings, name resolution and CS disambiguation can be described in a declarative, modular and sound way. To conclude, we have mentioned all the potential work that this CS2AS internal DSL can provide, and pointed out some publicly available examples in which this CS2AS bridges were exercised, including  ongoing work about the generation of executable source code to perform the CS2AS gap resolution. We claim that those CS2AS bridge descriptions are free of typos, because an existing OCL tool was used to specify them, which will increase the quality of OMG specifications as soon as those descriptions are contributed.
+%OMG specifications, comprising textual languages, can be improved by providing  DSLs to express how the CS can be bridged to the AS. Although some specifications attempt to define those bridges, for instance, by the means of an attribute grammar formalism, these CS2AS bridge definitions contain errors or are incomplete, introducing the motivation to improve the existing means to define them. We have proposed an OCL-based internal DSL for that purpose, and explained, along with a running example, the different aspects of the language. Given the flexibility, modularity and reuse facilities the OCL host language provides, we have showed how CS2AS mappings, name resolution and CS disambiguation can be described in a declarative, modular and sound way. To conclude, we have mentioned all the potential work that this CS2AS internal DSL can provide, and pointed out some publicly available examples in which this CS2AS bridges were exercised, including  ongoing work about the generation of executable source code to perform the CS2AS gap resolution. We claim that those CS2AS bridge descriptions are free of typos, because an existing OCL tool was used to specify them, which will increase the quality of OMG specifications as soon as those descriptions are contributed.
+
+We have introduced a Concrete Syntax to Abstract Syntax bridge that is:
+\begin{itemize}
+\item \textbf{Sound}. We have shown how intuitive aspects of the current OCL specification are formalized by OCL definitions and faults corrected.
+\item \textbf{Executable}. We use the dependencies behind the OCL definitions to establish an execution schedule.
+\item \textbf{Extensible}. We reuse the formalization of the OCL bridge in a QVT bridge.
+\end{itemize}
+
+Our bridge modularizes and separates the specification concerns:
+\begin{itemize}
+\item \textbf{Mapping}. An OCL operation hierarchy maps CS artifacts to the AS.
+\item \textbf{Name Resolution}. An OCL operation hierarchy flows the visible names down to the point of access.
+\item \textbf{Disambiguation}: Replacement CS artifacts avoid the need for semantic resolution within a syntactic parser.
+\end{itemize}
+
+Our bridge is currently ready-to-go; it works on test examples. It will now be applied to replace manual tooling in Eclipse OCL and QVT by tooling generated direct from the potential OCL 2.5 specification models.
+
 
 \bibliographystyle{unsrt}
 \bibliography{ow2015}

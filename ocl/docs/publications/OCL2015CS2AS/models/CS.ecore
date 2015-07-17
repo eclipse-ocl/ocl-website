@@ -1,39 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="oclCS">
-  <eClassifiers xsi:type="ecore:EClass" name="LetExpCS" eSuperTypes="#//ExpCS">
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="oclCS" nsURI="xx" nsPrefix="xx">
+  <eClassifiers xsi:type="ecore:EClass" name="LetExpCS" eSuperTypes="#//OclExpressionCS">
     <eStructuralFeatures xsi:type="ecore:EReference" name="inExpression" lowerBound="1"
-        eType="#//ExpCS" containment="true"/>
+        eType="#//OclExpressionCS" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" lowerBound="1"
         eType="#//VariableDeclarationCS" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="VariableDeclarationCS">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="varName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="initExp" eType="#//ExpCS"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="initExp" eType="#//OclExpressionCS"
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="varType" eType="#//TypeCS"
         containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="varName" eType="#//String"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="ExpCS" abstract="true"/>
-  <eClassifiers xsi:type="ecore:EClass" name="VariableExpCS">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="varName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  <eClassifiers xsi:type="ecore:EClass" name="VariableExpCS" eSuperTypes="#//OclExpressionCS">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="varName" eType="#//String"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CollectionRangeCS" eSuperTypes="#//CollectionLiteralPartCS">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="last" lowerBound="1" eType="#//ExpCS.1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="last" lowerBound="1" eType="#//OclExpressionCS"
         containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="CollectionRangeCS"/>
-  <eClassifiers xsi:type="ecore:EClass" name="ExpCS" abstract="true" eSuperTypes="#//CollectionLiteralPartCS"/>
-  <eClassifiers xsi:type="ecore:EClass" name="TypeCS" eSuperTypes="#//ExpCS">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="EReference0" eType="#//ExpCS"/>
+  <eClassifiers xsi:type="ecore:EClass" name="OclExpressionCS" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeCS" eSuperTypes="#//OclExpressionCS">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="EReference0" eType="#//OclExpressionCS"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CollectionLiteralPartCS">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="first" lowerBound="1" eType="#//ExpCS.1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="first" lowerBound="1" eType="#//OclExpressionCS"
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="EClass0"/>
   <eClassifiers xsi:type="ecore:EClass" name="NameExpCS">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="#//String"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isMarkedAsPre" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CollectionLiteralExpCS" eSuperTypes="#//OclExpressionCS">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parts" upperBound="-1"
+        eType="#//CollectionLiteralPartCS" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EDataType" name="String"/>
 </ecore:EPackage>
