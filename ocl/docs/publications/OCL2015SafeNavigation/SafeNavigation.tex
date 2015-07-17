@@ -43,7 +43,7 @@ consequences and identify further OCL refinements that are needed to make safe n
 %
 Tony Hoare apologized in 2009\cite{Hoare-mistake} for inventing the null reference in 1965. This `billion dollar mistake' has been causing difficulties ever since. However NIL had an earlier existence in LISP and I'm sure many of us would have made the same mistake.
 
-The problem arises because the null object has many, but not all, of the behaviors of an object and any attempt to use one of the missing behaviors leads to a program failure. Perhaps the most obvious missing behavior is the navigation expression \emph{anObject.name} which accesses the \emph{name} property of \emph{anObject}. Whenever \emph{anObject} can be null, there is no \emph{name} causing the program to fail.
+The problem arises because the null object has many, but not all, of the behaviors of an object and any attempt to use one of the missing behaviors leads to a program failure. Perhaps the most obvious missing behavior is the navigation expression \emph{anObject.name} which accesses the \emph{name} property of \emph{anObject}. Whenever \emph{anObject} can be null, accessing its \emph{name} property will cause the program to fail.
 
 A reliable program must avoid all navigation failures and so must prove that the source object of every navigation expression is never null. This is often too formidable an undertaking. We are therefore blessed with many programs that fail due to \emph{NullPointerException} when an unanticipated control path is followed.
 
@@ -67,10 +67,10 @@ This obviously fails if \verb|aPerson| is null. It also fails whenever \verb|fat
 
 \subsection{Safe Object Navigation Operator}
 
-We can easily introduce a \verb|?.\verb| operator to OCL by defining \verb|x?.y| as a short-form for 
+We can easily introduce a \verb|?.| operator to OCL by defining \verb|x?.y| as a short-form for 
 
 \begin{verbatim}
-        let x' = x in if x' <> null then x'.y else null endif
+        if x <> null then x.y else null endif
 \end{verbatim}
 
 We can rewrite \verb|aPerson.father.name.toUpper()| for safety as
@@ -127,7 +127,7 @@ This again ensures that null children are ignored.
 
 \subsection{Assessment}
 
-OCL 2.4 already has distinct object and collection navigation operators, with implicit-collect and implicit-as-set short-forms. These are sufficient to confuse new or less astute OCL programmers, who may just make a random choice and hope for a tool to correct the choice. Adding a further two operators can only add to the confusion. We must therefore look closely at how tooling can exploit the rigor of OCL to ensure that safe navigation eliminates one of OCL's limitations.
+OCL 2.4 already has distinct object and collection navigation operators, with implicit-collect and implicit-as-set short-forms. These are sufficient to confuse new or less astute OCL programmers, who may just make a random choice and hope for a tool to correct the choice. Adding a further two operators can only add to the confusion. We must therefore look closely at how tooling can exploit the rigor of OCL to ensure that safe navigation eliminates one of OCL's limitations. FIXME ASBH I'm not sure which OCL limitation you refer there
 
 \subsection{Safe Navigation Validation}
 
@@ -160,19 +160,37 @@ We could consider introducing non-null declarations analogous to C++ reference d
 
 OCL can exploit this information coming from UML models and may extend the syntax of iterators, let-variables and tuple parts to support similar declarations in OCL expressions. However, since OCL has always permitted nulls, we must treat \verb|[?]| as the default for the new OCL declarations even though \verb|[1]| is the default for UML declarations.
 
+With respect to use of the \verb|*| unlimited natural literal expression as TypedElement multiplicity, we will add some comments in the next section where null-free collection declarations are introduced.
+
 \subsection{Null-free Collection declarations}
 
 The ability to declare non-null variables and properties provides some utility for safe navigation validation, but we soon hit another problem. Collection operations are perhaps the most important part of OCL, and any collection may contain none, some or many null elements. Consequently whenever we operate on collection elements we hit the could-be-null hazard.
 
-Null objects can often be useful. However collections containing null are rarely useful. The could-be-null collection elements hazards are therefore doubly annoying, there is an irritating hazard diagnosis and the diagnosis complains about typical usage.
+Null objects can often be useful. However collections containing null are rarely useful. The could-be-null collection elements hazards are therefore doubly annoying, there is an irritating hazard diagnosis and the diagnosis complains about typical usage. FIXME ASBH I don't understand what you want to say in this last sentece.
 
-In order to eliminate the hazard diagnosis, we must be able to declare that a collection is null-free; i.e. that it contains no null elements. This could be treated as a third boolean qualifier extending the existing ordered and unique qualifiers. We could therefore introduce the new names, NullFreeBag, NullFreeCollection, NullFreeOrderedSet, NullFreeSequence and NullFreeSet but this is beginning to incur combinatorial costs and does not extend to nested collections.
+In order to eliminate the hazard diagnosis, we must be able to declare that a collection is null-free; i.e. that it contains no null elements. This could be treated as a third boolean qualifier extending the existing ordered and unique qualifiers. We could therefore introduce the new names, NullFreeBag, NullFreeCollection, NullFreeOrderedSet, NullFreeSequence and NullFreeSet but this is beginning to incur combinatorial costs.
 
-A different aspect of UML provides an opportunity for extension. UML supports bounded collections, but OCL does not even though OCL aspires to UML alignment. The alignment deficiency can be remedied by following a collection declaration by an optional a UML multiplicity bound. Thus \verb|Set(String)| is a short-form for \verb|Set(String)[0..*]| allowing UML bounded collections and OCL nested collection to support e.g. \verb|Sequence(Sequence(Integer)[3])[3]| as the declaration of a 3*3 Integer matrix.
+A different aspect of UML provides an opportunity for extension. UML supports bounded collections, but OCL does not, even though OCL aspires to UML alignment. The alignment deficiency can be remedied by following a collection declaration by an optional a UML multiplicity bound. Thus \verb|Set(String)| is a short-form for \verb|Set(String)[0..*]| allowing UML bounded collections and OCL nested collection to support e.g. \verb|Sequence(Sequence(Integer)[3])[3]| as the declaration of a 3*3 Integer matrix.
 
-We require an extension of the UML collection multiplicity, to also declare an element multiplicity. Syntactically we can re-use the `where' operator to allow \verb$[x|y]$ to be read as `a collection of multiplicity x where each element has multiplicity y'. We can now prohibit null elements and null rows in our example Integer matrix by specifying \verb$Sequence(Sequence(Integer)[3|1])[3|1]$.
+However, this UML collection multiplicity tells nothing about if elements \textit{cannot be null}. We require an extension of the UML collection multiplicity, to also declare an element multiplicity. Syntactically we can re-use the `where' operator (FIXME ASBH 'where' operator name looks like wrong. I'm unsure about how to name it without using "vertical bar symbol" or similar, though. )to allow \verb$[x|y]$ to be read as `a collection of multiplicity x where each element has multiplicity y'. We can now prohibit null elements and null rows in our example Integer matrix by specifying \verb$Sequence(Sequence(Integer)[3|1])[3|1]$.
 
-Finally we are getting somewhere. A collection operation on a null-free collection obviously has a non-null iterator and so the known non-null elements can propagate throughout complex OCL expressions. Provided we use accurate non-null and null-free declarations in our models, well written OCL does not need any change. Less well written OCL has its null hazards diagnosed. 
+Finally, we are getting somewhere. A collection operation on a null-free collection obviously has a non-null iterator and so the known non-null elements can propagate throughout complex OCL expressions. Provided we use accurate non-null and null-free declarations in our models, well written OCL does not need any change. Less well written OCL has its null hazards diagnosed. (FIXME ASBH  It's not clear to me what is well written OCL and why it doesn't need any change. )
+
+With respect to the usage of the \verb|*| unlimited natural literal as a possible element multiplicity, in principle, a declaration as the following one:
+
+\begin{verbatim}
+        multipleNames : String[*]
+\end{verbatim}
+
+would be unnecessary in OCL since we already have the OCL collections to denote that a property comprises multiple values. Therefore the notation, above would be equivalent (shorthand) to declare the following one:
+
+\begin{verbatim}
+        multipleNames : Collection(String)[*|?]
+\end{verbatim}
+
+in which we are specifying that \textit{multipleNames} can have between 0 and an unlimited number of Strings, and due to the OCL defaults, all of them \textit{could be null}.
+
+Therefore, it turns out that the only possible literals that we can use for element multiplicities are \verb|[1]| and \verb|[?]|, specifically to declare the possible non-null-ness (null-free-ness in case of being used as collection element multiplicity) or null-ness of that element.
 
 \subsection{Null-safe libraries}
 
@@ -209,11 +227,10 @@ The requirement for T3 to be the highest common type of T1 and T2 can be satisfi
 \begin{verbatim}
     Set(T)[c1|e1]::including(x2 : T[e2]) : Set(T)[c3|e3]
 \end{verbatim}
-Only common types provide a valid solution to an invocation, and choosing the most derived of the common types gives the highest common type as desired.
 
 If e1 and e2 are Boolean-values with true for \verb$[1]$ (is not null) and false for \verb$[?]$ (may be null), e3 is just \verb$e1 and e2$. If our library modeling support Boolean-valued OCL equations to determine the result multiplicity, we can model this and avoid the need for an implementation to transliterate specification words into code.
 
-Preliminary discussions indicated limited enthusiasm for accurate modeling of collection bounds in OCL, so we could just take the view that OCL does not support bounded collections enthusiastically; c3 is always \verb$[0..*]$. However if we need to support equations for the element multiplicity, we can easily support equations for the pessimistic collection multiplicity too. 
+Preliminary discussions (FIXME ASBH Preliminary discussions ? where ? reference ?) indicated limited enthusiasm for accurate modeling of collection bounds in OCL, so we could just take the view that OCL does not support bounded collections enthusiastically; c3 is always \verb$[0..*]$. However if we need to support equations for the element multiplicity, we can easily support equations for the pessimistic collection multiplicity too. 
 
 \begin{verbatim}
         c3 = c1->first() .. c1->last()+1
@@ -256,10 +273,10 @@ The possibility of safe navigation in OCL is new, or rather the pair of \verb$?.
 %
 We find that naive introduction of safe navigation to OCL risks just doubling the number of arbitrary navigation operator choices for an unskilled OCL user. These problems are soluble with tool support provided we can also solve the problem of declaring non-null objects and null-free collections.
 
-We take inspiration from UML multiplicity declarations to provide the necessary declarations. We exploit stereotypes so that the impact for well-designed models may be as little as 
+We take inspiration from UML multiplicity declarations to provide the necessary declarations. Due to the fact that by default OCL collections can contain null values, we exploit stereotypes so that the impact for well-designed models may be as little as 
 \begin{itemize}
 \item one stereotype per Package to specify that all of its collections are null-free
-\item an accurate \verb$[?]$ or \verb$[1]$ multiplicity to encode the design intent of each non-collection Property
+\item an accurate \verb$[?]$ or \verb$[1]$ multiplicity to encode the design intent of each non-collection Property (FIXME ASBH is this well contextualized ? i.e. it doesn't seem ot be related to the Stereotypes you are talking about, is it ? )
 \end{itemize}
 
 %
