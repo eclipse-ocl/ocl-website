@@ -25,14 +25,14 @@
 \tocauthor{Edward Willink}
 %
 \institute{Willink Transformations Ltd, Reading, England,\\
-\email{ed@willink.me.uk}}
+\email{ed\_at\_willink.me.uk}}
 
 
 \maketitle              % typeset the title of the contribution
 
 \begin{abstract}
 The null object has been useful and troublesome ever since it was introduced.
-The problems have mitigated by references in C++, annotations in Java or safe navigation in Groovy, Python and Xbase.
+The problems have been mitigated by references in C++, annotations in Java or safe navigation in Groovy, Python and Xbase.
 Introduction of a safe navigation operator to OCL has some rather unpleasant consequences. We examine these
 consequences and identify further OCL refinements that are needed to make safe navigation useable.
 
@@ -43,7 +43,7 @@ consequences and identify further OCL refinements that are needed to make safe n
 %
 Tony Hoare apologized in 2009\cite{Hoare-mistake} for inventing the null reference in 1965. This `billion dollar mistake' has been causing difficulties ever since. However NIL had an earlier existence in LISP and I'm sure many of us would have made the same mistake.
 
-The problem arises because the null object has many, but not all, of the behaviors of an object and any attempt to use one of the missing behaviors leads to a program failure. Perhaps the most obvious missing behavior is used by the navigation expression \emph{anObject.name} which accesses the \emph{name} property of \emph{anObject}. Whenever \emph{anObject} can be null, accessing its \emph{name} property will cause the program to fail.
+The problem arises because the null object has many, but not all, of the behaviors of an object and any attempt to use one of the missing behaviors leads to a program failure. Perhaps the most obvious missing behavior is used by the navigation expression \emph{anObject.name} which accesses the \emph{name} property of \emph{anObject}. Whenever \emph{anObject} can be null, accessing its \emph{name} property can cause the program to fail.
 
 A reliable program must avoid all navigation failures and so must prove that the source object of every navigation expression is never null. This is often too formidable an undertaking. We are therefore blessed with many programs that fail due to \emph{NullPointerException} when an unanticipated control path is followed.
 
@@ -57,7 +57,7 @@ In this paper we consider how OCL can combine the static rigor of C++-like refer
 
 \section{Safe Navigation Operators}\label{Safe Navigation Operators}
 
-OCL 2.4 has no protection against the navigation of null objects; any such navigation yields an invalid value, which is OCL's way of accommodating a program failure that other languages handle as an exception. OCL provides powerful collection operators enabling compact expressions such as
+OCL 2.4\cite{OCL-2.4} has no protection against the navigation of null objects; any such navigation yields an invalid value, which is OCL's way of accommodating a program failure that other languages handle as an exception. OCL provides powerful collection operators enabling compact expressions such as
 
 \begin{verbatim}
         aPerson.father.name.toUpper()
@@ -87,7 +87,7 @@ Collection operations are a very important part of OCL and any collection naviga
 \begin{verbatim}
         aPerson.children->collect(name)
 \end{verbatim}
-will fail if any element of the children collection is null.
+will fail if any element of the \verb|children| collection is null.
 
 We can easily introduce the safe collection navigation operator \verb|?->|  to OCL by defining \verb|x?->y| as a short-form for 
 
@@ -101,7 +101,7 @@ We can rewrite the problematic collection navigations for safety as:
         aPerson?.children?->collect(name)
 \end{verbatim}
 
-This ensures that any null children are ignored and so do not cause an invalid failure.
+This ensures that any null \verb|children| are ignored and so do not cause an invalid failure.
 
 \subsection{Safe Implicit-Collect Navigation Operator}
 
@@ -123,7 +123,7 @@ We can rewrite for safety as
         aPerson?.children?.name
 \end{verbatim}
 
-This again ensures that null children are ignored.
+This again ensures that null \verb|children| are ignored.
 
 \subsection{Assessment}
 
@@ -147,7 +147,7 @@ We have seen how the safe navigation operator is unuseably pessimistic when non-
 
 \subsection{Non-null Object declarations}
 
-We could consider introducing non-null declarations analogous to C++ reference declarations. We could even re-use the \verb|&| character. But we don't need to, since UML already provides a solution and a syntax. When declaring a TypedElement, a multiplicity may qualify the type:
+We could consider introducing non-null declarations analogous to C++ reference declarations. We could even re-use the \verb|&| character. But we don't need to, since UML\cite{UML-2.5} already provides a solution and a syntax. When declaring a TypedElement, a multiplicity may qualify the type:
 
 \begin{verbatim}
         mandatoryName : String[1]
@@ -166,7 +166,7 @@ OCL can exploit this information coming from UML models and may extend the synta
 
 The ability to declare non-null variables and properties provides some utility for safe navigation validation, but we soon hit another problem. Collection operations are perhaps the most important part of OCL, and any collection may contain none, some or many null elements. Consequently whenever we operate on collection elements we hit the pessimistic could-be-null hazard.
 
-Null objects can often be useful. However collections containing null are rarely useful. The pessimistic could-be-null hazards is therefore doubly annoying for collection elements:
+Null objects can often be useful. However collections containing null are rarely useful. The pessimistic could-be-null hazards are therefore doubly annoying for collection elements:
 \begin{itemize}
 \item a large proportion of collection operations are diagnosed as hazardous
 \item the hazard only exists because the tooling fails to understand typical usage.
@@ -176,7 +176,7 @@ In order to eliminate the hazard diagnosis, we must be able to declare that a co
 
 A different aspect of UML provides an opportunity for extension. UML supports bounded collections, but OCL does not, even though OCL aspires to UML alignment. The alignment deficiency can be remedied by following a collection declaration by an optional UML multiplicity bound. Thus \verb|Set(String)| is a short-form for \verb|Set(String)[0..*]| allowing UML bounded collections and OCL nested collections to support e.g. \verb|Sequence(Sequence(Integer)[3])[3]| as the declaration of a 3*3 Integer matrix.
 
-However, this UML collection multiplicity tells us nothing about whether elements \textit{cannot-be-null}. We require an extension of the UML collection multiplicity, to also declare an element multiplicity. Syntactically we can re-use the vertical bar symbol to allow \verb$[x|y]$ to be read as `a collection of multiplicity x where each element has multiplicity y'. We can now prohibit null elements and null rows by specifying \verb$Sequence(Sequence(Integer)[3|1])[3|1]$.
+However, this UML collection multiplicity tells us nothing about whether elements \textit{cannot-be-null}. We require an extension of the UML collection multiplicity to also declare an element multiplicity. Syntactically we can re-use the vertical bar symbol to allow \verb$[x|y]$ to be read as `a collection of multiplicity x where each element has multiplicity y'. We can now prohibit null elements and null rows by specifying \verb$Sequence(Sequence(Integer)[3|1])[3|1]$.
 
 Finally, we are getting somewhere. A collection operation on a null-free collection obviously has a non-null iterator and so the known non-null elements can propagate throughout complex OCL expressions. Provided we use accurate non-null and null-free declarations in our models, well-written OCL that already avoids null hazards does not need any change. Less well written OCL has its null hazards diagnosed.
 
@@ -233,9 +233,9 @@ The requirement for T3 to be the highest common type of T1 and T2 can be satisfi
 \end{verbatim}
 Only common types provide a valid solution to an invocation, and choosing the most derived of the common types gives the highest common type as desired.
 
-If e1 and e2 are Boolean-values with true for \verb$[1]$ (is not null) and false for \verb$[?]$ (may be null), e3 is just \verb$e1 and e2$. If our library modeling supports Boolean-valued OCL equations to determine the result multiplicity, we can model this and avoid the need for an implementation to transliterate specification words into code.
+If \verb$e1$ and \verb$e2$ are Boolean-valued with true for \verb$[1]$ (is not null) and false for \verb$[?]$ (may be null), \verb$e3$ is just \verb$e1 and e2$. If our library modeling supports Boolean-valued OCL equations to determine the result multiplicity, we can model this and avoid the need for an implementation to transliterate specification words into code.
 
-Preliminary discussions at Aachen\cite{aachen} indicated limited enthusiasm for accurate modeling of collection bounds in OCL, so we could just take the view that OCL does not support bounded collections enthusiastically; c3 is always \verb$[0..*]$. However if we need to support equations for the element multiplicity, we can easily support equations for the pessimistic collection multiplicity too. 
+Preliminary discussions at Aachen\cite{aachen} indicated limited enthusiasm for accurate modeling of collection bounds in OCL, so we could just take the view that OCL does not support bounded collections enthusiastically; \verb$c3$ is always \verb$[0..*]$. However if we need to support equations for the element multiplicity, we can easily support equations for the pessimistic collection multiplicity too. 
 
 \begin{verbatim}
         c3 = c1->first() .. c1->last()+1
@@ -247,7 +247,7 @@ Once the standard library has accurate null-safe modeling we are just left with 
 
 For object declarations, there seems little choice but to make this part of the user's modeling discipline; object declarations must accurately permit or prohibit the use of null.
 
-For collection declarations the default may-be-null legacy behavior is mostly wrong and for some users it may be universally wrong. We would like to provide a universal change to the default so that all collections are null-free unless explicitly declared to be null-full. In UML, we can achieve this by applying an \verb$OCL::Collections$ stereotype to a Package or Class. The \verb$nullFree$ Boolean stereotype property provides a setting that is `inherited' by all collection-valued properties within the Package or Class.
+For collection declarations the default may-be-null legacy behavior is mostly wrong and for some users it may be universally wrong. We would like to provide a universal change to the default so that all collections are null-free unless explicitly declared to be null-full. In UML, we can achieve this by defining an \verb$OCL::Collections::nullFree$ stereotype property for a Package or Class. The \verb$nullFree$ Boolean property provides a setting that is `inherited' by all collection-valued properties within the Package or Class.
 
 UML has no support for declaring collection elements to be non-null, so we need a further \verb$OCL::Collection::nullFree$ stereotype property to define whether an individual TypedElement has a null-free collection or not.
 
@@ -274,7 +274,7 @@ The safe navigation operator is not new since at least Groovy, Python and Xbase 
 
 The possibility of safe navigation in OCL is new, or rather the pair of \verb$?.$ and \verb$?->$ operators were new when we suggested it in the Aachen workshop\cite{aachen}. The utility of the \verb$[?]$ and \verb$[1]$ non-null multiplicities was also mentioned at the Aachen workshop. The null-free declarations, stereotypes and the interaction between safe navigation and non-null multiplicities have not been presented before, although they are available in the Mars release of Eclipse OCL \cite{Mars-OCL}. 
 
-\section{Acknowledgments}
+\paragraph{Acknowledgments}
 
 Many thanks to Adolfo S\'{a}nchez-Barbudo Herrera for his detailed review and constructive comments.
 %
@@ -326,10 +326,14 @@ Using null annotations:
 Eclipse OCL:
 \url{https://www.eclipse.org/modeling/mdt/downloads/?project=ocl}
 
+\bibitem{OCL-2.4} Object Constraint Language. Version 2.4., OMG Document Number: formal/2014-02-03, Object Management Group (2009),  \url{http://www.omg.org/spec/OCL/2.4}
+
 \bibitem{python}
 Python Software Foundation:
 The Python Language Reference.
 2.7.10 (2015)
+
+\bibitem{UML-2.5} OMG Unified Modeling Language (OMG UML), Version 2.5, {OMG Document Number}: formal/15-03-01, Object Management Group (2015), \url{http://www.omg.org/spec/UML/2.5}
 
 \bibitem{xbase}
 Xbase:
