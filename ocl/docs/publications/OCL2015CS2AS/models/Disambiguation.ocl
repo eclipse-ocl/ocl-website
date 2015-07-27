@@ -2,11 +2,19 @@ import 'CS.ecore'
 import 'AS.ecore'
 import 'Lookup.ocl'
 
+
+package oclCS
+context NameExpCS
+def : ast() : oclAS::OclExpression =
+	null
+
+endpackage
+
 package oclCS
 
 context NameExpCS
 def : isAVariableExp() : Boolean =
-	let variable = ast().lookupVariable(self)
+	let variable = ast().lookupVariable(name)
 	in variable <> null
 
 endpackage

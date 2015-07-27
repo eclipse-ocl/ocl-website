@@ -417,7 +417,7 @@ The rationale is that we are interested in looking up AS elements for which we m
 
 \begin{lstlisting}[caption=Name resolution producers, label=lst:exampleNameResodesc, language=OCL]  
 context OclAny
-def : env : env::Environment 
+def : env : env::Environment = 
   if oclContainer() <> null
   then oclContainer().childEnv(self)
   else env::Environment{}
@@ -627,8 +627,8 @@ context NameExpCS
 def : ast() : ocl::OclExpression =
   if isAVariableExp() 
   then
-    let variable = ast().lookupVariable(self)
-    in oclAS::VariableExp {
+    let variable = ast().lookupVariable(name)
+    in ocl::VariableExp {
         name = name,
         referredVariable = variable,
         type = if variable = null
@@ -637,8 +637,8 @@ def : ast() : ocl::OclExpression =
                endif
     }
   else 
-    let property = ast().lookupProperty(self)
-    in oclAS::PropertyCallExp {
+    let property = ast().lookupProperty(name)
+    in ocl::PropertyCallExp {
         name = name,
         referredProperty = property,
         type = if property = null
@@ -654,7 +654,7 @@ This approach has the benefit of localizing the disambiguation in the \emph{isAV
 \begin{lstlisting}[caption=NameExpCS disambigutation rule, label=lst:nameExpDisambiguationRule, language=OCL]
 context NameExpCS
 def : isAVariableExp() : Boolean =
-	let variable =  ast().lookupVariable(self),
+	let variable = ast().lookupVariable(name)
 	in variable <> null
 \end{lstlisting}
 
@@ -741,7 +741,7 @@ Our bridge modularizes and separates the specification concerns:
 \begin{itemize}
 \item \textbf{Mapping}. An OCL operation hierarchy maps CS artifacts to the AS.
 \item \textbf{Name Resolution}. An OCL operation hierarchy flows the visible names down to the point of access.
-\item \textbf{Disambiguation}. Unified CS elements, plus CS disambiguation rules, avoid the need for semantic resolution within a syntactic parser.
+i\item \textbf{Disambiguation}. Unified CS artifacts, plus CS disambiguation rules, avoid the need for semantic resolution within a syntactic parser.
 \end{itemize}
 
 Our bridge is currently ready-to-go; it works on test examples. It will now be applied to replace manual tooling in Eclipse OCL and QVT by tooling generated direct from the potential OCL 2.5 specification models.

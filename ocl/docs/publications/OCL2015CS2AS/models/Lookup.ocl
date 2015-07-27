@@ -1,6 +1,45 @@
 import 'CS.ecore'
 import 'AS.ecore'
+import 'Environment.ecore'
+
+package env
+context Environment
+def : nestedEnv() : Environment =
+	null 
+	
+def : addElement(element : OclAny) : Environment =
+	null
+endpackage
+
+package ocl
+context OclElement
+
+def : env : env::Environment = 
+  if oclContainer() <> null
+  then oclContainer().childEnv(self)
+  else env::Environment{}
+  endif
+
+def : childEnv(child : OclAny) : env::Environment =
+  env
+  
+  
+endpackage
 
 package oclAS
+context LetExp
+def : childEnv(child : OclAny) : env::Environment =
+  if child = variable
+  then env
+  else env.nestedEnv().addElement(variable)
+  endif
+
+
+context OclExpression
+def : lookupVariable(name : String ) : Variable =
+	null
+
+def : lookupProperty(name : String ) : Property =
+	null
 	
 endpackage
