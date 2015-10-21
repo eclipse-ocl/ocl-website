@@ -49,7 +49,7 @@ A reliable program must avoid all navigation failures and so must prove that the
 
 Language enhancements such as references~\cite{c++-references} in C++ allow the non-nullness of objects to be declared as part of the source code. Once these are exploited by good programmers, compile-time analysis can identify a tractably small number of residual navigation hazards that need to be addressed.
 
-A similar capability is available for Java using annotations such as \emph{@NonNull}~\cite{java-NonNull}, however problems of legacy compatibility for Java's large unannotated libraries makes it very hard to achieve comprehensive detection of null navigation hazards.
+A similar capability is available using \emph{@NonNull}~\cite{java-NonNull} annotations in Java, however problems of legacy compatibility for Java's large unannotated libraries makes it very hard to achieve comprehensive detection of null navigation hazards.
 
 An alternative approach is pursued by languages such as Groovy~\cite{groovy}, Python~\cite{python} and Xbase~\cite{xbase}. A safe navigation operator makes the nulls less dangerous so that \emph{anObject?.name} avoids the failure if \emph{anObject} is null. The failure is replaced by a null result which may solve the problem, or may just move the problem sideways since the program must now be able to handle a null \emph{name}.
 
@@ -57,7 +57,7 @@ In this paper we consider how OCL can combine the static rigor of C++-like refer
 
 \section{Safe Navigation Operators}\label{Safe Navigation Operators}
 
-OCL 2.4~\cite{OCL-2.4} has no protection against the navigation of null objects; any such navigation yields an invalid value, which is OCL's way of accommodating a program failure that other languages handle as an exception. OCL provides powerful collection operators enabling compact expressions such as
+OCL 2.4~\cite{OCL-2.4} has no protection against the navigation of null objects; any such navigation yields an invalid value. This is OCL's way of accommodating a program failure that other languages handle as an exception. OCL provides powerful navigation and collection operators enabling compact expressions such as
 
 \begin{verbatim}
         aPerson.father.name.toUpper()
@@ -79,7 +79,7 @@ We can rewrite \verb|aPerson.father.name.toUpper()| for safety as
         aPerson?.father?.name?.toUpper()
 \end{verbatim}
 
-This ensures that the result is either the expected value or null; no invalid failure.
+This ensures that the result is the expected value or null; no invalid failure.
 
 \subsection{Safe Collection Navigation Operator}
 
@@ -198,7 +198,7 @@ Finally, we are getting somewhere. A collection operation on a null-free collect
 
 \subsection{Null-safe libraries}
 
-The OCL standard library provides a variety of useful operations and iterations. Thier return values may or may not be non-null. The library currently has only semi-formal declarations. These lack the precision we need for null-safe analysis. We  will therefore consider how more formal declaratons can capture the behaviors that we need to specify.
+The OCL standard library provides a variety of useful operations and iterations. Their return values may or may not be non-null. The library currently has only semi-formal declarations. These lack the precision we need for null-safe analysis. We  will therefore consider how more formal declarations can capture the behaviors that we need to specify.
 
 \subsubsection{Simple Declaration}
 
@@ -271,6 +271,10 @@ For collection declarations the default may-be-null legacy behavior is mostly wr
 UML has no support for declaring collection elements to be non-null, so we need a further \verb$OCL::Collection::nullFree$ stereotype property to define whether an individual TypedElement has a null-free collection or not.
 
 For disciplined modelers, the sole cost of migrating to null-safe OCL will be to apply an OCL::Collections stereotype to each of their Packages.
+
+\subsubsection{Feedback from workshop}
+
+UML is moving, and perhaps has already moved, to prohibit nulls in multi-valued properties. UML-derived collections are therefore inherently null-free and no stereotype is required. Rather the converse of a null-full declaration is needed to declare that nulls are really required and that some workaround for the UML prohibition is to be used.
 
 \subsection{Deep non-null analysis}
 
