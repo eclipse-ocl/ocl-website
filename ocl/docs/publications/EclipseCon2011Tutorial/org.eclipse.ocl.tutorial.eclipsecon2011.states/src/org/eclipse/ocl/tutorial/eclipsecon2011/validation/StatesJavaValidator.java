@@ -17,8 +17,10 @@
 package org.eclipse.ocl.tutorial.eclipsecon2011.validation;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.ocl.examples.xtext.completeocl.validation.CompleteOCLEObjectValidator;
+import org.eclipse.ocl.pivot.utilities.OCL;
+//import org.eclipse.ocl.xtext.completeocl.validation.CompleteOCLEObjectValidator;
 import org.eclipse.ocl.tutorial.eclipsecon2011.states.StatesPackage;
+import org.eclipse.ocl.xtext.completeocl.validation.CompleteOCLEObjectValidator;
 import org.eclipse.xtext.validation.EValidatorRegistrar;
 
 public class StatesJavaValidator extends AbstractStatesJavaValidator
@@ -26,10 +28,11 @@ public class StatesJavaValidator extends AbstractStatesJavaValidator
     @Override
     public void register(EValidatorRegistrar registrar) {
         super.register(registrar);
+        OCL ocl = OCL.newInstance();
         StatesPackage ePackage = StatesPackage.eINSTANCE;
         URI oclURI = URI.createPlatformResourceURI(
             "/org.eclipse.ocl.tutorial.eclipsecon2011.states.ocl/model/States.ocl", true);
         registrar.register(ePackage,
-            new CompleteOCLEObjectValidator(ePackage, oclURI));
+            new CompleteOCLEObjectValidator(ePackage, oclURI, ocl.getEnvironmentFactory()));
     }
 }
