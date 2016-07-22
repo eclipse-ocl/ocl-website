@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="Extensions" nsURI="platform:/resource/mdt/ocl/docs/publications/OCL2016Extensibility/Extensions.ecore"
+    nsPrefix="pfx">
+  <eClassifiers xsi:type="ecore:EClass" name="Class" eSuperTypes="#//Type"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CollectionType" abstract="true" eSuperTypes="#//DataType">
+    <eTypeParameters name="T"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DataType" eSuperTypes="#//Type"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Bag">
+    <eTypeParameters name="T"/>
+    <eGenericSuperTypes eClassifier="#//CollectionType">
+      <eTypeArguments eTypeParameter="#//Bag/T"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="OrderedSet">
+    <eTypeParameters name="T"/>
+    <eGenericSuperTypes eClassifier="#//CollectionType">
+      <eTypeArguments eTypeParameter="#//OrderedSet/T"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sequence">
+    <eTypeParameters name="T"/>
+    <eGenericSuperTypes eClassifier="#//CollectionType">
+      <eTypeArguments eTypeParameter="#//Sequence/T"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Set">
+    <eTypeParameters name="T"/>
+    <eGenericSuperTypes eClassifier="#//CollectionType">
+      <eTypeArguments eTypeParameter="#//Set/T"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Type" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="List">
+    <eTypeParameters name="T"/>
+    <eGenericSuperTypes eClassifier="#//CollectionType">
+      <eTypeArguments eTypeParameter="#//List/T"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Dict">
+    <eTypeParameters name="K"/>
+    <eTypeParameters name="V"/>
+    <eGenericSuperTypes eClassifier="#//CollectionType">
+      <eTypeArguments eTypeParameter="#//Dict/K"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="CollectionKind">
+    <eLiterals name="Collection"/>
+    <eLiterals name="Bag"/>
+    <eLiterals name="OrderedSet"/>
+    <eLiterals name="Sequence"/>
+    <eLiterals name="Set"/>
+  </eClassifiers>
+</ecore:EPackage>
