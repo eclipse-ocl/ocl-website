@@ -1,0 +1,100 @@
+%!TEX root = ./paper1.tex
+
+\lstset{
+  float=tb,
+	captionpos=b,
+	breaklines=true,
+	xleftmargin=20pt,
+	basicstyle=\ttfamily\scriptsize,
+	numberstyle=\tiny,
+	flexiblecolumns=true,
+	numbers=left,
+	nolol=false,
+	tabsize=2
+}
+
+\lstdefinelanguage{OCL}{
+morekeywords={import,if,then,else,endif,self,and,true,false,def,includes,OclElement,package,let,in},
+sensitive=true,
+morecomment=[l]{--},
+morestring=[b]",
+morestring=[b]',
+showstringspaces=false
+}
+
+\lstdefinelanguage{QVTo}{
+morekeywords={import,modeltype,uses,transformation,inout,in,out,configuration,property,main,var,if,then,else,endif,map,new,self,library,helper, mapping, and,return, when, where, object, true, false, result},
+sensitive=true,
+morecomment=[l]{--},
+morecomment=[l]{//},
+morestring=[b]",
+morestring=[b]',
+showstringspaces=false
+}
+
+\lstdefinelanguage{Acceleo}{
+morekeywords={template, file, if, else, for},
+sensitive=true,
+morecomment=[l]{--},
+morecomment=[l]{//},
+morestring=[b]",
+morestring=[b]',
+showstringspaces=false
+}
+
+\lstdefinelanguage{MWE}{
+morekeywords={module, import, var, true, false, },
+sensitive=true,
+morecomment=[l]{//},
+morestring=[b]",
+showstringspaces=false
+}
+
+\lstdefinelanguage{Java}{
+morekeywords={class, private, public, true, false, new, if, for, int, return, void, extends, implements, this, null, super, import, package},
+sensitive=true,
+morecomment=[l]{//},
+morestring=[b]",
+showstringspaces=false
+}
+
+\lstdefinelanguage{JastAdd}{
+morekeywords={abstract, ast, syn, inh, eq, boolean, int, false, true, if, for, return},
+morestring=[b]',
+sensitive=true
+}
+
+\lstdefinelanguage{NaBL}{
+morekeywords={rules, defines, unique, non, refers, to},
+sensitive=true
+}
+
+\lstdefinelanguage{Gra2Mol}{
+morekeywords={rule, from, to, queries, mappings, skip, end_rule},
+morestring=[b]',
+sensitive=true
+}
+
+\lstdefinelanguage{Xtext}{
+morekeywords={terminal, returns, grammar, import, fragment, current},
+morestring=[b]',
+morecomment=[l]{//},
+sensitive=true
+}
+
+\lstdefinelanguage{Xtend}{
+morekeywords={FOR, ENDFOR, IF, ELSE, ENDIF, def, protected, void, new, var, typeof, return},
+morestring=[b]',
+morestring=[b]",
+morecomment=[s]{/*}{*/},
+sensitive=true
+}
+
+\lstdefinelanguage{CS2AS}{
+morekeywords={source, target, nameresolution, named, element, exports, for, from, all, children, resolution, helpers, mappings, map, disambiguation, lookup, lookupFrom, resolve, trace, when, occluding, nested,scope, def, protected, import,if,then,else,endif,self,and,true,false,def,includes,OclElement,package,let,in, void, new, var, typeof, return},
+morestring=[b]',
+morestring=[b]",
+morecomment=[l]{--},
+morecomment=[s]{/*}{*/},
+sensitive=true
+}
