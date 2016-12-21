@@ -1,2 +1,0 @@
-modeling/mdt/6.1.2/R201611141024
-modeling/mdt/6.2.2/R201612120613
