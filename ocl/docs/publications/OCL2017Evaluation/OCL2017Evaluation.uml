@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_aXiL4F_6EeeMYKMUDTrolQ" name="OCL2017Evaluation">
+  <packageImport xmi:type="uml:PackageImport" xmi:id="_alr8oF_6EeeMYKMUDTrolQ">
+    <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
+  </packageImport>
+  <packagedElement xmi:type="uml:Class" xmi:id="_c3uQsF_6EeeMYKMUDTrolQ" name="AbstractValue" isAbstract="true"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_evOk4F_6EeeMYKMUDTrolQ" name="CollectionValue" isAbstract="true">
+    <generalization xmi:type="uml:Generalization" xmi:id="_xmiMoF_7EeeMYKMUDTrolQ" general="_c3uQsF_6EeeMYKMUDTrolQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_KrISg1_8EeeMYKMUDTrolQ" name="iterable" type="_rm_hgF_6EeeMYKMUDTrolQ" aggregation="composite" association="_KrISgF_8EeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_KrIShF_8EeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_KrIShV_8EeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_gmclMF_6EeeMYKMUDTrolQ" name="BagValue">
+    <generalization xmi:type="uml:Generalization" xmi:id="_ufcf4F_7EeeMYKMUDTrolQ" general="_evOk4F_6EeeMYKMUDTrolQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_JpkH01_8EeeMYKMUDTrolQ" name="custom bag" type="_oOCBoF_6EeeMYKMUDTrolQ" aggregation="composite" association="_JpkH0F_8EeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_JpkH1F_8EeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JpkH1V_8EeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_hW38kF_6EeeMYKMUDTrolQ" name="SetValue">
+    <generalization xmi:type="uml:Generalization" xmi:id="_w92cAF_7EeeMYKMUDTrolQ" general="_evOk4F_6EeeMYKMUDTrolQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_HST8kl_8EeeMYKMUDTrolQ" name="java hashset" type="_ltO40F_6EeeMYKMUDTrolQ" aggregation="composite" association="_HSKyoF_8EeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_HST8k1_8EeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_HST8lF_8EeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+    <nestedClassifier xmi:type="uml:Class" xmi:id="_ltO40F_6EeeMYKMUDTrolQ" name="Java HashSet">
+      <generalization xmi:type="uml:Generalization" xmi:id="__gm60F_7EeeMYKMUDTrolQ" general="_rm_hgF_6EeeMYKMUDTrolQ"/>
+    </nestedClassifier>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_iJ-0gF_6EeeMYKMUDTrolQ" name="OrderedSetValue">
+    <generalization xmi:type="uml:Generalization" xmi:id="_vTTlwF_7EeeMYKMUDTrolQ" general="_evOk4F_6EeeMYKMUDTrolQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_I-Wno1_8EeeMYKMUDTrolQ" name="customorderedset" type="_pjRWQF_6EeeMYKMUDTrolQ" aggregation="composite" association="_I-WnoF_8EeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_I-WnpF_8EeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_I-WnpV_8EeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_kB8bsF_6EeeMYKMUDTrolQ" name="SequenceValue">
+    <generalization xmi:type="uml:Generalization" xmi:id="_v4G78F_7EeeMYKMUDTrolQ" general="_evOk4F_6EeeMYKMUDTrolQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_IUUzM1_8EeeMYKMUDTrolQ" name="java arraylist" type="_nEQWIF_6EeeMYKMUDTrolQ" aggregation="composite" association="_IUUzMF_8EeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_IUUzNF_8EeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_IUUzNV_8EeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_nEQWIF_6EeeMYKMUDTrolQ" name="Java ArrayList">
+    <generalization xmi:type="uml:Generalization" xmi:id="_-f8IAF_7EeeMYKMUDTrolQ" general="_rm_hgF_6EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_oOCBoF_6EeeMYKMUDTrolQ" name="Custom Bag">
+    <generalization xmi:type="uml:Generalization" xmi:id="_8x9jQF_7EeeMYKMUDTrolQ" general="_rm_hgF_6EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_pjRWQF_6EeeMYKMUDTrolQ" name="CustomOrderedSet">
+    <generalization xmi:type="uml:Generalization" xmi:id="_9uKs0F_7EeeMYKMUDTrolQ" general="_rm_hgF_6EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_rm_hgF_6EeeMYKMUDTrolQ" name="Java Iterable" isAbstract="true"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_spTTEF_6EeeMYKMUDTrolQ" name="Java Iterator" isAbstract="true">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_NQFik1_8EeeMYKMUDTrolQ" name="iterable" type="_rm_hgF_6EeeMYKMUDTrolQ" association="_NQFikF_8EeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_NQFilF_8EeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_NQFilV_8EeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_-_-_YmAOEeeMYKMUDTrolQ" name="java arraylist" type="_nEQWIF_6EeeMYKMUDTrolQ" association="_-_-YUGAOEeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="__ADQ0GAOEeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="__ATvgGAOEeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_HSKyoF_8EeeMYKMUDTrolQ" memberEnd="_HST8kl_8EeeMYKMUDTrolQ _HST8lV_8EeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HST8kF_8EeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HST8kV_8EeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_HST8lV_8EeeMYKMUDTrolQ" name="setvalue" type="_hW38kF_6EeeMYKMUDTrolQ" association="_HSKyoF_8EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_IUUzMF_8EeeMYKMUDTrolQ" memberEnd="_IUUzM1_8EeeMYKMUDTrolQ _IUUzNl_8EeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IUUzMV_8EeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IUUzMl_8EeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_IUUzNl_8EeeMYKMUDTrolQ" name="sequencevalue" type="_kB8bsF_6EeeMYKMUDTrolQ" association="_IUUzMF_8EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_I-WnoF_8EeeMYKMUDTrolQ" memberEnd="_I-Wno1_8EeeMYKMUDTrolQ _I-Wnpl_8EeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_I-WnoV_8EeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I-Wnol_8EeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_I-Wnpl_8EeeMYKMUDTrolQ" name="orderedsetvalue" type="_iJ-0gF_6EeeMYKMUDTrolQ" association="_I-WnoF_8EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_JpkH0F_8EeeMYKMUDTrolQ" memberEnd="_JpkH01_8EeeMYKMUDTrolQ _JpkH1l_8EeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_JpkH0V_8EeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JpkH0l_8EeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_JpkH1l_8EeeMYKMUDTrolQ" name="bagvalue" type="_gmclMF_6EeeMYKMUDTrolQ" association="_JpkH0F_8EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_KrISgF_8EeeMYKMUDTrolQ" memberEnd="_KrISg1_8EeeMYKMUDTrolQ _KrIShl_8EeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KrISgV_8EeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KrISgl_8EeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_KrIShl_8EeeMYKMUDTrolQ" name="collectionvalue" type="_evOk4F_6EeeMYKMUDTrolQ" association="_KrISgF_8EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_NQFikF_8EeeMYKMUDTrolQ" memberEnd="_NQFik1_8EeeMYKMUDTrolQ _NQFill_8EeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NQFikV_8EeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NQFikl_8EeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_NQFill_8EeeMYKMUDTrolQ" name="iterator" type="_spTTEF_6EeeMYKMUDTrolQ" association="_NQFikF_8EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_T90wcF_9EeeMYKMUDTrolQ" name="BooleanValue">
+    <generalization xmi:type="uml:Generalization" xmi:id="_dPyrEF_9EeeMYKMUDTrolQ" general="_c3uQsF_6EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_WoTZsF_9EeeMYKMUDTrolQ" name="TupleValue">
+    <generalization xmi:type="uml:Generalization" xmi:id="_ed4O0F_9EeeMYKMUDTrolQ" general="_c3uQsF_6EeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_Os9EAGAOEeeMYKMUDTrolQ" name="Java HashMap"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_SsusQGAOEeeMYKMUDTrolQ" name="NewCollectionValue">
+    <generalization xmi:type="uml:Generalization" xmi:id="_c0fmcGAOEeeMYKMUDTrolQ" general="_c3uQsF_6EeeMYKMUDTrolQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_gnO4QmAOEeeMYKMUDTrolQ" name="java arraylist" type="_nEQWIF_6EeeMYKMUDTrolQ" aggregation="composite" association="_gnORMGAOEeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_gnO4Q2AOEeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_gnO4RGAOEeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_hcyAMmAOEeeMYKMUDTrolQ" name="java hashmap" type="_Os9EAGAOEeeMYKMUDTrolQ" aggregation="composite" association="_hcxZIGAOEeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_hcyAM2AOEeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_hcyANGAOEeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_Vde3AmCaEeeMYKMUDTrolQ" name="java iterator" type="_JA7PsGCaEeeMYKMUDTrolQ" association="_VdeP8GCaEeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_VdlksGCaEeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_Vd3RgGCaEeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_gnORMGAOEeeMYKMUDTrolQ" memberEnd="_gnO4QmAOEeeMYKMUDTrolQ _gnO4RWAOEeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gnO4QGAOEeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gnO4QWAOEeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_gnO4RWAOEeeMYKMUDTrolQ" name="newcollectionvalue" type="_SsusQGAOEeeMYKMUDTrolQ" association="_gnORMGAOEeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_hcxZIGAOEeeMYKMUDTrolQ" memberEnd="_hcyAMmAOEeeMYKMUDTrolQ _hcynQGAOEeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hcyAMGAOEeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hcyAMWAOEeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_hcynQGAOEeeMYKMUDTrolQ" name="newcollectionvalue" type="_SsusQGAOEeeMYKMUDTrolQ" association="_hcxZIGAOEeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_-_-YUGAOEeeMYKMUDTrolQ" memberEnd="_-_-_YmAOEeeMYKMUDTrolQ __AkOMGAOEeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-_-_YGAOEeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-_-_YWAOEeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="__AkOMGAOEeeMYKMUDTrolQ" name="java iterator" type="_spTTEF_6EeeMYKMUDTrolQ" association="_-_-YUGAOEeeMYKMUDTrolQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_JA7PsGCaEeeMYKMUDTrolQ" name="Java Iterator" isAbstract="true">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_JA7PsWCaEeeMYKMUDTrolQ" name="iterable" type="_rm_hgF_6EeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_JA7PsmCaEeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JA7Ps2CaEeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_JA7PtGCaEeeMYKMUDTrolQ" name="java arraylist" type="_nEQWIF_6EeeMYKMUDTrolQ">
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_JA7PtWCaEeeMYKMUDTrolQ"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JA7PtmCaEeeMYKMUDTrolQ" value="1"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_VdeP8GCaEeeMYKMUDTrolQ" memberEnd="_Vde3AmCaEeeMYKMUDTrolQ _VeHwMGCaEeeMYKMUDTrolQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Vde3AGCaEeeMYKMUDTrolQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Vde3AWCaEeeMYKMUDTrolQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_VeHwMGCaEeeMYKMUDTrolQ" name="newcollectionvalue" type="_SsusQGAOEeeMYKMUDTrolQ" association="_VdeP8GCaEeeMYKMUDTrolQ"/>
+  </packagedElement>
+</uml:Model>
