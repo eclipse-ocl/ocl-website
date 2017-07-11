@@ -18,7 +18,7 @@
 %                                     also used for the TOC unless
 %                                     \toctitle is used
 %
-\author{Edward D. Willink\inst{1}}
+\author{Edward D. Willink}
 %
 \authorrunning{Edward Willink} % abbreviated author list (for running head)
 %
@@ -54,7 +54,7 @@ We briefly review some implementation challenges that the OCL specification prov
 
 \paragraph{Collection types:}
 
-OCL defines an abstract $Collection$ type and four concrete derivations to support the four permutations of ordered/not-ordered, unique/not-unique content. These derived collections types are
+Four concrete derivations of the abstract $Collection$ type are specified to support the four permutations of ordered/not-ordered, unique/not-unique content. These derived collections types are
 
 \begin{itemize}
 	\item $Bag$ - not-ordered, not-unique
@@ -63,7 +63,7 @@ OCL defines an abstract $Collection$ type and four concrete derivations to suppo
 	\item $Set$ - not-ordered, unique
 \end{itemize}
 
-Java implementations may use a custom class, \verb$LinkedHashSet$, \verb$ArrayList$ and \verb$HashSet$ to implement these four \verb$Collection$ types.
+Java implementations may use a custom class, \verb$LinkedHashSet$, \verb$ArrayList$ and \verb$HashSet$ respectively to implement these four \verb$Collection$ kinds.
 
 Problem: Four distinct collection types.
 
@@ -75,7 +75,7 @@ Problem: Immutability implies inefficient collection churning.
 
 \paragraph{Eagerness:}
 
-OCL operations are defined as a computation of an output from some inputs. A cascade of operations such as \verb$a->including(b)->excludes(c)$ is therefore evaluated in three steps as get-\verb$a$, create \verb$a+b$, test \verb$a+b$ for \verb$c$ content. There is no mechanism for early discovery of a \verb$c$ to bypass redundant computations.
+OCL operations are defined as a computation of an output from some inputs. A cascade of operations such as \verb$a->including(b)->excludes(c)$ is therefore evaluated in three steps as get-\verb$a$, then create \verb$a+b$, and finally test \verb$a+b$ for \verb$c$ content. There is no mechanism for early discovery of a \verb$c$ to bypass redundant computations.
 
 Problem: Specification implies eager evaluation.
 
@@ -97,7 +97,7 @@ OCL is a specification language and when dealing with numbers, OCL uses unbounde
 \begin{verbatim}
 1 = 1.0  Set{1,1.0}->size() = 1  Set{Set{1},Set{1.0}}->size() = 1
 \end{verbatim}
-When using Java to implement OCL, the numeric equality is satisfied by the primitive types \verb$int$ and \verb$double$ but not by the object types \verb$Integer$ and \verb$Double$. Since Java sets use object equality to establish uniqueness, a naive implementation that assumes that OCL and Java equality are the same may malfunction.
+When using Java to implement OCL, the numeric equality is satisfied by the primitive types \verb$int$ and \verb$double$ but not by the object types \verb$Integer$ and \verb$Double$. Since Java sets use object equality to establish uniqueness, a naive implementation may malfunction if it assumes that OCL and Java equality are the same.
 
 Problem: OCL and Java equality semantics are different.
 
@@ -123,14 +123,14 @@ The foregoing problems lead to poor and even inaccurate OCL implementations. We 
 
 \subsection{Immutability}
 
-While OCL may provide no operations to modify Collections, it does not prohibit modification by underlying tooling, provided the modification does not affect the OCL execution.
+While OCL may provide no operations to modify Collections, it does not prohibit modification by underlying tooling. A modification that does not affect OCL execution is permissible.
 
 An evaluation of \verb$a->including(b)->including(c)$ may therefore re-use the intermediate collection created by \verb$a->including(b)$ and modify it to create the final result. This is safe since the intermediate result cannot be accessed in any other way than by the subsequent \verb$->including(c)$. If there are no other accesses to \verb$a$, it is permissible to
 modify \verb$a$ twice and avoid all intermediates.
 
 \subsection{Eagerness}
 
-While the specification may imply that evaluations should be performed eagerly, this is just the way specifications are written to ease understanding. An implementation is permitted to do something different so long as the difference is not observable. Lazy evaluation is a tactic that has been used with many languages. OCL has a strong functional discipline and so laziness has much to offer in an OCL evaluator. Unfortunately OCL development teams have been slow to exploit this optimization.
+While the specification may imply that evaluations should be performed eagerly, this is just the way specifications are written to ease understanding. An implementation is permitted to do something different so long as the difference is not observable. Lazy evaluation is a tactic that has been used with many languages. OCL has a strong functional discipline and so laziness has much to offer in an OCL evaluator. Unfortunately OCL development teams have been slow to exploit this tactic.
 
 \subsection{Invalidity}
 
@@ -149,7 +149,7 @@ and machine failures such as
 	\item network failure
 \end{itemize}
 
-Since machine failures are not mentioned by the specification, it would seem that they must be \verb$invalid$, but few programs are expected to return a useful result in the event of a machine failure. Consequently the treatment of machine failures as \verb$invalid$ for the purposes of 4-valued (\verb$true$,\verb$false$,\verb$null$,\verb$invalid$) strict logic evaluation seems misguided. Rather a further fifth \verb$failure$ value for machine failure should be non-strict so that machine failures are not catchable by logic guards. The fourth strict \verb$invalid$ value should apply only to program failures.
+Since machine failures are not mentioned by the specification, it would seem that they must be \verb$invalid$, but only very specialized applications such as the OCL specification of a debugger can be expected to handle machine failures. Consequently the treatment of machine failures as \verb$invalid$ for the purposes of 4-valued (\verb$true$,\verb$false$,\verb$null$,\verb$invalid$) strict logic evaluation seems misguided. Rather a further fifth \verb$failure$ value for machine failure should be non-strict so that machine failures are not catchable by logic guards. The fourth strict \verb$invalid$ value should apply only to program failures.
 
 Program failures are amenable to program analysis that can prove that no program failure will occur. When analysis is insufficiently powerful, the programmer can add a redundant guard to handle e.g. an `impossible' divide-by-zero. With 5-valued logic we can prove that the partial result of a collection evaluation will remain valid if fully evaluated and so avoid the redundant full calculation when the partial calculation is sufficient.
 
@@ -165,9 +165,11 @@ Determinism is a very desirable characteristic of any program evaluation, partic
 
 The \verb$Set::asSequence()$ override refines the order to $unknown$, which is not the same as $indeterminate$. 
 
-The foregoing appears in the normative part of the specification. Only the non-normative annex mentions a lack of determinism.
+The \verb$Collection::any()$ iteration specifies an $indeterminate$ choice between alternatives. 
 
-It is therefore unclear from the specification text whether an OCL implementation may be non-deterministic. A clarified OCL specification could reasonably take either alternative.
+The foregoing appears in the normative part of the specification. Only the non-normative annex mentions a lack of determinism for order discovery.
+
+It is therefore unclear from the specification text whether an OCL implementation of order discovery may be non-deterministic. A clarified OCL specification could reasonably take either alternative. If order discovery is deterministic, it is easy for \verb$Collection::any()$'s choice to be consistent with that discovery.
 
 In practice, typical OCL implementations use a Java \verb$Set$ to realize OCL $Set$ functionality. The iteration order over a Java \verb$Set$ depends on hash codes, which depend on memory addresses, which depend on the unpredictable timing of garbage collection activities. It is therefore not possible for typical OCL implementations to be deterministic. 
 
@@ -179,7 +181,7 @@ The four permutations of unique and ordered provide four collection behaviors an
 
 \section{New Collection Solution}\label{Solutions}
 
-Our new solution has only one $Collection$ implementation type that exhibits all four $Collection$ behaviors, but only one at a time. To avoid confusion between our new $Collection$ implementation and the OCL abstract $Collection$ or the Java \verb$Collection$ classes, we will use \verb$NewCollection$ in this paper\footnote{The Eclipse OCL class name is currently LazyIterable}.
+Our new solution has only one $Collection$ implementation type that exhibits all four $Collection$ behaviors, but only one at a time. To avoid confusion between our new $Collection$ implementation and the OCL abstract $Collection$ or the Java \verb$Collection$ classes, we will use \verb$NewCollection$ in this paper\footnote{The Eclipse OCL class name is currently LazyCollectionValueImpl}.
 
 \subsection{Deterministic Collection Representation}
 
@@ -190,31 +192,35 @@ A \verb$NewCollection<T>$ instance uses two Java collection instances internally
 	\item \verb$HashMap<T,Integer>$ of unique elements and their repeat counts.
 \end{itemize}
 
-For a $Sequence$, the \verb$ArrayList$ serializes the required elements. The \verb$HashMap$ is unused and may be \verb$null$.
+For a $Sequence$, the \verb$ArrayList$ serializes the required elements; the \verb$HashMap$ is unused and may be \verb$null$.
 
-For a $Set$, the keys of the \verb$HashMap$ provide the unique elements each mapped to a unit \verb$Integer$ repeat count. The \verb$ArrayList$ serializes the unique elements in a deterministic order.
+For a $Set$, the keys of the \verb$HashMap$ provide the unique elements each mapped to a unit \verb$Integer$ repeat count; the \verb$ArrayList$ serializes the unique elements in a deterministic order.
 
-For an $OrderedSet$, the keys of the \verb$HashMap$ provide the unique elements each mapped to a unit \verb$Integer$ repeat count. The \verb$ArrayList$ serializes the unique elements in the required order.
+For an $OrderedSet$, the keys of the \verb$HashMap$ provide the unique elements each mapped to a unit \verb$Integer$ repeat count; the \verb$ArrayList$ serializes the unique elements in the required order.
 
-For a $Bag$, the keys of the \verb$HashMap$ provide the unique elements each mapped to a repeat count of that element. The \verb$ArrayList$ serializes the unique elements in a deterministic order.
+For a $Bag$, the keys of the \verb$HashMap$ provide the unique elements each mapped to a repeat count of that element; the \verb$ArrayList$ serializes the unique elements in a deterministic order.
 
 The Java implementation of a \verb$HashSet$ uses a \verb$HashMap$ and so using a \verb$HashMap$ for $Set$ and $OrderedSet$ incurs no additional costs. On a 64 bit machine, each \verb$HashMap$ element incurs a 44 byte cost per \verb$Node$ and typically two 8 byte costs for pointers. Using an \verb$ArrayList$ as well as a \verb$HashMap$ increases the cost per entry from 60 to 68 bytes; a 13\% overhead for non-$Sequence$s.
 
-Use of an \verb$ArrayList$ to sequence the unique elements for all forms of $Collection$ allows an efficient deterministic iterator to be provided for all kinds of $Collection$.
-
-For a $Bag$, there is a choice as to whether an element iteration is over all elements, repeating repeated elements, or just the unique elements. The \verb$NewCollection$ therefore provides a regular \verb$iterator()$ over each element, and a \verb$bagIterator()$ that skips repeats but allows the repeat count to be accessed by the iterator. $Bag$-aware implementations of $Collection$ operations can therefore offer a useful speed-up.
+Use of an \verb$ArrayList$ to sequence the unique elements allows an efficient deterministic iterator to be provided for all kinds of $Collection$.
 
 Since a $Set$ now has a deterministic order, there is no implementation difference between a $Set$ and an $OrderedSet$.
 
 The deterministic order maintained by the \verb$ArrayList$ is based on insertion order. New elements are therefore added at the end or not at all, which avoids significant costs for \verb$ArrayList$ maintenance.
 
+For a $Bag$, there is a choice as to whether an element iteration is over all elements, repeating repeated elements, or just the unique elements. The \verb$NewCollection$ therefore provides a regular \verb$iterator()$ over each element, and an alternative API that skips repeats but allows the repeat count to be accessed by the iterator. $Bag$-aware implementations of $Collection$ operations can therefore offer a useful speed-up.
+
 The \verb$NewCollection$ supports all $Collection$ behaviors, but only one at a time. Non-destructive conversion between behaviors can be performed as no-operations. A $Set$ converts to a $Sequence$ by continuing to use the \verb$ArrayList$ and ignoring the \verb$HashMap$. However the conversion from a $Sequence$ to a $Bag$ or $Set$ requires the \verb$HashMap$ to be created and non-unique content of the \verb$ArrayList$ to be pruned; a new \verb$NewCollection$ is therefore created to avoid modifying the original \verb$NewCollection$.
 
 The \verb$NewCollection$ does not inherit inappropriate Java behavior. The problems with inconsistent OCL/Java equality semantics can therefore be resolved as \verb$NewCollection$ delegates to the internal \verb$HashMap$.
 
+\subsection{Performance Graphs}
+
+The performances reported in the following figures use log-log axes to demonstrate the relative linear/quadratic execution time behaviors over a 6 decade range of collection sizes. The measurements come from manually coded test harnesses that instrument calls to the specific support routines of interest. Considerable care is taken to ensure that the 64 bit default Oracle Java 8 VM has warmed up and garbage free. Curves are 'plotted' backwards i.e. largest collection size first to further reduce warm up distortions. Each plotted point comes from single measurement without any averaging. Consequently the occasional `rogue' point is probably due to an unwanted concurrent activity and demonstrates the probable accuracy of surrounding points even at the sub-millisecond level. Genuine deviations from smooth monotonic behavior may arise from fortuitous uses of L1 and L2 caches. Garbage collection may lead to inconsistent results for huge collection sizes. 
+
 \subsection{Deterministic Collection Cost}
 
-Fig~\ref{fig:SetCreatePerformance} contrasts the performance of creating instances of the `old' Eclipse OCL $Set$ with the `new' NewCollection $Set$. log-log axes show the time to create a $Set$ from a $Sequence$ of distinct integers. Overall the `new' design is about 2 times slower corresponding to the use of two rather than one underlying Java collection.
+Fig~\ref{fig:SetCreatePerformance} shows the time to create a $Set$ from a $Sequence$ of distinct integers, contrasting the `old' Eclipse OCL $Set$ with the `new' NewCollection $Set$. Overall the `new' design is about 2 times slower corresponding to the use of two rather than one underlying Java collection.
 
 \begin{figure}
 	\begin{center}
@@ -280,7 +286,7 @@ If \verb$a$ or \verb$c$ has multiple consumers, as shown in Fig~\ref{fig:LazyCac
 	\label{fig:LazyCachedExample}
 \end{figure}
 
-Eager, lazy and cached evaluations share the same structure of operation and variable interconnections. The correct behavior is configured by an analysis of the OCL expression to identify whether the collection subject to single access permitting a transparent behavior or multiple access requiring a cached behavior in which the source iteration is lazily cached for multiple use by the multiple accesses. Unfortunately, collection operations, such as \verb$Collection::size()$, are unable to return a result until the source has been fully traversed  lazy access and so an eager evaluation is sometimes unavoidable.
+Eager, lazy and cached evaluations share the same structure of operation and variable interconnections. The correct behavior is determined by analysis of the OCL expression. For a singly accessed collection, a transparent behavior is configured. For multiple access, a cached behavior is configured in which the source iteration is lazily cached for multiple use by the multiple accesses. Unfortunately, collection operations, such as \verb$Collection::size()$, are unable to return a result until the source has been fully traversed and so an eager evaluation is sometimes unavoidable.
 
 \subsection{Lazy Cost}
 
@@ -367,7 +373,7 @@ In Fig~\ref{fig:AccumulationPerformance} we contrast the performance of the accu
 using \verb$Set$ or \verb$Sequence$ as the \verb$C$ collection type and \verb$C{1..N}$ as the \verb$S$ source value for an \verb$N$ collection size.
 
 The new approach uses mutable evaluation to re-use \verb$acc$ and so avoid churning.
-The old approach uses the one new $Set$ churn per \verb$Set::including$ execution as currently practiced by Eclipse OCL~\cite{Eclipse-OCL} and USE~\cite{USE} (Dresden OCL~\cite{Dresden-OCL} creates two $Set$s). The new approach scales linearly and so is clearly superior to the traditional quadratic cost. The new approach has a two-fold cost for using $Set$s rather $Sequence$s; much less than when churning occurs.
+The old approach uses the one new $Set$ churn per \verb$Set::including$ execution as currently practiced by Eclipse OCL~\cite{Eclipse-OCL} and USE~\cite{USE} (Dresden OCL~\cite{Dresden-OCL} creates two $Set$s). The new approach scales linearly and so is clearly superior to the traditional quadratic cost. The new approach has a two-fold cost for using $Set$s rather than $Sequence$s; much less than when churning occurs.
 
 \begin{figure}
 	\begin{center}
@@ -383,7 +389,6 @@ Note that this optimization relies on a `compile-time' OCL expression analysis t
 
 %More general redundancy and rewriting is much harder and probably less effective than the lazy evaluation we will now describe.
 
-
 \subsection{Lazy limitations}
 
 Some operations such as \verb$aCollection->size()$ cannot be executed lazily since the size cannot be known without the whole collection. But in a suitable context such as \verb$aCollection->size() > 3$, it is obvious that the full collection is not necessary after all. Even for \verb$aCollection->size()$, \verb$aCollection$ does not need to be fully evaluated since we are only interested in the number of elements. If the computation of \verb$aCollection$ can be aware that only its size is required, a more efficient existence rather than value of each element might be computed.
@@ -396,7 +401,7 @@ As a side-effect free language, OCL is very well suited to caching the results o
 
 Model to model transformations depend on re-use of created output elements and so the Eclipse QVTd tooling~\cite{Eclipse-QVTd} pragmatically provides caches for Functions and Mappings but not Operations or Iterations.
 
-Empirical observation suggest that for object operations and derived properties, the re-use benefits and statistics are much more favorable and so such caching should be part of an OCL evaluator. We will shortly see another example where operation caching can be helpful.
+Empirical observation suggests that for object operations and derived properties, the re-use benefits and statistics are much more favorable and so such caching should be part of an OCL evaluator. We will shortly see another example where operation caching can be helpful.
 
 \subsection{Smart select}
 
@@ -426,7 +431,7 @@ It is also common to use
 S->select(element | element.name = wantedName)
 \end{verbatim}
 
-This locates a matching content of \verb$S$by choosing the appropriately named elements. This idiom treats the \verb$S$ as a \verb$Map$ with a \verb$name$ key, but whereas a \verb$Map$ returns the value in constant time, naive implementation of $select$ incurs linear search cost.
+This locates a matching content of \verb$S$ by choosing the appropriately named elements. This idiom treats the \verb$S$ as a \verb$Map$ with a \verb$name$ key, but whereas a \verb$Map$ returns the value in constant time, naive implementation of $select$ incurs linear search cost.
 
 For a single matching lookup, building the \verb$Map$ incurs a linear cost and so there is no benefit in an optimization. However in a larger application it is likely that the name lookup may occur a few  times for the same name and many times for different names. Providing an underlying \verb$Map$ may be very beneficial, converting a quadratic performance to linear.
 
@@ -482,7 +487,7 @@ the actual run-time models are available:
 	\item Run-Time Navigability Information (unnavigable opposites)
 	\item Run-Time Instances Information (allInstances)
 \end{itemize}
-Adding a few additional activities is structurally easy, and only a minor compile-time degradation. The results presented earlier use a manual emulation of what the automated analysis and synthesis should achieve~\footnote{Unifying the four concrete Collection types by a single replacement presents some compatibility challenges that may require Ec;lipse OCL to make a major version number change. The code for lazy evaluations is therefore only available on the ewillink/509670 branch in the Eclipse OCL GIT repository}.
+Adding a few additional activities is structurally easy, and only a minor compile-time degradation. The results presented earlier use a manual emulation of what the automated analysis and synthesis should achieve~\footnote{Unifying the four concrete eager Collection types by a single lazy replacement is an API breakage that requires Eclipse OCL to make a major version number change. The code for lazy evaluations is therefore only available on the ewillink/509670 branch in the Eclipse OCL GIT repository}.
 
 For OCL-based applications such as QVTc or QVTr~\cite{QVT-1.3}, the Eclipse OCL code generator has been extended and appears to provide a twenty-fold speed-up compared to less optimized interpreted execution~\cite{Willink-EXE2016}. A smaller speed-up is to be expected for intensive $Collection$ computations where most of the execution occurs in shared run-time support such as \verb$Set::intersection()$.
 
@@ -520,13 +525,13 @@ For OCL-based applications such as QVTc or QVTr~\cite{QVT-1.3}, the Eclipse OCL 
 
 Lack of determinism in Model-to-Model transformation tools has been a regular irritation. e.g. \url{https://bugs.eclipse.org/bugs/show\_bug.cgi?id=358814}.  
 
-Gogolla~\cite{OCL-Determinism} identified the lack of determinism for OCL collection conversions and suggested that certain combinations should be deterministic so that the following is true:
+Gogolla et al~\cite{OCL-Determinism} identify the lack of determinism for OCL collection conversions and suggested that certain combinations should be deterministic so that the following is true:
 \begin{verbatim}
         SET->asBag()->asSequence() = SET->asSequence()
 \end{verbatim}
 In this paper we make OCL collections fully deterministic and so all the suggested combinations are deterministic. The only open question is whether the deterministic order is $unknown$. If known, two different OCL implementations should yield the same deterministic result. 
 
-Lazy OCL evaluation is used by Tisi et all~\cite{Lazy OCL} to support infinite collections. The authors consider their work as a variant semantics for OCL. Our alternative reading of the OCL specification allows infinite collections to be supported by regular OCL tooling provided eager operations such as \verb$Collection::size()$ are avoided. The default \verb$bagIterator$ provided by the \verb$NewCollection$ is incompatible with lazy Bags, however an alternative but less efficient \verb$lazyBagIterator$ could remedy this limitation.   
+Lazy OCL evaluation is used by Tisi et al~\cite{Lazy OCL} to support infinite collections. The authors consider their work as a variant semantics for OCL. Our alternative reading of the OCL specification allows infinite collections to be supported by regular OCL tooling provided eager operations such as \verb$Collection::size()$ are avoided. The default \verb$Bag$-aware iteration provided by the \verb$NewCollection$ is incompatible with lazy Bags, however an alternative but less efficient approach could remedy this limitation.   
 
 Discomfort with the prevailing state of the art highlighted by these papers inspired the solution provided in this paper. The unified Collection implementation type is new. The deterministic Collection type is new. `Lazy' OCL is not new, but the OCL expression analysis to exploit the lazy unified Collection type is new.
 %
@@ -540,7 +545,7 @@ We have distinguished between program and machine failures so that the new repre
 
 We have used lazy evaluation to significantly reduce memory costs and to avoid redundant computations by allowing favorable algorithms to terminate prematurely.
 
-We have avoided some quadratic costs by using mutable collections and a content cache for select().
+We have linearized some quadratic costs by using mutable collections and a content cache for select().
   
 %\paragraph{Acknowledgments}
 
