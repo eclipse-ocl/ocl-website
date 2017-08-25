@@ -1,0 +1,95 @@
+% This is LLNCS.DEM the demonstration file of
+% the LaTeX macro package from Springer-Verlag
+% for Lecture Notes in Computer Science,
+% version 2.4 for LaTeX2e as of 16. April 2010
+%
+\documentclass{llncs}
+%
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage[pdftex]{graphicx}
+%
+\begin{document}
+%
+\mainmatter              % start of the contributions
+%
+\title{Commutative Short Circuit Operators}
+%
+\titlerunning{Commutative Short Circuit Operators}  % abbreviated title (for running head)
+%                                     also used for the TOC unless
+%                                     \toctitle is used
+%
+\author{Edward D. Willink}
+%
+\authorrunning{Edward Willink} % abbreviated author list (for running head)
+%
+%%%% list of authors for the TOC (use if author list has to be modified)
+\tocauthor{Edward Willink}
+%
+\institute{Willink Transformations Ltd, Reading, England,\\
+\email{ed\_at\_willink.me.uk}}
+
+
+\maketitle              % typeset the title of the contribution
+Lightning presentation at the 17th International Workshop in OCL and Textual Modeling, July 20, 2017, Marburg, Germany.
+%
+\pagebreak
+%
+\section{Commutative Short Circuit Operators - E.D.Willink}
+OCL's 4-level logic has been a source of much unhappiness and while various solutions have been suggested, none have met with enthusiasm. We look at where the unhappiness comes from and thereby suggest a new solution.
+
+The OCL designers defined an underlying model in which all expressions have types. Consequently the mathematical concept of truth was reified by a \texttt{Boolean} type with associated Boolean library operations. The designers chose to avoid exceptions. This in combination with UML conformance required a \texttt{null} value for the missing value of properties with optional multiplicity, and an \texttt{invalid} value for everything bad that might be evaluated. 
+
+Unfortunately \texttt{null} and \texttt{invalid} pollute the simplicity of truths and so the Amsterdam Manifesto~\cite{amsterdam} elaborates Boolean operators with short-circuit like functionality for problems such as: 
+
+\texttt{a <> null and a.doSomething()}
+
+However the operators remain commutative and so it is suggested that all terms are evaluated in parallel until the result is knowable. A Karnaugh Map defines the mapping from the \texttt{true} (T), \texttt{false} (F), \texttt{null} ($\epsilon$) and \texttt{invalid} ($\perp$) values of \texttt{Left} and \texttt{Right} inputs to the \texttt{and} output.
+
+\begin{center}
+	\begin{tabular}{|c|c||c|c|c|} 
+		\hline
+		Left & Right & and & requires & `and2' \\ [0.5ex] 
+		\hline
+		T & T & T & T & T \\ 
+		T & F & F & F & F \\
+		T & $\perp$,$\epsilon$ & $\perp$ & $\perp$ & $\perp$ \\
+		F & - & & F & \\
+		F & T,F & F & & F \\
+		F & $\perp$,$\epsilon$ & F & & $\perp$ \\
+		$\perp$,$\epsilon$ & - & & $\perp$ & \\ 
+		$\perp$,$\epsilon$ & T,F,$\perp$,$\epsilon$ & $\perp$ & & $\perp$ \\ 
+		\hline
+	\end{tabular}
+\end{center}
+
+Parallel execution is an implementation nightmare and the intermediate \texttt{invalid} results can be inefficient. If we eliminate commutative short circuits, we find that \texttt{invalid} results are exceptional rather than normal.
+
+\texttt{a <> null requires a.doSomething()}
+
+A new \texttt{requires} operator imposes a left argument first evaluation order for \texttt{and}. This avoids the spurious \texttt{invalid} results from the right argument and clearly indicates the intent to handle non-truths. The \texttt{and} operator can then be used for truths only. Once static analysis verifies that neither left nor right input of an \texttt{and} operator can be \texttt{null} or \texttt{invalid}, an implementation may implement a regular \texttt{`and2'} operation that returns \texttt{invalid} for any \texttt{null} or \texttt{invalid} input.
+
+A new \texttt{obviates} operator is also needed to regularize \texttt{or} short circuiting.
+
+
+%Providing commutative short-circuits may have seemed like a good way to allow \texttt{undefined} and truths to co-exist, but experience has shown that truths are subverted. Exploratory evaluation of Boolean operator arguments in parallel is an implementation nightmare.
+
+%If we separate the distinct requirements for truth and \texttt{undefined} reasoning by eliminating the crazy commutative short-circuits.
+
+%Truth reasoning requires 2-valued \texttt{and}, \texttt{implies}, \texttt{not}, \texttt{or}, \texttt{xor} operators.
+
+%Undefined reasoning requires selectively 4-valued \texttt{and}, \texttt{implies}, \texttt{or} operators. Only \texttt{implies} is not commutative and easy to read. Replacing commutative 4-valued \texttt{and}, \texttt{or} by not-commutative selectively 4-valued \texttt{requires}, \texttt{obviates} can make them easier to read: \texttt{a <> null requires a.doSomething()}.
+
+%The selectively 4-valued functionality evaluates the first argument, if \texttt{null} or \texttt{invalid} execution terminates with an \texttt{invalid} result.
+
+
+
+
+\begin{thebibliography}{}
+	%
+	\bibitem{amsterdam}
+	Cook, s., Kleppe, A., Mitchell, R., Rumpe, B., Warmer, j., Wills, A.:
+	The Amsterdam Manifesto on OCL. December 1999.
+	\url{http://www4.informatik.tu-muenchen.de/publ/papers/CKR+99.pdf}
+	
+\end{thebibliography}
+\end{document}
