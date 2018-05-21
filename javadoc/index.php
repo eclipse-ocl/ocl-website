@@ -3,6 +3,7 @@ $projDetails = array(
 	"/modeling/mdt",
 	"/modeling/mdt/downloads",
 	"/modeling",
+	"/ocl",
 	"MDT"
 );
 
