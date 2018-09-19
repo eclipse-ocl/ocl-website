@@ -1,3 +1,2 @@
-modeling/mdt/5.4.1/R201809031400
 modeling/mdt/6.5.0/R201809100900
 modeling/mdt/6.5.0/R201809161223
