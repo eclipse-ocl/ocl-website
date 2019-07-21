@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pivot:Model xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pivot="http://www.eclipse.org/ocl/2015/Pivot"
+    xsi:schemaLocation="http://www.eclipse.org/ocl/2015/Pivot java://org.eclipse.ocl.pivot.PivotPackage" xmi:id="AAAAA" name="Hospital.ocl" externalURI="platform:/resource/XMLplay/model/Hospital.ocl" xmiidVersion="1">
+  <ownedImports importedNamespace="pivot:Model Hospital.ecore.oclas#AAAAA" xmiidVersion="1"/>
+  <ownedPackages xmi:id="ecwDJ" name="hosp" URI="hosp">
+    <ownedClasses xmi:id="FXncz" name="Hospital">
+      <ownedInvariants xmi:id="bBKaE" name="maxPatients">
+        <ownedSpecification xsi:type="pivot:ExpressionInOCL" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+            body="self.patients->size() &lt;= self.beds&#xA;">
+          <ownedBody xsi:type="pivot:OperationCallExp" name="&lt;=" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+              referredOperation="http://www.eclipse.org/ocl/2015/Library.oclas#8brvY">
+            <ownedSource xsi:type="pivot:OperationCallExp" name="size" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#tYtCd"
+                referredOperation="http://www.eclipse.org/ocl/2015/Library.oclas#eYPCX">
+              <ownedSource xsi:type="pivot:PropertyCallExp" name="patients" type="#52UnR" referredProperty="Hospital.ecore.oclas#XFYDm">
+                <ownedSource xsi:type="pivot:VariableExp" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz" referredVariable="#jQqum"/>
+              </ownedSource>
+            </ownedSource>
+            <ownedArguments xsi:type="pivot:PropertyCallExp" name="beds" type="pivot:DataType http://www.eclipse.org/emf/2002/Ecore.oclas#1EhKl"
+                referredProperty="Hospital.ecore.oclas#b9hkc">
+              <ownedSource xsi:type="pivot:VariableExp" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz" referredVariable="#jQqum"/>
+            </ownedArguments>
+          </ownedBody>
+          <ownedContext xsi:type="pivot:ParameterVariable" xmi:id="jQqum" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz"/>
+        </ownedSpecification>
+      </ownedInvariants>
+      <ownedInvariants xmi:id="4r1zp" name="uniquePatientId">
+        <ownedSpecification xsi:type="pivot:ExpressionInOCL" isRequired="false" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+            body="self.patients->forAll(p1, p2 | p1 &lt;> p2 implies p1.id &lt;> p2.id)&#xA;&#xA;">
+          <ownedBody xsi:type="pivot:IteratorExp" name="forAll" isRequired="false" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+              referredIteration="http://www.eclipse.org/ocl/2015/Library.oclas#YtmML">
+            <ownedSource xsi:type="pivot:PropertyCallExp" name="patients" type="#52UnR" referredProperty="Hospital.ecore.oclas#XFYDm">
+              <ownedSource xsi:type="pivot:VariableExp" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz" referredVariable="#ouHq,"/>
+            </ownedSource>
+            <ownedBody xsi:type="pivot:OperationCallExp" name="implies" isRequired="false" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+                referredOperation="http://www.eclipse.org/ocl/2015/Library.oclas#cIALH">
+              <ownedSource xsi:type="pivot:OperationCallExp" name="&lt;>" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+                  referredOperation="http://www.eclipse.org/ocl/2015/Library.oclas#X1Ovl">
+                <ownedSource xsi:type="pivot:VariableExp" name="p1" type="pivot:Class Hospital.ecore.oclas#QZZv1" referredVariable="#2Kq28"/>
+                <ownedArguments xsi:type="pivot:VariableExp" name="p2" type="pivot:Class Hospital.ecore.oclas#QZZv1" referredVariable="#3Kq28"/>
+              </ownedSource>
+              <ownedArguments xsi:type="pivot:OperationCallExp" name="&lt;>" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+                  referredOperation="http://www.eclipse.org/ocl/2015/Library.oclas#ZmEtV">
+                <ownedSource xsi:type="pivot:PropertyCallExp" name="id" type="pivot:DataType http://www.eclipse.org/emf/2002/Ecore.oclas#1EhKl"
+                    referredProperty="Hospital.ecore.oclas#DLOBC">
+                  <ownedSource xsi:type="pivot:VariableExp" name="p1" type="pivot:Class Hospital.ecore.oclas#QZZv1" referredVariable="#2Kq28"/>
+                </ownedSource>
+                <ownedArguments xsi:type="pivot:PropertyCallExp" name="id" type="pivot:DataType http://www.eclipse.org/emf/2002/Ecore.oclas#1EhKl"
+                    referredProperty="Hospital.ecore.oclas#DLOBC">
+                  <ownedSource xsi:type="pivot:VariableExp" name="p2" type="pivot:Class Hospital.ecore.oclas#QZZv1" referredVariable="#3Kq28"/>
+                </ownedArguments>
+              </ownedArguments>
+            </ownedBody>
+            <ownedIterators xsi:type="pivot:IteratorVariable" xmi:id="2Kq28" name="p1" type="pivot:Class Hospital.ecore.oclas#QZZv1" representedParameter="http://www.eclipse.org/ocl/2015/Library.oclas#//@ownedPackages.0/@ownedClasses.25/@ownedOperations.34/@ownedIterators.0"/>
+            <ownedIterators xsi:type="pivot:IteratorVariable" xmi:id="3Kq28" name="p2" type="pivot:Class Hospital.ecore.oclas#QZZv1" representedParameter="http://www.eclipse.org/ocl/2015/Library.oclas#//@ownedPackages.0/@ownedClasses.25/@ownedOperations.34/@ownedIterators.1"/>
+          </ownedBody>
+          <ownedContext xsi:type="pivot:ParameterVariable" xmi:id="ouHq," name="self" type="pivot:Class Hospital.ecore.oclas#FXncz"/>
+        </ownedSpecification>
+      </ownedInvariants>
+      <ownedOperations xmi:id="GLEKL" name="admitPatient" isRequired="false" type="pivot:VoidType http://www.eclipse.org/ocl/2015/Library.oclas#7u3MH">
+        <ownedParameters xmi:id="JBbKJ" name="p" isRequired="false" type="pivot:Class Hospital.ecore.oclas#QZZv1"/>
+        <ownedPostconditions xmi:id=",ZJmO">
+          <ownedSpecification xsi:type="pivot:ExpressionInOCL" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+              body="self.patients = self.patients@pre->including(p)&#xA;&#xA;">
+            <ownedBody xsi:type="pivot:OperationCallExp" name="=" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+                referredOperation="http://www.eclipse.org/ocl/2015/Library.oclas#eR9Jh">
+              <ownedSource xsi:type="pivot:PropertyCallExp" name="patients" type="#52UnR" referredProperty="Hospital.ecore.oclas#XFYDm">
+                <ownedSource xsi:type="pivot:VariableExp" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz" referredVariable="#ntull"/>
+              </ownedSource>
+              <ownedArguments xsi:type="pivot:OperationCallExp" name="including" type="#32UnR" referredOperation="http://www.eclipse.org/ocl/2015/Library.oclas#eutuy">
+                <ownedSource xsi:type="pivot:PropertyCallExp" name="patients" type="#52UnR" isPre="true" referredProperty="Hospital.ecore.oclas#XFYDm">
+                  <ownedSource xsi:type="pivot:VariableExp" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz" referredVariable="#ntull"/>
+                </ownedSource>
+                <ownedArguments xsi:type="pivot:VariableExp" name="p" isRequired="false" type="pivot:Class Hospital.ecore.oclas#QZZv1"
+                    referredVariable="#QeqPx"/>
+              </ownedArguments>
+            </ownedBody>
+            <ownedContext xsi:type="pivot:ParameterVariable" xmi:id="ntull" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz"/>
+            <ownedParameters xsi:type="pivot:ParameterVariable" xmi:id="QeqPx" name="p" isRequired="false" type="pivot:Class Hospital.ecore.oclas#QZZv1"
+                representedParameter="#JBbKJ"/>
+            <ownedResult xsi:type="pivot:ParameterVariable" name="result" isRequired="false" type="pivot:VoidType http://www.eclipse.org/ocl/2015/Library.oclas#7u3MH"/>
+          </ownedSpecification>
+        </ownedPostconditions>
+        <ownedPreconditions xmi:id="8ZaCZ">
+          <ownedSpecification xsi:type="pivot:ExpressionInOCL" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+              body="self.beds > 0&#xA;">
+            <ownedBody xsi:type="pivot:OperationCallExp" name=">" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#XEMMs"
+                referredOperation="http://www.eclipse.org/ocl/2015/Library.oclas#5+qvY">
+              <ownedSource xsi:type="pivot:PropertyCallExp" name="beds" type="pivot:DataType http://www.eclipse.org/emf/2002/Ecore.oclas#1EhKl"
+                  referredProperty="Hospital.ecore.oclas#b9hkc">
+                <ownedSource xsi:type="pivot:VariableExp" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz" referredVariable="#MNM4p"/>
+              </ownedSource>
+              <ownedArguments xsi:type="pivot:IntegerLiteralExp" type="pivot:PrimitiveType http://www.eclipse.org/ocl/2015/Library.oclas#tYtCd"
+                  integerSymbol="0"/>
+            </ownedBody>
+            <ownedContext xsi:type="pivot:ParameterVariable" xmi:id="MNM4p" name="self" type="pivot:Class Hospital.ecore.oclas#FXncz"/>
+            <ownedParameters xsi:type="pivot:ParameterVariable" name="p" isRequired="false" type="pivot:Class Hospital.ecore.oclas#QZZv1"
+                representedParameter="#JBbKJ"/>
+          </ownedSpecification>
+        </ownedPreconditions>
+      </ownedOperations>
+    </ownedClasses>
+  </ownedPackages>
+  <ownedPackages name="$$" URI="http://www.eclipse.org/ocl/2015/Orphanage" nsPrefix="orphanage">
+    <ownedClasses xsi:type="pivot:OrderedSetType" xmi:id="52UnR" name="OrderedSet" superClasses="#te3yy #RJyXs" isNullFree="true" lower="1">
+      <ownedBindings>
+        <ownedSubstitutions actual="pivot:Class Hospital.ecore.oclas#QZZv1" formal="http://www.eclipse.org/ocl/2015/Library.oclas#53+C2"/>
+      </ownedBindings>
+    </ownedClasses>
+    <ownedClasses xsi:type="pivot:OrderedSetType" xmi:id="32UnR" name="OrderedSet" superClasses="#te3yy #RJyXs">
+      <ownedBindings>
+        <ownedSubstitutions actual="pivot:Class Hospital.ecore.oclas#QZZv1" formal="http://www.eclipse.org/ocl/2015/Library.oclas#53+C2"/>
+      </ownedBindings>
+    </ownedClasses>
+    <ownedClasses xsi:type="pivot:CollectionType" xmi:id="te3yy" name="OrderedCollection" superClasses="#gOCc8">
+      <ownedBindings>
+        <ownedSubstitutions actual="pivot:Class Hospital.ecore.oclas#QZZv1" formal="http://www.eclipse.org/ocl/2015/Library.oclas#feFHs"/>
+      </ownedBindings>
+    </ownedClasses>
+    <ownedClasses xsi:type="pivot:CollectionType" xmi:id="RJyXs" name="UniqueCollection" superClasses="#gOCc8">
+      <ownedBindings>
+        <ownedSubstitutions actual="pivot:Class Hospital.ecore.oclas#QZZv1" formal="http://www.eclipse.org/ocl/2015/Library.oclas#jdfjE"/>
+      </ownedBindings>
+    </ownedClasses>
+    <ownedClasses xsi:type="pivot:CollectionType" xmi:id="gOCc8" name="Collection" superClasses="http://www.eclipse.org/ocl/2015/Library.oclas#jbMkR">
+      <ownedBindings>
+        <ownedSubstitutions actual="pivot:Class Hospital.ecore.oclas#QZZv1" formal="http://www.eclipse.org/ocl/2015/Library.oclas#qs59R"/>
+      </ownedBindings>
+    </ownedClasses>
+  </ownedPackages>
+</pivot:Model>

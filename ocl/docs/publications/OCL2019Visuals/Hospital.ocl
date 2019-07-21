@@ -1,0 +1,13 @@
+import 'Hospital.ecore'
+
+package hosp
+
+context Hospital
+inv maxPatients: self.patients->size() <= self.beds
+inv uniquePatientId: self.patients->forAll(p1, p2 | p1 <> p2 implies p1.id <> p2.id)
+
+context Hospital::admitPatient(p:Patient) :
+pre: self.beds > 0
+post: self.patients = self.patients@pre->including(p)
+
+endpackage
