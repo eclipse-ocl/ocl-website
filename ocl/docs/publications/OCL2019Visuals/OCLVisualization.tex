@@ -194,7 +194,7 @@ The corresponding AST of this `mark-up' is shown in Fig~\ref{fig:FixedNaiveInvAS
 	\vspace{-10pt}
 \end{figure}
 
-Once we can have multiple instances, and the reading order is clear, we can solve our example as shown in Fig~\ref{fig:vOCLinv}. The three blobs correspond to the three variables \verb$self$, \verb$p1$ and \verb$p2$, and each contributes a partial reading.
+Once we can have multiple instances, and the reading order is clear, we can solve our example as shown in Fig~\ref{fig:vOCLinv}. The three blobs correspond to the three variables \verb$self$, \verb$p1$ and \verb$p2$, and each contributes a partial reading. Since we have multiple blobs, it is no longer sensible to use grey for the background metamodel so that the one self blob can be black.
 
 The isolated blob for \verb$self$ is bound to \verb$Hospital$ and reads as \verb$self.patients$ to make available a \verb$Patient$ for binding to each of the other two blobs, one for \verb$p1$ and one for \verb$p2$.
 

@@ -1,0 +1,82 @@
+% This is LLNCS.DEM the demonstration file of
+% the LaTeX macro package from Springer-Verlag
+% for Lecture Notes in Computer Science,
+% version 2.4 for LaTeX2e as of 16. April 2010
+%
+\documentclass{llncs}
+%
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage[pdftex]{graphicx}
+%
+\begin{document}
+%
+\mainmatter              % start of the contributions
+%
+\title{An OCL Map Type}
+%
+\titlerunning{An OCL Map Type}  % abbreviated title (for running head)
+%                                     also used for the TOC unless
+%                                     \toctitle is used
+%
+\author{Edward D. Willink}
+%
+\authorrunning{Edward Willink} % abbreviated author list (for running head)
+%
+%%%% list of authors for the TOC (use if author list has to be modified)
+\tocauthor{Edward Willink}
+%
+\institute{Willink Transformations Ltd, Reading, England,\\
+\email{ed\_at\_willink.me.uk}}
+
+
+\maketitle              % typeset the title of the contribution
+Lightning presentation at the 19th International Workshop in OCL and Textual Modeling, September 16, 2019, Munich, Germany.
+%
+\pagebreak
+%
+\section{An OCL Map Type - E.D.Willink}
+OCL's family of \verb$Collection$ types is well known, but a \verb$Map(K,V)$ type is missing. Some distinguished authors have suggested that the deficiency can be remedied by a \verb$Set(Tuple(K, V))$, but this is clearly misguided since a \verb$Set(Tuple)$ can have many different-valued entries for the same key, whereas a map can only have one value per key.
+
+The Java Map type is very familiar and might perhaps inspire an equally familiar library type for OCL, but this too is misguided since a Java Map is mutable while an OCL \verb$Map$ should be immutable.
+
+The ordered \verb$Collection$s are therefore a better source of inspiration. The following have obvious functionality:
+
+\verb$=$, \verb$<>$, \verb$isEmpty()$, \verb$notEmpty()$, \verb$size()$.
+
+New \verb$keys()$ and \verb$values()$ operations can access the two halves of the map. 
+
+Similarly obvious functionality with respect to the keys can be provided  by:
+
+\verb$excludes(k)$, \verb$excludesAll(c)$, \verb$excluding(k)$,
+
+\verb$excludingAll(c)$, \verb$includes(k)$, \verb$includesAll(c)$
+
+Further emulation of ordered Collections suggests that \verb$at(k)$ accesses the map at index \verb$k$. \verb$including(k,v)$ creates a new map with an additional or replacement \verb$k<-v$ binding. It returns \verb$null$ for a null value and \verb$invalid$ for a missing value.
+
+Richer support can be provided by:
+
+\verb$excludesMap(m)$, \verb$excludesValue(v$), \verb$excludingMap(m)$,
+
+\verb$includesMap(m)$, \verb$includesValue(v$), \verb$includingMap(m)$
+
+Construction of a \verb$Map$ literal can re-use the \verb$Tuple$ literal syntax in conjunction with a new binding operator \verb$<-$. Thus a map literal with two entries for two value to key bindings my be created by:
+
+\verb$Map{k1<-v1, k2<-v2}$
+
+The above facilities were prototyped in Eclipse OCL 2015-06. They provide an adequate ability to use a \verb$Map$ but prove very inefficient for Map construction since creating a Map with \verb$N$ entries requires progressive construction of \verb$N-1$ intermediate maps; the execution performance is therefore at best quadratic. The Eclipse OCL 2019-03 release therefore extends the create/operation \verb$Map$ functionality with iteration support.
+
+A \verb$Map$ is treated as a set of keys each with a bound co-value. All the standard \verb$Collection$ iterations apply to \verb$Map$s using the set of keys as the iteration domain. Additionally a co-iterator may be bound to the iterator to avoid the need to invoke \verb$at(k)$ to obtain the value of each key. Thus a map can be checked to ensure that each \verb$v$ bound to its \verb$k$ iterator is equal to the squared value of the iterator.
+
+\verb$let c : Map(Integer, Real)$ \verb$= ...$ \verb$in c->forAll(k<-v | v = k*k)$
+
+A new \verb$collectBy$ iterator, that may be used on \verb$Collection$s or \verb$Map$s, supports creation of a \verb$Map$ by collecting an expression value for each iterator key. A map from ten integer values to their squares may be built by:
+
+\verb$Sequence{1..10}->collectBy(k | k*k)$
+
+Future work might generalize \verb$k<-v$ from special purpose punctuation to an expression operator. The downside of this generalization is the cost/complexity of a new \verb$Entry(K,V)$ type for the new expression result and of course many new operations to allow an \verb$Entry$ type to be used sensibly. The upside is that the \verb$collectBy$ body may use let variables and may compute both key and value. A map that binds an integer value  to its string value could be built by: 
+
+\verb$Sequence{1..10}->collectBy(k | k.toString()<-k)$ 
+
+A consequence of permitting both key and value to be computed, is that, in general, uniqueness of the key values cannot be guaranteed. To avoid non-deterministic loss of colliding values, the \verb$Map$ parameterization would need to be a multimap: \verb$Map(K,Bag(V))$. 
+
+\end{document}
