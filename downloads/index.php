@@ -25,6 +25,10 @@ $extraZips = array(
 	"mdt-ocl-examples",			# deprecated
 	"mdt-ocl-examples-tools",	# new in buckminster based tools/core builds
 # End OCL Stuff
+	"modisco-Update", 				# post 1.5.0
+	"org.eclipse.modisco.update", 	# post 0.10.1 - 1.2
+	"MoDisco-Update", 				# post 0.10.0
+	"MODISCO-Update", 				# pre 0.10.0
 	"xsd-SDK", # deprecated
 	"xsd-sourcedoc", # new EMF 2.4.0M5 x 3
 	"emf-sdo-xsd-sourcedoc", # never existed
