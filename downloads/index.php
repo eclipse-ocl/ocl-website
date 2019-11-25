@@ -91,7 +91,8 @@ $filePre = array(
 	"/eodm" => array("emft-eodm","mdt-eodm"),
 	"/uml2" => array("uml2","mdt-uml2"),
 	"/ocl" => array("emft-ocl","mdt-ocl"),
-	"/xsd" => array("xsd","mdt-xsd", "emf-xsd", "emf-sdo-xsd")
+	"/xsd" => array("xsd","mdt-xsd", "emf-xsd", "emf-sdo-xsd"),
+	"/modisco" => array("modisco","MoDisco","MODISCO","org.eclipse.modisco")
 );
 
 /* define showNotes(), $oldrels, doLanguagePacks() in extras-$proj.php (or just extras.php for flat projects) if necessary, downloads-common.php will include them */
