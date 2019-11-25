@@ -26,7 +26,7 @@ $extraZips = array(
 	"mdt-ocl-examples-tools",	# new in buckminster based tools/core builds
 # End OCL Stuff
 	"modisco-Update", 				# post 1.5.0
-	"org.eclipse.modisco.update", 	# post 0.10.1 - 1.2
+	"org.eclipse.modisco.updatesite", 	# post 0.10.1 - 1.2
 	"MoDisco-Update", 				# post 0.10.0
 	"MODISCO-Update", 				# pre 0.10.0
 	"xsd-SDK", # deprecated
@@ -82,6 +82,16 @@ $dls = array(
 			"SDK (Runtime, Source, Doc)" => "SDK",	# deprecated EMF 2.4.0M5
 			"Sources + Docs" => "sourcedoc",		# new EMF 2.4.0M5
 			"Runtime" => "runtime" //,
+			//"Examples" => "examples",
+			//"Automated Tests" => "automated-tests"
+		)
+	),
+	"/modisco" => array(
+		"MoDisco" => array(
+			"<acronym title=\"Click to download archived All-In-One p2 Repo Update Site\"><img alt=\"Click to download archived All-In-One p2 Repo Update Site\" src=\"/modeling/images/dl-icon-update-zip.gif\"/> <b style=\"color:green\">All-In-One Update Site</b></acronym>" => "Update",
+			//"SDK (Runtime, Source, Doc)" => "SDK",	# deprecated EMF 2.4.0M5
+			//"Sources + Docs" => "sourcedoc",		# new EMF 2.4.0M5
+			//"Runtime" => "runtime" //,
 			//"Examples" => "examples",
 			//"Automated Tests" => "automated-tests"
 		)
