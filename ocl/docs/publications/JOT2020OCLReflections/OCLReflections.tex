@@ -20,23 +20,8 @@
 
 \author[affiliation=orgname, nowrap] % , photo=FILE]
 {Edward D. Willink}
-{
-	
-Since parts of this paper rely on the personal observations of one of the leading participants at OMG and Eclipse, it is appropriate to provide a selective biography to distinguish my direct and indirect knowledge.
-	
-My involvement started in around 2003 from providing Eclipse support for the UMLX model transformation language~\cite{Willink-UMLX} using the then planned QVTr language. This led to participation in the Eclipse support for QVTr and interaction with the Eclipse OCL project~\cite{Eclipse-OCL} to make it extensible for use by the Eclipse QVTd project~\cite{Eclipse-QVTd}. I had no involvement with OCL~2.0. I contributed a few review comments to QVT~1.0.
-	
-Involvement with OCL and QVT at Eclipse led to the my appointment as the Thales representative for the OMG Revision Task Forces for OCL and QVT. I therefore contributed some revisions for OCL~2.2 and consistent models for QVT~1.1.
-	
-As personnel at OMG and Eclipse moved on, I found himself as chair of the OMG OCL and QVT RTFs and as project lead of Eclipse OCL and QVTd projects. Lack of active personnel meant that I was often the sole active participant.
-	
-I `retired' from Thales in 2012. Since then I am grateful, firstly to Tricia Balfe at Nomos Software, and then to Cory Casanave at Model Driven Solutions, for appointing me as their OCL and QVT RTF representatives.
-	
-At OMG, I resolved the `easy' problems in OCL~2.3 and OCL~2.4. This led to increasing awareness of the `hard' problems and the issuing of a Request For Proposal to address these via an `OCL~2.5' rewrite. The RFP~\cite{OCL-2.5-RFP}, starting at Section~6.5, can be read as a catalog of the serious OCL~2 problems.
-	
-At Eclipse, I inherited the Classic Eclipse OCL for Ecore/UML whose stable APIs made significant development almost impossible. A new fully-modeled Eclipse OCL exploited Xtext to provide much enhanced UX and a Pivot model to unify the competing Ecore and UML needs. Enhanced APIs, and Java code generation, support extension for QVT. The Pivot-based Eclipse OCL prototyped many solutions for OCL specification problems. Many of the solutions have been presented to the annual OCL Workshop. Unfortunately the need for API stability has become a hindrance to further development.
-	
-Contact him at \email{ed \_at\_ willink.me.uk}.}
+{is the chair of QVT and OCL specification Revision Task Forces at the Object Management Group and project leader for QVTd and OCL at the Eclipse Foundation.
+	Contact him at \email{ed \_at\_ willink.me.uk}.}
 
 \affiliation{orgname}{Willink Transformations Ltd., Reading, UK,}
 
@@ -145,6 +130,21 @@ The bottom row shows how the parsed ASG provides a query or constraint that an e
 
 Before criticizing OCL~2 too harshly, it must be remembered that there were no metamodels for OCL~1 and so the metamodels for OCL~2 were a significant novelty. We could praise the OCL~2 metamodels for being perhaps 95\% correct rather than dwelling on the 5\% wrong. However it is the 5\% wrong and the lack of a comprehensive prototype to reveal the wrongness that has caused so much trouble for implementers whose trust in the OMG specification was misplaced.
 
+\subsection{Author's background}
+
+Since parts of this paper rely on the personal observations of one of the leading participants at OMG and Eclipse, it is appropriate to provide a selective biography to distinguish my direct and indirect knowledge.
+
+My involvement started in around 2003 from providing Eclipse support for the UMLX model transformation language~\cite{Willink-UMLX} using the then planned QVTr language. This led to participation in the Eclipse support for QVTr and interaction with the Eclipse OCL project~\cite{Eclipse-OCL} to make it extensible for use by the Eclipse QVTd project~\cite{Eclipse-QVTd}. I had no involvement with OCL~2.0. I contributed a few review comments to QVT~1.0.
+
+Involvement with OCL and QVT at Eclipse led to the my appointment as the Thales representative for the OMG Revision Task Forces for OCL and QVT. I therefore contributed some revisions for OCL~2.2 and consistent models for QVT~1.1.
+
+As personnel at OMG and Eclipse moved on, I found himself as chair of the OMG OCL and QVT RTFs and as project lead of Eclipse OCL and QVTd projects. Lack of active personnel meant that I was often the sole active participant.
+
+I `retired' from Thales in 2012. Since then I am grateful, firstly to Tricia Balfe at Nomos Software, and then to Cory Casanave at Model Driven Solutions, for appointing me as their OCL and QVT RTF representatives.
+
+At OMG, I resolved the `easy' problems in OCL~2.3 and OCL~2.4. This led to increasing awareness of the `hard' problems and the issuing of a Request For Proposal to address these via an `OCL~2.5' rewrite. The RFP~\cite{OCL-2.5-RFP}, starting at Section~6.5, can be read as a catalog of the serious OCL~2 problems.
+
+At Eclipse, I inherited the Classic Eclipse OCL for Ecore/UML whose stable APIs made significant development almost impossible. A new fully-modeled Eclipse OCL exploited Xtext to provide much enhanced UX and a Pivot model to unify the competing Ecore and UML needs. Enhanced APIs, and Java code generation, support extension for QVT. The Pivot-based Eclipse OCL prototyped many solutions for OCL specification problems. Many of the solutions have been presented to the annual OCL Workshop. Unfortunately the need for API stability has become a hindrance to further development.
 \section{Problems}\label{Problems}
 
 The problems with OCL take many forms. In the following subsections we categorize them to distinguish those that directly affect users and those which only affect toolsmiths struggling to make sense of the specification.  
@@ -893,7 +893,7 @@ Since the `CS' content is exchanged with other tools we will refer to this as th
 
 \begin{figure}
 	\begin{center}
-		\includegraphics[width=4.5in]{OCL3TypeDescriptor.png}
+		\includegraphics[width=5.0in]{OCL3TypeDescriptor.png}
 	\end{center}
 	\vspace{-40pt}
 	\caption{Possible OCL~3 Type Descriptor}
