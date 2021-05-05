@@ -1,0 +1,10 @@
+
+
+package example {
+	class FixedExample {
+		attribute count : Integer;
+		invariant PositiveCount: count <> null implies count > 0;
+	}
+}
+
+
