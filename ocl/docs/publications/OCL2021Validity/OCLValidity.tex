@@ -67,11 +67,15 @@ Crash
 %
 OCL \cite{OCL-2.4} evolved from Syntropy to satisfy the need to elaborate UML \cite{UML-2.5} diagrams with constraint details that could not sensibly be expressed graphically. Within the context of a UML model, OCL specifies what happens within a domain-specific Utopia where nothing bad happens, not even when the user models real problems.
 
-OCL is a specification language that is also executable and so the OCL specification makes concessions to realizability by prohibiting infinite collections such as \verb|Integer.allInstances()| and tolerating indeterminacy for operations such as \verb|Set::asOrderedSet()|. However there is no concession to 32 bit integers or floating point precision. These details pale in comparison to the major oversight of what happens when things go wrong.
+OCL is not just a model-oriented pseudo-code. OCL is a specification language that is also executable. The OCL specification makes some concessions to realizability by prohibiting infinite collections and tolerating indeterminacy for operations such as \verb|Set::asOrderedSet()|. However there is very little consideration of what happens when things go wrong; the single solution of an \verb|invalid| value is used for all problems.
 
-In this paper we review the ways in  which OCL can go wrong and introduce a validity analysis so that we can guarantee that OCL will always crash desirably and never crash undesirably.
+In this paper we give detailed consideration to how OCL goes wrong and refine the specification so that when OCL goes wrong, it does so usefully and predictably.
 
-We use the emotive term crash for the problem since all programmers understand what a crash is. It avoids any confusion with solutions where terms such as invalid/exception/error/failure are used.
+We will use the emotive term crash for going wrong, since all programmers understand what a crash is. It avoids any confusion with terms such as invalid/exception/error/failure that may be associated with particular solution approaches.
+
+While reviewing the many ways in which an OCL evaluation can crash, we identify the need for more than an ill-considered one-size-fits-all solution. In particular, we identify that there is nothing that can, or should be done, for some crashes, and so it is very desirable for these to be reliably propagated for resolution by the user. In contrast other crashes are the undesirable consequence of inadequate programming. We introduce a validity analysis to identify the inadequacies and so guarantee that OCL will always crash desirably and never crash undesirably.
+
+Once we introduce rigor to OCL's crashing, we are forced to confront the conflicts between recursion, commutativity and short-circuits for the Boolean \verb|and| and \verb|or| operations. We refine their specification to remove the conflicts. Commutativity is only supported where the validity analysis proves that the usage \emph{isCommutable}. We observe that commutativity is not actually necessary if pairwise idempotence is replaced by multi-term redundancy pruning.
 
 In Section~\ref{Crashes} we review the ways in which OCL can crash so that in Section~\ref{Goal} we outline what we need to achieve and in what respects the OCL specification needs to be tweaked. Section~\ref{Running Example} presents a running example to show how even the simplest of invariants may be unsafe. In Section~\ref{Program Analysis} we introduce the analysis and symbolic evaluation that diagnoses all crash hazards and in Section~\ref{Corollaries} we identify opportunities for better practice that exploits the validity analysis. In Section~\ref{Current Status and Further Work} we describe how far the implementation work has progressed.  Finally in Section~\ref{Related Work} we review the related work and conclude in Section~\ref{Conclusions}.
 
@@ -79,7 +83,7 @@ In Section~\ref{Crashes} we review the ways in which OCL can crash so that in Se
 
 Programmers in most languages are resigned to the need to debug their programs to fix bugs and to handle exceptions where problems are unavoidable. OCL has no exception capability. Rather than throwing an exception as an out-of-band `return', OCL returns the \verb|invalid| singleton value as an in-band result. In principle, these two mechanisms are equivalent, particularly if a practical OCL implementation supports a richer \verb|invalid| that includes details of the problem while continuing to behave as a singleton.
 
-Many OCL programmers are unhappy that the in-band return of \verb|invalid| means that an OCL Constraint is not 2-valued despite being a self-evident arbiter of whether some condition is satisfied or not. This unhappiness is actually a misunderstanding \cite{OCLreflections} since any non-trivial constraint expressed in almost any language has three possible outcomes; satisfied, not-satisfied and crash. The misunderstanding arises because, when the crash uses an exception mechanism, the crash outcome bypasses the invocation code, which perceives only two outcomes. In contrast, the OCL programmer must ensure that the invocation propagates the \verb|invalid| back to the invocation's caller. The misunderstanding is therefore an ergonomic issue whereby the API provided by the OCL evaluator fails to meet the expectations of the user and fails to alert the programmer to the simple solution of converting an OCL \verb|invalid| result into an exception to propagate the crash.
+Many OCL programmers are unhappy that the in-band return of \verb|invalid| means that an OCL Constraint is not 2-valued despite being a self-evident arbiter of whether some condition is satisfied or not. This unhappiness is actually a misunderstanding \cite{OCLreflections} since any non-trivial constraint expressed in almost any language has three possible outcomes; satisfied, not-satisfied and crash. The misunderstanding arises because, when the crash uses an exception mechanism, the crash outcome bypasses the invocation code, which perceives only two outcomes. In contrast, the OCL programmer must ensure that the invocation propagates the \verb|invalid| back to the invocation's caller. The misunderstanding is therefore an ergonomic issue whereby the API provided by the OCL evaluator fails to meet the expectations of the programmer, and fails to alert the programmer to the simple solution of converting an OCL \verb|invalid| result into an exception to propagate the crash.
 
 It would clearly be better if programs do not crash, but before we look at reasons for OCL to crash, we will look at mechanisms that avoid some crashes.
 
@@ -89,7 +93,7 @@ It would clearly be better if programs do not crash, but before we look at reaso
 
 An OCL validator should check all the WFRs, preferably at edit time, but at least before execution, since execution is likely to fail miserably if a WFR is violated. We may therefore assume that no crash occurs as a consequence of a WFR violation.
 
-\subsubsection{Guards}\label{Guards} Where a programmer is aware that a crash may occur, the programmer may guard against it. A substantive guard may use an \verb|if then else endif| to provide alternative functionality, or a more localized guard may use a logical operator.
+\subsubsection{Guards}\label{Guards} Where a programmer is aware that a crash may occur, the programmer may guard against it. A substantive guard may use an \verb|if then else endif| clause to provide alternative functionality, or a more localized guard may use a logical operator.
 
 \begin{verbatim}
     (var != null) || var.doSomething()		// C or Java
@@ -99,7 +103,7 @@ The Java above uses the short-circuit \verb&||& operator to prevent a \emph{Null
 
 As we shall see, the equivalent OCL operator is not short-circuit. Rather than preventing a crash, it can allow a crash to happen and then require the crash to be uncrashed.
 
-\subsection{Catastrophic / Desirable Crashes}
+\subsection{Catastrophic / Desirable Crashes}\label{Desirable Crashes}
 
 Problems such as Power Failure, Stack Overflow or Memory Allocation Failure can occur at almost any time and there is nothing that a normal OCL program can do about them.
 
@@ -107,7 +111,7 @@ Problems such File Access, Network or Database failure may occur when a \emph{Na
 
 These problems are pretty catastrophic. We categorize the consequent crashes as desirable since the most sensible response is to diagnose the problem as helpfully as possible in the hope that the user may understand and resolve the issue.
 
-
+We will revisit Stack Overflow in Section~\ref{Stack Overflow Revisited}.
 
 
 %An OCL execution results from the collaboration of the execution of each OCL Abstract Syntax Tree element. We must therefore examine each AST element for crash hazards, very few of which are mentioned in the OCL specification.
@@ -138,7 +142,7 @@ The loose wording in the specification could be formalized by preconditions for 
     pre NonNullSource: not source.oclIsUndefined();
 \end{verbatim}
 
-Failure of a precondition is a consequence of careless programming, we therefore categorize it as an undesirable crash. The programmer needs assistance to ensure that such crashes never occur.
+Failure of a precondition is a consequence of careless programming. We therefore categorize it as an undesirable crash. The programmer needs assistance to ensure that such crashes never occur.
 
 The strict execution semantics of the OCL Abstract Syntax Tree elements provides a simple crash-and-stay-crashed behavior. The OCL Standard Library defines
 
@@ -158,11 +162,11 @@ The problem of divide-by-zero exists in many languages, but is relatively rare i
 
 \subsubsection{Index-out-of-bounds}
 
-The \verb|OrderedSet| and \verb|Sequence| collection types support indexing in much the same way as \verb|Array| and \verb|List| in other languages. A crash occurs when an unsuitable index access is used. This problem occurs more often than might be expected since many users accidentally use the 0-based index typical of an execution language, rather than the 1-based index of a specification.
+The \verb|OrderedSet| and \verb|Sequence| collection types support indexing in much the same way as \verb|Array| and \verb|List| in other languages. A crash occurs when an unsuitable index access is used. This problem occurs more often than might be expected, since many users accidentally use the 0-based index typical of an execution language, rather than the 1-based index of a specification.
 
 \subsubsection{Missing Content}
 
-The collection types support reverse indexing using the \verb|indexOf| operation or the \verb|any| iteration and crash when the indexing misses. The crash from \verb|indexOf| is excessive since a \verb|null| or negative return could signal the query miss less forcefully. It is unreasonable to expect every use of \verb|indexOf| to be guarded by an \verb|includes|.
+The collection types support reverse indexing using the \verb|indexOf| operation, or the \verb|any| iteration, and crash when the indexing misses. The crash from \verb|indexOf| is excessive since a \verb|null| or negative return could signal the query-miss less forcefully. It is unreasonable to expect every use of \verb|indexOf| to be guarded by an \verb|includes|.
 
 \subsubsection{Bad String Content}
 
@@ -174,14 +178,14 @@ Once a crash has occurred, the programmer may take some action to handle it.
 
 \subsubsection{Catching}
 
-In many languages a crash is propagated by throwing an exception and subsequently catching it. In OCL, the crash is propagated as the \verb|invalid| value and may be `caught' by the \verb|OCLAny::oclIsInvalid()| operation.
+In many languages a crash is propagated by throwing an exception and subsequently catching it. In OCL, the crash is propagated as the \verb|invalid| value and may be `caught' by the \verb|OcAlny::oclIsInvalid()| operation.
 
 \begin{verbatim}
     let result : OclAny = functionThatMayCrash() in
     if result.oclIsInvalid() then fixupCrash() else result endif
 \end{verbatim}
 
-Accommodating \verb|OCLAny::oclIsInvalid()| is inconvenient when realizing OCL by translation to a conventional language, since all usages of the conventional exception passing must convert to values wherever \verb|oclIsInvalid()| might be invoked.
+Accommodating \verb|OclAny::oclIsInvalid()| is inconvenient when realizing OCL by translation to a conventional language, since the conventional exception passing must be diligently trapped and converted to an \verb|invalid|values wherever \verb|oclIsInvalid()| might be invoked.
 
 Ideally the usage of \verb|oclIsInvalid()| would be limited to not-invalid preconditions and Operating System level OCL that really wants to catch a catastrophic failure to produce a friendly diagnostic or to perhaps retry on another computer.
 
@@ -203,7 +207,7 @@ The OCL short-circuit is
     (var <> null) or var.doSomething()
 \end{verbatim}
 
-Since the operator is commutative an implementation has a free choice of the evaluation order, and may even use different processors to evaluate the two arguments concurrently. For less obvious OCL expressions, it may be unclear to user or tooling what the best evaluation order is. An implementation cannot in general avoid evaluating the `wrong' argument first before evaluation of the `right' argument provides the guard value and so requires the implementation to discard the `erroneous' crash.
+Since the operator is commutative, an implementation has a free choice of the evaluation order, and may even use different processors to evaluate the two arguments concurrently. For less obvious OCL expressions, it may be unclear to user or tooling what the best evaluation order is. An implementation cannot in general avoid evaluating the `wrong' argument first. Subsequent evaluation of the `right' argument may provide the guard value and so require the implementation to discard the `erroneous' crash.
 
 Even if the implementation foregoes the concurrency opportunity and evaluates first argument first, the commutativity allows a programmer to accidentally specify the guard second, so the implementation must still support the uncrash. Of course no sensible programmer will program the guard term second so the implementation is just being forced to implement something that should never happen.
 
@@ -242,6 +246,16 @@ Unfortunately the commutative not-strict logical operators break the simple cras
 
 %In this paper we outline a deeper analysis that can guarantee that all undesirable crashes are eliminated. In the same way that execution of type-unsafe OCL is prohibited by a validation tool that checks the Well Formedness Rules, the new validity analysis can prohibit undesirable crashes.
 
+\subsection{Stack Overflow Revisited}\label{Stack Overflow Revisited}
+
+In Section~\ref{Desirable Crashes} we lumped a Stack Overflow together with other catastrophic crashes that the OCL programmer can do nothing about. Certainly, once such a crash occurs, it is desirable to diagnose it, but the origin of the crash is frequently due to an uncontrolled recursion and so down to bad programming.
+
+Detecting the soundness of an arbitrary recursion requires a solution to the Halting Problem which in general does not exist. We can however diagnose wherever an unsafe recursion hazard exists.
+
+As a minimum we can identify recursive call sites. In practice the recursion will be guarded to ensure that it terminates. For relatively simple step and repeat recursions we may be able to analyze the step to see whether it iterates towards a limit and so remove the pessimistic unsafe characterization.
+
+If the recursion terminates with the help of a short-circuit \emph{and} or \emph{or} operation we have a further conflict with commutativity; it is essential that the termination guard is evaluated before the next recursion starts.
+
 \subsection{Model Transformation}
 
 Many model transformation tools provide a disciplined framework to create or mutate an output model using immutable OCL queries on the input model. OCL crashes pose a difficult problem.
@@ -264,15 +278,31 @@ We have motivated our goal for normal OCL
 	\item careless/undesirable crashes never occur
 \end{itemize}
 
-This is fully in accord with OCL's strict behavior provided preconditions are always satisfied. We need a validity analysis that can guarantee this proviso.
+This is fully in accord with OCL's strict behavior, provided preconditions are always satisfied. We need a validity analysis that can guarantee this proviso.
 
-The not-strict commutative specification of the logical operators conflicts with both our goals. A catastrophic crash can be guarded and so not crash. A careless crash may occur before it is guarded and uncrashed.
+Unfortunately the OCL specification bundles a \emph{short-circuit-and} behavior with a \emph{commutative-and} behavior as a composite \emph{and} operation. The conflicts between these behaviors and the rest of the specification are `resolved' by undermining strictness.
+
+However, the not-strict commutative specification of the logical operators conflicts with both our goals. 
+\begin{itemize}
+	\item A catastrophic crash can be guarded and so not crash.
+	\item A careless crash may occur before it is guarded and uncrashed.
+\end{itemize} 
 
 We can satisfy our goals by revising the logical operators to be sequentially strict. A strict evaluation of the first argument can ensure the crash happens. The first argument can then short-circuit the unwanted second argument evaluation guaranteeing that unwanted crashes do not occur.
 
-For most users this change will make no difference. Where there is a difference, it is probably associated with an inefficiency or worse.
+This approach re-instates strictness to support a qualified form of commutativity. An alternative approach to repairing the specification that retains unqualified commutativity must compromise short-circuiting. This would be much simpler but more damaging to compatibility and expressiveness. It would eliminate everything potentially associated with short-circuiting.
 
-To avoid a real incompatibility we need to ensure that our validity analysis detects the cases where sequentially-strict logical operators may give different results to commutative non-strict logical operators.
+\begin{itemize}
+	\item No recursion
+	\item No null values for Boolean operations
+	\item No invalid values for Boolean operations	
+\end{itemize} 
+
+\subsection{Revised and operation}
+
+%For most users this change will make no difference. Where there is a difference, it is probably associated with an inefficiency or worse.
+
+%To avoid a real incompatibility we need to ensure that our validity analysis detects the cases where sequentially-strict logical operators may give different results to commutative non-strict logical operators.
  
 % of ensuring that desirable crashes always crash and that undesirable crashes never crash conflicts with the not-strict semantics of the logical operators.
 
@@ -324,7 +354,7 @@ to
 		Use Case & Input 1 & Input 2 & Revised Output \\
 		\hline
 		\hline
-		2-valued, & true & true & true \\
+		2-valued & true & true & true \\
 		& true & false & false \\
 		Normal Short-Circuit & false &  & false \\
 		\hline
@@ -336,13 +366,42 @@ to
 	\end{tabular}
 \end{center}
 
-Normal short-circuit and 2-valued functionality has unchanged results but now explicitly avoids the redundant second argument computation which guarantees that no crash is computed and then discarded.
+Normal short-circuit and 2-valued functionalities have unchanged results but now explicitly avoid the redundant second argument computation. This guarantees that no desirable crash is computed and then discarded.
 
 % compute the second ar. The functionality with a $\epsilon$(\verb|null|) or $\bot$(\verb|invalid|) as the first input is detected by the analysis and requires a bug fix or refactoring by the programmer. 
 
-The subtle change that all crashes return $\bot$ (\verb|invalid|) rather than sometimes $\epsilon$ (\verb|null|) is a reversion from the idempotence introduced in OCL 2.4 back to OCL 2.3.
+The subtle change that all crashes return $\bot$ (\verb|invalid|) rather than sometimes $\epsilon$ (\verb|null|) is a reversion from the idempotence introduced in OCL 2.4 back to the simpler OCL 2.3.
 
-The significant change is that the Commutated Short Circuit functionality now crashes on the first argument without giving the second argument a chance to discard a crash. Our validity analysis must identify this usage to avoid breaking unwise constraints.
+\subsection{Qualified Commutativity}
+
+The significant change is that the Commutated Short Circuit functionality now crashes on the first argument without giving the second argument a chance to discard a crash. Our validity analysis must identify this usage and commute the arguments at compile-time to ensure that a crash-proof argument is evaluated first.
+
+An unavoidable but diagnosable incompatibility arises only when both arguments may crash. The diagnosis will force the programmer to sequence the potential crashes by caching at least one of them in a let-variable.
+
+%This refinement endorses the unconditionally sound \emph{short-circuit-and} behavior over the unsound \emph{commutative-and} behavior at run-time. It does not however remove compile-time commutativity. As always, an optimizing compiler is free to introduce an optimization that does not change observable behavior. A compiler may therefore exploit commutativity when there is no observable change. That is commutativity may be used once our validity analysis has proved that the actual usage is commutable. This can be the case for crash-proof Boolean-valued expressions, but will not be true for important short-circuit guards. 
+ 
+ 
+%To make OCL sound, we must revise the language to eliminate the conflicts or to accommodate the conflicts. Trimming \emph{null}, \emph{invalid} and recursion seems impractical and trimming short-circuits is barely credible. We accept that clean numerics are impractical and so live with an \emph{isDivisible} precondition for divide. Similarly we must recognize that the OCL specification has bundled \emph{short-circuit-and} and \emph{commutative-and} behaviours in the one \emph{and} operation and neglected to specify any corresponding preconditions. \emph{short-circuit-and} needs no extra preconditions, but \emph{commutative-and} has an \emph{isCommutable} precondition that is debateable for \emph{null} or \emph{invalid} inputs and violated when the second term is a recursive call.
+
+\subsection{Commutativity Utility}
+
+It seems helpful to review to what extent unqualified commutativity is actually necessary.
+
+A simple traditional example of the utility of commutativity comes from mental arithmetic where \verb|3*15| is easier to calculate than \verb|15*3|, since people are more familiar with their 3 rather than 15 times tables. More generally the combination of associativity, distributivity and commutativity may allow a calculation to be refactored to minimize inaccuracies when subtracting large nearly-equal numbers.
+
+For Boolean arithmetic, ease of calculation is irrelevant, but a refactoring exploiting idempotence is essential to allow elimination of redundant terms. However commutativity is only necessary because the pairwise definition of idempotence needs to shuffle terms to enable \verb|A & B & C & B & A| to be simplified to any permutation such \verb|B & C & A|. If we replace 2-term idempotence by a multi-term idempotence in which a later repeated term is redundant, the example simplification has the unique \verb|A & B & C| result that supports the optimization while ensuring that a guarding term precedes a guarded term.
+
+Unqualified commutativity is therefore unnecessary. The validity analysis outlined in this paper enables the \emph{isCommutable} precondition to be evaluated to determine when both arguments are crash-proof and so permit qualified commutativity. This will be most useful at compile-time where an expensive analysis can be tolerated to impose a smart strategy on the evaluation. Terms could be ordered according to some heuristic such as
+
+\begin{itemize}
+	\item most-likely-to-guard-first
+	\item most-expensive-to-compute-last
+	\item most-likely-to-contribute-to-a-common-subexpression-first	
+\end{itemize}
+
+The resulting OCL Abstract Syntax can capture the compile-time optimization. The run-time can blindly follow the defined order, since it is unlikely that the run-time can afford the overhead of determining a more optimum order and fairly unlikely that the run-time has extra profiling information to allow a better decision than at compile-time.
+
+If concurrent evaluation of commutative terms is required, it will be necessary to augment the OCL \emph{OperationCallExp} with a \emph{may-be-concurrent} flag to capture the result of the compile-time analysis that guarantees that the terms are crash-proof and so commutable or parallelizable. 
  
 \section{Running Example}\label{Running Example}
 
@@ -357,7 +416,7 @@ The significant change is that the Commutated Short Circuit functionality now cr
 	\vspace{-10pt}
 \end{figure}
 
-Our running example considers the very simple class constraint shown using OCLinEcore\cite{OCLinEcore} in Fig~\ref{fig:NaiveExample}.
+Our running example considers the very simple class constraint shown using OCLinEcore~\cite{OCLinEcore} in Fig~\ref{fig:NaiveExample}.
 
 The \verb|NaiveExample| class contains an \emph{Integer} attribute named \verb|count| and an invariant to require a positive value.
 
@@ -365,12 +424,12 @@ It would seem self evident that the invariant is 2-valued corresponding to satis
 
 \subsection{Hazards}
 
-If the host model is served by a cloud network or database, there is a possibility that the \emph{PropertyCallExp} access to \verb|count| may fail with some form of network error. This error is treated as \verb|invalid| by OCL and consequently the evaluation of the constraint yields an \verb|invalid| result. As noted above, this rather pedantic but catastrophic concern is resolved by a strict any-crash-always-crashes philosophy.
+If the host model is served by a cloud network or database, there is a possibility that the \emph{PropertyCallExp} access to \verb|count| may fail with some form of network error. This error is treated as \verb|invalid| by OCL and consequently the evaluation of the constraint yields an \verb|invalid| result. As noted above, this rather pedantic but catastrophic concern is sensibly resolved by a strict any-crash-always-crashes philosophy.
 
 Fig~\ref{fig:NaiveExample} also shows the OCLinEcore editor's hover text to
-reveal the underlying \emph{Property} declaration with a fully qualified name \verb|example::NaiveExample::count|, primitive type \verb|Integer| and multiplicity \verb|[?]|. The optional multiplicity allows the value of \verb|count| to be \verb|null|. In Ecore \cite{EMF}, where the emphasis is on simple default construction of Java objects, the default multiplicity lower bound for all objects is 0. Consequently this is the OCLinEcore default and so a widespread practice. In contrast for UML, the lower bound multiplicity default is unity so that a \verb|null| is only permitted after an explicit user action. Either way, a valid \emph{Property} may specify that \verb|null| is an acceptable value. The \verb|null| value violates the strict precondition of the comparison operation. It crashes the invariant and disappoints the user hoping for a 2-valued outcome.
+reveal the underlying \emph{Property} declaration. It has a fully qualified name \verb|example::NaiveExample::count|, primitive type \verb|Integer| and multiplicity \verb|[?]|. The optional multiplicity allows the value of \verb|count| to be \verb|null|. In Ecore \cite{EMF}, where the emphasis is on simple default construction of Java objects, the default multiplicity lower bound for all objects is 0. Consequently this is the OCLinEcore default and so a widespread practice. In contrast, for UML, the lower bound multiplicity default is unity so that a \verb|null| is only permitted after an explicit user action. For either representation, a valid \emph{Property} may specify that \verb|null| is an acceptable value. The \verb|null| value violates the strict precondition of the comparison operation. It crashes the invariant and disappoints the user hoping for a 2-valued outcome.
 
-We require our tooling to support elimination of this not-2-valued hazard by diagnosing that the required non-null/non-invalid input of the comparison operator is \emph{MayBeNull}.
+We require our tooling to support elimination of this not-2-valued hazard by diagnosing that the comparison operator requires non-null/non-invalid inputs but that an actual input \emph{MayBeNull}.
 
 \subsection{Fixes}
 
@@ -391,7 +450,7 @@ The \verb|implies| operation guards the comparison preventing the crash, but nai
 
 \section{Program Analysis}\label{Program Analysis}
 
-Our running example shows that even simple OCL code can have a problem that can be fixed. We now introduce an analysis to alert the user for the need for fixes and confirm that sufficient fixes have been applied to guarantee that no undesirable crashes occur and that all desirable crashes always crash. We first review the conventional run-time evaluation of our example OCL expression.
+Our running example shows that even simple OCL code can have a problem that can be fixed. We now introduce an analysis to alert the user to the need for fixes, and to confirm that sufficient fixes have been applied to guarantee that no undesirable crashes occur, and that all desirable crashes always crash. We first review the conventional run-time evaluation of our example OCL expression.
 
 \begin{verbatim}
     self.count <> null implies self.count > 0
@@ -399,7 +458,7 @@ Our running example shows that even simple OCL code can have a problem that can 
 
 \subsection{Simple Evaluation}\label{Simple Evaluation}
 
-The OCL specification defines the Abstract Syntax of OCL expressions. Fig~\ref{fig:FixedExampleAST} shows the Pivot-based Eclipse OCL AST of the fixed example invariant using a UML Object Diagram-like exposition of the XML serialization. (Solid lines and diamonds for compositions, dashed lines for references.)
+The OCL specification defines the Abstract Syntax of OCL expressions. Fig~\ref{fig:FixedExampleAST} shows the Pivot-based Eclipse OCL AST of the fixed example invariant using a UML Object Diagram-like exposition of the XML serialization. (Solid lines and diamonds for compositions, dashed lines for references, XML namespace:element-type box titles.)
 
 \begin{figure}
 	\vspace{-10pt}
@@ -412,7 +471,7 @@ The OCL specification defines the Abstract Syntax of OCL expressions. Fig~\ref{f
 	\vspace{-10pt}
 \end{figure}
 
-The top of the diagram shows the \verb|FixedExample| \emph{Class}, \verb|count| \emph{Property} and \verb|PositiveCount| \emph{Constraint} metamodel elements. The \emph{Constraint} is realized by an \emph{ExpressionInOCL} with a \verb|self| \emph{ParameterVariable} and the \emph{ownedBody} OCL expression tree with an \verb|implies| \emph{OperationCallExp} at its root\footnote{The \emph{referredOperation} links to the Standard Library model are omitted}.
+The top of the diagram shows the \emph{Class} named \verb|FixedExample| with \verb|count| \emph{Property} and \verb|PositiveCount| \emph{Constraint} metamodel elements. The \emph{Constraint} is realized by an \emph{ExpressionInOCL} with a \verb|self| \emph{ParameterVariable} and the \emph{ownedBody} OCL expression tree with an \verb|implies| \emph{OperationCallExp} at its root\footnote{The \emph{referredOperation} links to the Standard Library model are omitted}.
 
 The \emph{ownedSource} sub-tree comprises another \emph{OperationCallExp} for the \verb|<>| operation with further sub-trees comprising a \emph{PropertyCallExp} to evaluate the \verb|count| property upon the result of the \emph{VariableExp} that accesses the \verb|self| \emph{ParameterVariable}. The second sub-tree comprises a \emph{NullLiteralExp} that evaluates to the \verb|null| value.
 
@@ -457,9 +516,9 @@ The conventional use of the OCL well formedness rules supports a static analysis
 %    }
 %\end{verbatim}
 
-At edit/compile-time we have no actual instances, rather we need to prove that for all possible instances the result will be either 2-valued or a desirable crash. With our revision to strict semantics for everything except for the sequentially-strict logical operations we `just' need to prove that no undesirable crash can occur.
+At edit/compile-time we have no actual instances, rather we need to prove that for all possible instances the result will be either 2-valued or a desirable crash. With our revision to strict semantics, for everything except for the sequentially-strict logical operations, we `just' need to prove that no undesirable crash can occur.
 
-For our example, we have intuitively identified that \verb|self.count > 0| may crash for \verb|invalid| or \verb|null| values of \verb|count|. More rationally, the \verb|self| object is not \verb|invalid| and instance slots cannot contain \verb|invalid| values, so an \verb|invalid| value is only possible as a consequence of a database/network failure. This would be a desirable crash. However the instance slot can contain a \verb|null| value. The \verb|self.count <> null| guard uses \verb|implies| to protect against this \verb|null| value. Confirming this protection requires a \verb|false| value for the \verb|<>| output, enabling us to deduce that the inputs are different.
+For our example, we have intuitively identified that \verb|self.count > 0| may crash for \verb|invalid| or \verb|null| values of \verb|count|. More rationally, the \verb|self| object is not \verb|invalid| and instance slots cannot contain \verb|invalid| values, so an \verb|invalid| value is only possible as a consequence of a database/network failure. This would be a desirable crash. However the instance slot can contain a \verb|null| value. The \verb|self.count <> null| guard uses \verb|implies| to protect against this \verb|null| value. Activating this protection requires a \verb|false| value for the \verb|<>| output, enabling us to deduce that the inputs are different.
 %Since \verb|count| is accessed from an instance slot, a desirable crash may occur from a database/network failure. An undesirable crash can occur for a \verb|null| or \verb|invalid| value. Slots cannot have \verb|invalid| values so only the \verb|null| value permitted by the multiplicity lower bound needs to be eliminated. The \verb|implies| guard idiom ensures that any crash while evaluating its second argument is ignored if the first argument evaluates to \verb|false|. The guard is \verb|false| when the \verb|<>| evaluates to \verb|false| which requires the inputs to differ; \verb|x| to differ from \verb|null|.
 
 This achieves what we want, but it has required us to deduce properties of the \verb|<>| inputs from its output. This is a reverse evaluation that requires distinct implementation programming and which scales badly since only single input monotonic operations support useful deduction of an input from a known output.
@@ -467,9 +526,10 @@ This achieves what we want, but it has required us to deduce properties of the \
 We can avoid reverse flow deductions by instead hypothesizing that an undesirable crash can occur and demonstrate that forward evaluation leads to a contradiction. For our example, we consider the hypothesis
 
 \begin{center}
-	\begin{tabular}{c c}
-		when: & self.count <> null \\
+	\begin{tabular}{c|c}
 		execution is attempted for: & self.count > 0 \\
+		\hline
+		when: & self.count <> null \\
 	\end{tabular}
 \end{center}
 
@@ -477,18 +537,18 @@ This evaluation can be performed by a symbolic evaluator that elaborates the sta
 
 \subsection{Boolean Symbolic Evaluation}
 
-For simple invariants it is sufficient for the \emph{SymbolicValue} to be a tuple maintaining the following information for our partial knowledge:
+For simple invariants, it is sufficient for the \emph{SymbolicValue} to be a tuple maintaining the following information for our partial knowledge:
 \begin{itemize}
 	\item Value Type : Type[1]
 	\item MayBeInvalid : Boolean[1]
 	\item MayBeNull : Boolean[1]
 \end{itemize}
 
-The symbolic nullity state requires only two \emph{MayBeNull}, \emph{MayNotBeNull} values since the third \emph{IsNull} state uses the constant literal value of type \emph{OclVoid}.
+The \verb|MayBeInvalid| Boolean distinguishes the two symbolic possibilities: \emph{MayBeInvalid}, \emph{MayNotBeInvalid}. The third \emph{IsInvalid} possibility is a constant literal of type \verb|OclInvalid|.
 
-The symbolic careless invalidity state requires only two \emph{MayBeInvalid}, \emph{MayNotBeInvalid} values since the third \emph{IsInvalid} state would be a deliberate and so desirable crash that bypasses our careless invalidity analysis.
+The \verb|MayBeNull| Boolean distinguishes the two symbolic possibilities: \emph{MayBeNull}, \emph{MayNotBeNull}. The third \emph{IsNull} possibility is a constant literal of type \verb|OclVoid|.
 
-For our example:
+Resuming our example:
 
 \begin{verbatim}
     self.count <> null implies self.count > 0
@@ -498,7 +558,7 @@ The symbolic evaluation needs to confirm that no undesirable crash can occur for
 
 \subsubsection{Base Symbolic Evaluation}
 
-An overall symbolic evaluation of an invariant uses the initial symbolic value.
+An overall symbolic evaluation of our invariant uses the initial symbolic value.
 \begin{center}
 	\begin{tabular}{|c||c|c||c|}
 		\hline
@@ -508,7 +568,7 @@ An overall symbolic evaluation of an invariant uses the initial symbolic value.
 		\hline
 	\end{tabular}
 \end{center}
- and all other constraints and preconditions
+and evaluates all other constraints and preconditions
 \begin{center}
 	\begin{tabular}{|c|c||c|}
 		\hline
@@ -553,7 +613,7 @@ An overall symbolic evaluation of an invariant uses the initial symbolic value.
 	\end{tabular}
 \end{center}
 
-giving the symbolic values of each AST node as
+This gives the symbolic values of each AST node as
 
 \begin{center}
 	\begin{tabular}{|c||c|c|c|}
@@ -579,13 +639,13 @@ giving the symbolic values of each AST node as
 	\end{tabular}
 \end{center}
 
-Five of the six \verb|>| preconditions are satisfied by the symbolic values.
+Five of the six \verb|self.count > 0| preconditions are satisfied by the symbolic values.
 
-The sixth, \verb|not source.oclIsUndefined()| might not be satisfied since, for its \verb|self.count| source, \emph{MayBeNull} is \verb|true| and propagates as \emph{MayBeInvalid} after the comparison.
+The sixth, \verb|not source.oclIsUndefined()| might not be satisfied since, for its \verb|self.count| source, \emph{MayBeNull} is \verb|true| and so propagates as \emph{MayBeInvalid} after the comparison.
 
 \subsubsection{Hypothesized Symbolic Evaluation}
 
-We can establish that the sixth precondition is satisfied by showing that the hypothesis that a \emph{null} value of the \verb|self.count| source can be used leads to a contradiction. 
+We can establish that the sixth precondition is satisfied by showing that a contradiction results from the hypothesis that the \verb|self.count| can be executed to give a \emph{null} value. 
 
 We bind an additional non-symbolic value \verb|null| as the symbolic value of \verb|self.count|.
 
@@ -599,7 +659,7 @@ We bind an additional non-symbolic value \verb|null| as the symbolic value of \v
 	\end{tabular}
 \end{center} 
 
-We impose additional preconditions on the short-circuit and if-then-else ancestors of the hypothesized value to ensure that the control path that evaluates the hypothesized value is used.
+We impose additional preconditions on the short-circuit and if-then-else ancestors of the hypothesized value to ensure that the control path that evaluates the hypothesized value is executable.
 
 \begin{center}
 	\begin{tabular}{|c|c||c|}
@@ -613,7 +673,7 @@ We impose additional preconditions on the short-circuit and if-then-else ancesto
 	\end{tabular}
 \end{center}
 
-Re-evaluating the symbolic values of each AST node for the new known values and checking all constraints finds the required contradiction. \verb|self.count <> null| now evaluates to \verb|false| contradicting the new precondition that the \verb|self.count <> null| source is \verb|true|.
+Re-evaluating the symbolic values of each AST node for the new known values and checking all constraints we find the required contradiction. \verb|self.count <> null| now evaluates to \verb|false| contradicting the new precondition that it is \verb|true| when used as the source of the \verb|implies| operation.
 
 \subsubsection{Intuition}
  
@@ -653,6 +713,8 @@ In addition to an \emph{Integer} variant of the rare divide-by-zero hazard, a mu
     aSequence->at(badIndex)
 \end{verbatim}
 
+The OCL specification provides the preconditions:
+
 \begin{verbatim}
     operation Sequence<T>::at(i : Integer) : T {
         precondition: i > 0;
@@ -679,7 +741,7 @@ The symbolic evaluation of all collection operations needs to relate the output 
 
 \subsection{Content Symbolic Evaluation}
 
-In addition to tracking the sizes of collections it is also necessary to track known content of collections so that an \verb|includes| guard or \verb|including| action can satisfy the validity requirements of a subsequent \verb|any| iteration.
+In addition to tracking the sizes of collections it is also necessary to track known content of collections so that an \verb|includes| guard, \verb|including| action, or \verb|select| filter can satisfy the validity requirements of a subsequent \verb|any| iteration.
 
 %The relevant guards and actions may be present ab initio, or may be added in order to satisfy that validity analysis. It is anticipated that most additional guards needed by the validity analysis will be genuine bug fixes rather than bloat just to placate tooling. 
 
@@ -699,22 +761,22 @@ Preconditions become an important part of the design and are exploited and check
 
 \subsection{Bodyconditions and BodyExpressions}
 
-The Object Constraint Language is actually an expression language so that the functionality of an \emph{Operation} or \emph{Property} is characterized by a bodyexpression for the respective \emph{ownedBody} or \emph{ownedDefaultValue}. UML only supports constraints and so the \verb|result = bodyexpression| idiom reformulates the arbitrarily-typed bodyexpression as the Boolean-typed \emph{Constraint}. The UML exposition is indistinguishable from a postcondition.
+The Object Constraint Language is actually an expression language so that the functionality of an \emph{Operation} or \emph{Property} is characterized by a body-expression for the respective \emph{ownedBody} or \emph{ownedDefaultValue}. UML only supports constraints and so the \verb|result = bodyexpression| idiom reformulates the arbitrarily-typed body-expression as the Boolean-typed \emph{Constraint}. The UML exposition is indistinguishable from a postcondition.
 
-When specifying OCL, the use of a bodyexpression is desirable when the expression represents a sensible implementation that can be used as is.
+When specifying OCL, the use of a body-expression is desirable since an implementation may be able to use it for straightforward code generation.
 
 \subsection{Postconditions}
 
-For an operation such as \verb|sort()| a postcondition is appropriate to specify the generic characteristics of a bubble or quick sort without imposing any particular implementation. 
+For an operation such as \verb|sort()|, a postcondition is appropriate to specify the generic characteristics of a bubble or quick sort without imposing any particular implementation. 
 
-In addition to the obvious \verb|result = ...| to specify the final result, it is also necessary to provide postconditions for each of the properties of the \emph{SymbolicCollectionValue} such as 
+In addition to the obvious \verb|result = ...| to specify the final result, it is also necessary to provide postconditions for each of the properties of a \emph{SymbolicCollectionValue} such as 
 \verb|result->size() = self->size() + 1|.
 
 %Similarly \verb|Sequence::including(object:T)| operation requires more than just a postcondition \verb|result = self.append(object)|. There should also be an explicit rather than transitive \verb|self->size() = self@pre->size()+1| postcondition. And once we start to rectify pre and post conditions omissions;, we notice errors in those that are present. The specified postcondition has two errors; it should be \verb|result = self@pre->append(object)| and would be simpler and more useful as a body expression \verb|self->append(object)|. Pedantically we should also provide a nothing-else-changes framing condition, but with OCL inherently immutable perhaps this can be left as read.
 
 Postconditions are never executed by Eclipse OCL. Their execution may be requested in USE. When executed at run-time, they require execution overheads for no benefit, until one fails, at which point a crash must be handled.
 
-Once postconditions form part of the edit/compile-time analysis many too-weak/too-strong problems may be uncovered in the same way as for preconditions. For library operations at least, a new occasional build-time test could animate each operation with a diverse suite of input values that check the postconditions. For model operations, a similar opportunity exists but work on automated test model generation has revealed challenges. 
+Once postconditions form part of the edit/compile-time analysis, many too-weak/too-strong problems may be uncovered in the same way as for preconditions. For library operations at least, a new occasional build-time test could animate each operation with a diverse suite of input values that check the postconditions. For model operations, a similar opportunity exists but work on automated test model generation has revealed challenges. 
 
 
 %They could be but will burn time for the almost all cases that are problem free. Once they participate in the validity analysis, their utility will be conformed by usage. On an operation by operation basis, it could be tractable to auto-generate a diverse suite of library operation calls so that the postconditions can be extensively exercised at build-time.
@@ -760,19 +822,73 @@ Once we use symbolic evaluation and associate a distinct symbolic value with eac
 
 \subsection{Exceptions}
 
-Our validity analysis guarantees that no undesirable crashes occur, and that desirable crashes always crash. For the benefit of Operating System level OCL that needs to handle a genuine crash, the ability to use \verb|OclAny::oclIsInvalid()| to catch a crash could be enhanced by a \verb|OclAny::oclAsException()| method to unpack the \verb|invalid| singleton into a new \emph{Exception} class instance for comprehensive handling.
+Our validity analysis guarantees that no undesirable crashes occur, and that desirable crashes always crash. For the benefit of Operating System level OCL that needs to handle a genuine crash, the ability to use \verb|OclAny::oclIsInvalid()| to catch a crash could be enhanced by an \verb|OclAny::oclAsException()| method to unpack the \verb|invalid| singleton into a new \emph{Exception} class instance for comprehensive handling.
+
+%\subsection{Stack Overflow Revisited}\label{Stack Overflow Revisited}
+
+%In Section~\ref{Desirable Crashes} we lumped a Stack Overflow together with other catastropic crashes that the OCL programmer can do nothing about. Certainly, once such a crash occurs, it is desirable to diagnose it, but the origin of the crash is frequently due to an uncontrolled recursion and so down to bad programming.
+
+%Detecting the soundness of an arbitrary recursion requires a solution to the Halting Problem which in general does not exist. We can however help to diagnose hazards.
+
+%As a minimum we can identify recursive call sites. In practice the recursion will be guarded to ensure that it terminates. For relatively simple step and repeat recursions we may be able to analyze the step to see whether it counts towards a limit and so remove the over-zealous diagnosis.
+
+%Again in practice, the recursion may use a short circuit to guard the recursion.
+
+%\begin{verbatim}
+%def: isPrimeNumber(candidatePrime : Integer) : Boolean =
+%    isPrimeNumber(candidatePrime, 3, Sequence{2})
+%
+%def: isPrimeNumber(candidatePrime : Integer, candidateFactor:Integer,
+%    knownPrimes:Sequence(Integer)) : Boolean =
+%    (candidateFactor*candidateFactor > candidatePrime)
+%    or (knownPrimes->forAll(n |
+%        ((candidatePrime.div(n)) * n) <> candidatePrime)
+%        and isPrimeNumber(candidatePrime, candidateFactor+2,
+%           knownPrimes->append(candidateFactor)
+%        ))
+%\end{verbatim}
+
+%\subsection{Commutativity Revisited}
+
+%In the recursion example two short circuits are used for both \emph{and} and \emph{or}. As short circuits it is important that commutativity is not exploited else recursion occurs before the end-of-recursion guard.
+
+%This demonstrates that there is conflict between commutativity and short-circuits even when the computation avoids all use of \emph{null} and \emph{invalid}.
+
+%To make OCL sound, we must revise the language to eliminate the conflicts or to accommodate the conflicts. Trimming \emph{null}, \emph{invalid} and recursion seems impractical and trimming short-circuits is barely credible. We accept that clean numerics are impractical and so live with an \emph{isDivisible} precondition for divide. Similarly we must recognize that the OCL specification has bundled \emph{short-circuit-and} and \emph{commutative-and} behaviours in the one \emph{and} operation and neglected to specify any corresponding preconditions. \emph{short-circuit-and} needs no extra preconditions, but \emph{commutative-and} has an \emph{isCommutable} precondition that is debatable for \emph{null} or \emph{invalid} inputs and violated when the second term is a recursive call.
+
+%A simple traditional example of the utility of commutativity comes from mental arithmetic where \verb|3*15| is easier to calculate than \verb|15*3| since people are more familiar with their 3 rather than 15 times tables. More generally the combination of associativity, distributivity and commutativity may allow a calculation to be reorganized to minimize inaccuracies when subtracting large nearly-equal numbers.
+
+%For Boolean arithmetic ease of calculation is irrelevant, but a reorganization exploiting idempotency may allow elimination of redundant terms. However commutativity is only necessary because the pairwise definition of idempotency needs to shuffle terms to enable \verb|A & B & C & B & A| to be simplified to any permutation such \verb|B & C & A|. If we replace 2-term idempotency by an N-term tail redundancy, the simplification has the single \verb|A & B & C| result that supports the optimization while ensuring that a guard term precedes a guarded term.
+
+%Commutativity is therefore unnecessary, but the validity analysis outlined in this paper enables the \emph{isCommutable} precondition to be evaluated to determine when commutativity is permitted. This will be most useful at compile-time where an expensive analysis can be tolerated to impose a smart strategy on the evaluation. Terms could be ordered according to some heuristic such as
+
+%\begin{itemize}
+%	\item most-likely-to-guard-first
+%	\item most-expensive-to-compute-last
+%	\item most-likely-to-contribute-to-a-common-subexpression-first	
+%\end{itemize}
+
+%The resulting OCL AS can capture the compile-time optimization. The run-time can blindly follow the defined order since it is unlikely that the run-time can afford the overhead of determining an optimum order and fairly unlikely that the run-time has extra profiling information to allow a better decision than at compile-time.
+
+%If concurrent evaluation of commutative terms is required, it will be necessary to augment the OCL \emph{OperationCallExp} with a \emph{may-be-concurrent} flag to capture the result of the compile-time analysis that guarantees that the terms are commutable.
 
 \section{Current Status and Further Work}\label{Current Status and Further Work}
 
-This phase of work was initially driven by the challenges of faithfully implementing undesirable crashes for a QVTc/QVTr Java code generator~\cite{Eclipse-QVTd}. The inconveniences of uncrashing logical operations spiral once the logical operations define complex relation guards; an unmatching capability is required. Since the awkwardness of the implementation corresponds quite closely to surprising behavior for the user, it is much more appropriate to push back and alert the user to the hazards and so avoid generating any of the difficult code. For model transformation, the no undesirable crashes, all-crashes-always-crash policy is better, simpler and faster.
+This phase of work was initially driven by the challenges of faithfully implementing undesirable crashes for a QVTc/QVTr Java code generator~\cite{Eclipse-QVTd}. The inconveniences of uncrashing logical operations spiral once the logical operations define complex relation guards; an unmatching capability is required. Since the awkwardness of the implementation corresponds quite closely to surprising behavior for the user, it is much more appropriate to push back and alert the user to the hazards and so avoid generating any of the difficult code. For model transformation, the no-undesirable-crashes, all-crashes-always-crash policy is better, simpler and faster.
 
 The work continued the null-safe navigation work \cite{Safe OCL} which initially required almost all navigation operators to be changed to their safe counterparts; a widespread effort for no real benefit. Extending the null-safe declarations to support null-free collection reduced the changes to genuine hazards. However limited heuristic program control flow analysis meant that only simple guards were recognized as avoiding the hazard.
 
-The new work expands from just null hazards to all precondition failures with a much more comprehensive program flow analysis to propagate, for instance, a known symbol collection size or content to discount a hazard.
+The new work expands from just null hazards to all precondition failures with a much more comprehensive program flow analysis to propagate, for instance, a known symbolic collection size or content to discount a hazard.
 
-The initial approach of deducing the values of variables backwards from the point at which a guard provides extra knowledge gave way to a forward evaluation of all relevant constraints to contradict \emph{IsXxx} hypotheses at each potential hazard.
+The initial approach of deducing the values of variables backwards from the point at which a guard provides extra knowledge gave way to a forward evaluation of all relevant constraints to contradict hypotheses for each potential hazard.
 
-Once the focus shifts to a forwards symbolic evaluation, it is then just necessary to improve the formulation of the library operations.
+So far, the prototype demonstrates that an initial symbolic evaluation can associate an overall \emph{MayBeInvalid} and \emph{MayBeNull} state for each (common-)sub-expression. These states can be refined on a local per-expression basis as each symbolic re-evaluation subject to a hypothesis contradicts the \emph{MayBeInvalid} hypothesis. This is currently limited to Boolean Symbolic Evaluation and only a small number of common operations have had their preconditions accurately codified.
+
+Further work is required to codify all operations, support Integer and Content Symbolic Evaluation and to aggregate all applicable invariants to contribute to the overall common-sub-expressions.
+
+Further further work should support auto-generation of all operation-specific code from OCL definitions of their preconditions and bodies. 
+
+%Once the focus shifts to a forwards symbolic evaluation, it is then just necessary to improve the formulation of the library operations.
 
 
 %Preconditions are now elevated from the cosmetic status of syntax-checked comments to the declarations of undesirable crash hazards that edit/compile-time analysis must diagnose so that the user can eliminate them.
@@ -797,7 +913,7 @@ Once the focus shifts to a forwards symbolic evaluation, it is then just necessa
 
 \section{Related Work}\label{Related Work}
 
-Preconditions and postconditions are an essential part of design by contract endorsed by the OCL specification~\cite{OCL-2.4}, but because they are not much used in practice, these deficiencies in the OCL specification have not been reported. The USE tool~\cite{USE} is able to execute preconditions and postconditions at run-time. Eclipse OCL~\cite{Eclipse-OCL} never executes them.
+Preconditions and postconditions are an essential part of design by contract endorsed by the OCL specification~\cite{OCL-2.4}, but because they are not much used in practice, related deficiencies in the OCL specification have not been reported. The USE tool~\cite{USE} is able to execute preconditions and postconditions at run-time. Eclipse OCL~\cite{Eclipse-OCL} never executes them.
 
 The inadequacy of preconditions and postconditions has been highlighted by the proposals to add support for framing conditions \cite{Framing} that simplistically assert that nothing else changes. It is not clear that framing conditions are necessary for OCL since the prohibition on side-effects ensures nothing changes that isn't mentioned in a postcondition.  
 
@@ -853,7 +969,7 @@ Francisco, M., Castro, L.: Automatic Generation of Test Models and Propertiesfro
 \url{https://st.inf.tu-dresden.de/OCL2012/preproceedings/07.pdf}
 
 \bibitem{Gogolla}
-Gogolla, M., Burgue\~no, L., Vallecillo, A.: EMFtoCSP: A Tool for the Model Finding and Model Completion with USE. 18th International Workshop on OCL and Textual Modeling. Copenhagen, Denmark, October 14, 2018.
+Gogolla, M., Burgue\~no, L., Vallecillo, A.: Model Finding and Model Completion with USE. 18th International Workshop on OCL and Textual Modeling. Copenhagen, Denmark, October 14, 2018.
 \url{https://ceur-ws.org/Vol-2245/ocl_paper_9.pdf}
 
 \bibitem{EMFtoCSP}

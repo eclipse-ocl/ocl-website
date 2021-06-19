@@ -1,0 +1,1 @@
+The XML diagrams are from E:\Development\Chital\runtime-New_configuration\XMLplay and may be edited by the 2019-06 (4.12) Eclipse installation on my laptop.
