@@ -11,19 +11,13 @@
 %% values in them; it is your responsibility as an author to replace
 %% the commands and values with those provided to you when you
 %% complete the rights form.
-\setcopyright{acmcopyright}
 \copyrightyear{2022}
 \acmYear{2022}
-\acmDOI{XXXXXXX.XXXXXXX}
-
-%% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[OCL 2022]{Make sure to enter the correct
-  conference title from your rights confirmation emai}{October 23,
-  2022}{Montreal, Canada}
+\setcopyright{acmlicensed}\acmConference[MODELS '22 Companion]{ACM/IEEE 25th International Conference on Model Driven Engineering Languages and Systems}{October 23--28, 2022}{Montreal, QC, Canada}
+\acmBooktitle{ACM/IEEE 25th International Conference on Model Driven Engineering Languages and Systems (MODELS '22 Companion), October 23--28, 2022, Montreal, QC, Canada}
 \acmPrice{15.00}
-\acmISBN{978-1-4503-XXXX-X/18/06}
-
-%%\acmSubmissionID{123-A56-BU3}
+\acmDOI{10.1145/3550356.3561537}
+\acmISBN{978-1-4503-9467-3/22/10}
 
 %%
 %% For managing citations, it is recommended to use bibliography
@@ -113,9 +107,9 @@
 OCL is primarily a specification language supporting the elaboration
 of often-graphical metamodels with textual constraints.
 
-As shown in Figure~\ref{fig:teaser}, OCL\cite{OCL-2.4} compromises the familiar popularity of typical general purpose languages, such as Java, with formal languages, such as Z. Formal languages are so unfamiliar as to be unacceptable to many programmers. OCL's use, in conjunction with UML\cite{UML-2.5.1}, ensures that OCL has model oriented support. OCL's functional style facilitates a definition of a constraint as a compact expression.
+As shown in Figure~\ref{fig:teaser}, OCL\cite{OCL-2.4} compromises the familiar popularity of typical general purpose languages, such as Java, with formal languages, such as Z. Formal languages are so unfamiliar as to be unacceptable to many programmers. OCL's use, in conjunction with UML\cite{UML-2.5.1}, ensures that OCL has model oriented support. OCL's functional style facilitates the definition of a constraint as a compact expression.
 
-The foregoing contrast is important but just ergonomic. More important for specification purposes is correctness, for which the generality of General Purpose Languages makes correctness proofs very hard if not impossible. In contrast, Formal Languages can be provably correct but the time and skills necessary to provide that proof are not available to many programmers or applications. OCL is positioned nicely between these two extremes. The relevant, accessible syntax means that 20 years on OCL is still the language of choice for writing model constraints. The potential for proof arises from the underlying side-effect-free functional specification principles. Sadly, the potential for proof has not been exploited and so remains just a potential for most specifications.
+The foregoing contrast is important but just ergonomic. More important for specification purposes is correctness, for which the generality of General Purpose Languages makes correctness proofs very hard if not impossible. In contrast, Formal Languages can be provably correct but the time and skills necessary to provide that proof are not available to many programmers or applications. OCL is positioned nicely between these two extremes. The relevant, accessible syntax means that 20 years on OCL is still the language of choice for writing model constraints. The potential for proof arises from the underlying side-effect-free functional specification principles. Sadly, the potential for proof has not been exploited in mainstream tools and so remains just a potential for most specifications.
 
 As a specification language, OCL is just a model-oriented pseudo-code, for which tooling ensures some degree of syntactic consistency with the standard. It is only once OCL's executable capability is realized that the pseudo-code is elevated to functional accuracy.
 
@@ -178,7 +172,7 @@ The \verb|Set{1, 1.0}->size()| demonstrates the uniformity of OCL numbers; the O
 Sets.newHashSet(Double.valueOf(1), 1.0).size()
 \end{verbatim} 
 
-We revisit these and many other semantic differences so that a transliteration author can choose whether to resolve each difference by implementation heroism in the transliterator or by supporting a variant OCL subset that we refer to as Java-Friendly OCL (jfOCL).
+We revisit these and many other semantic differences so that a transliteration author can choose whether to resolve each difference by implementation heroism in the transliterator or by compromising to offer only a defective OCL subset that we refer to as Java-Friendly OCL (jfOCL).
 
 % attempts can review the almost inevitable limitations of an OCL-like transliteration when choosing to implement a jfOCL2java rather than OCL2java code generator.
 
@@ -189,7 +183,7 @@ We revisit these and many other semantic differences so that a transliteration a
 
 %We will now enumerate some of the significant issues that must be resolved during the CS to AS conversion.
 
-\section{Tool Structure}\label{Tool Structure}
+\section{Tool Structure and Performance}\label{Tool Structure}
 
 To understand what the transliterator does not do, it is helpful to review what standard tooling provides.
 
@@ -267,6 +261,8 @@ If we now use a LISP-like assembler notation and consider the overheads of inter
 \end{verbatim}
 
 There will be control overheads as each opcode such as LD is fetched and dispatched. Each nested term will result in a nested function call. It is easy to see that there are now many additional control overheads that are likely to reduce the efficiency well below 10\%.
+
+The 10\% estimate above and further estimates below are based on experience. The numbers are a little more helpful than purely relative terms such as `really inefficient'. The numbers cannot be precise since a much better performance can be achieved when the programmer is able to adopt a very direct flat bloated style. A more maintainable style that satisfies diverse use cases with many overrideable helper functions may give worse performance. For the particular case of \verb|LD A|, a single assembler instruction may easily bloat to many hundreds of instructions once an interpreted access uses a hierarchy of scoped \verb|Map|s with each access needing to compute a hash code in order to lookup an entry and then invoke an equality test to check on a hit. Contrasting the hundreds of instructions for a \verb|Map| access with the typically better performance of a small \verb|List| search is not the topic of this paper. An efficient code synthesis may require just a single instruction by locating \verb|A| in a local variable.
 
 A LISP-like selective rendering of the OCL ASG is even less direct
 
@@ -375,7 +371,7 @@ In addition to the traditional Object Oriented instance to slot interpretation o
 
 \paragraph{OCL Type Names}
 
-OCL lacks a distinctive type literal syntax analogous to Java's \texttt{MyClass.class}. Consequently the argument for \texttt{oclIsKindOf(V)} may refer to the type \texttt{V} or the property \texttt{V} or the let-variable \texttt{V} or ...
+OCL lacks a distinctive type literal syntax analogous to Java's \texttt{MyClass.class}. Consequently the argument for \texttt{oclIsKindOf(V)} may refer to at least the type \texttt{V} or the property \texttt{V} or the let-variable \texttt{V}.
 
 OCL is UML-aligned, consequently OCL supports UML templates even though the OCL specification lacks any grammar, concrete or abstract syntax support. Once templates are  supported, template parameters are yet another option for a name reference.
 
@@ -389,7 +385,7 @@ Once the OCL semantics has been identified, it is possible to translate the OCL 
 
 \subsection{Program Structure}
 	
-Java package, class and operation constructs are very similar and more powerful than OCL's so there is little difficulty in using mapping OCL structural concepts to a subset of Java.
+Java package, class and operation constructs are very similar and more powerful than OCL's so there is little difficulty in mapping OCL structural concepts to a subset of Java.
 
 \subsection{Properties}\label{Properties}
 
@@ -409,7 +405,7 @@ Even the simplest access may need care since OCL does not specify the reificatio
 	\item UML Association
 \end{itemize} 
 
-The transliterator must invoke an appropriate helper, since direct use of Java's mechanism is not often correct. Distinct mechanisms will usually be needed depending whether the access is to DataType of Class object and whether the access is to a single object or a collection of objects.
+The transliterator must invoke an appropriate helper, since direct use of Java's mechanism is not often correct. Distinct mechanisms will usually be needed depending whether the access is to a DataType or a Class object and whether the access is to a single object or a collection of objects.
 
 \begin{figure}
 	\includegraphics[width=2.0in]{OCLOpposite.png}
@@ -418,8 +414,8 @@ The transliterator must invoke an appropriate helper, since direct use of Java's
 	\label{fig:navigation}
 \end{figure}
 
-OCL hides a variety of access mechanisms behind the simple dot-navigation syntax. The implicit opposite syntax is useful and powerful but hard to implement. With respect to Figure~\ref{fig:navigation}, OCL supports the \verb|anX.y| navigation even though \verb|X::y| is not navigable. Implementation of this is discussed in Section \ref{Implicit Opposites}.
-(Further lexical complexities arise when the \verb|y| role is omitted from the metamodel. A default name is available by re-using the name of the target type allowing \verb|anX.Y|. If the auto-generated name is ambiguous the more elaborate \verb|anX.Y[Y::x]| syntax may be used.) 
+OCL hides a variety of access mechanisms behind the simple dot-navigation syntax. The unnavigable opposite syntax is useful and powerful but hard to implement. With respect to Figure~\ref{fig:navigation}, OCL supports the \verb|anX.y| navigation even though \verb|X::y| is not navigable. Implementation of this is discussed in Section \ref{Implicit Opposites}.
+Further lexical complexities arise when the \verb|y| role is omitted from the metamodel. A default name is available by re-using the name of the target type allowing \verb|anX.Y|. If the auto-generated name is ambiguous the more elaborate \verb|anX.Y[Y::x]| syntax may be used.
 
 Yet more complexity arises from
 
@@ -455,17 +451,17 @@ In contrast, a Java exception is a \texttt{Throwable} instance that is thrown. I
 
 These very different practical semantics are not amenable to naive transliteration.
 
-An implementation may chose to use Java exception semantics throughout the transliteration. Every generation of an OCL \texttt{invalid} must then be replaced by a thrown \texttt{Throwable}. Conversely every OCL operation that may be passed an \texttt{invalid} value must have an operation call that carefully catches any exceptions to create the required \texttt{invalid}. This is inconvenient for ordinary code, it is distinctly awkward when the exception can occur while initializing a let variable.
+An implementation may chose to use Java exception semantics throughout the transliteration. Every generation of an OCL \texttt{invalid} must then be replaced by a thrown \texttt{Throwable}. Conversely every OCL operation that may be passed an \texttt{invalid} value must have an operation call that carefully catches any exceptions to create the required \texttt{invalid}. This is inconvenient for ordinary code, it is distinctly awkward when the exception can occur while initializing a let variable. The awkwardness arises because an exception while evaluating the `init' variable child of a \texttt{LetExp} must be caught so that it may be correctly propagated or suppressed according to the logic of the `in' child.
 
 Alternatively, an implementation may use OCL \texttt{invalid} semantics throughout the transliteration. This then requires every helper to be accurately coded to guarantee that exceptions are returned as \texttt{invalid}, a guarantee that is likely to be overlooked by maintainers. Every call to a helper may therefore need to wrapped in an exception conversion. All helpers must be coded to propagate \texttt{invalid}.
 
 The latter approach could be suitable if \texttt{invalid} was a prolific use case, but hopefully \texttt{invalid} is rare, so it is more efficient to work with, rather than against, Java's natural capabilities. It is appropriate to analyze the potentially invalid flows in order to plan the necessary catch handlers. An accurate analysis can ensure that only those very rare let-variables that can propagate an invalid value incur the overheads.
 
-Implementation of \texttt{invalid} is a significant pain, so tools may follow USE's\cite{USE} example and omit support for \texttt{invalid} altogether. However this is not OCL; it provides support only for OCL programs that never fail. There will be no divide-by-zero, no null-navigation, no index-out-of-bounds on ordered collections.
+Implementation of \texttt{invalid} is a significant pain, so tools may follow USE's\cite{USE} example and omit support for \texttt{invalid} altogether. However this is not OCL; it provides support only for OCL programs that never fail. There can be no divide-by-zero, no null-navigation, no index-out-of-bounds on ordered collections.
 
 None of the above approaches is attractive. Careful study of the OCL specification reveals that it is well-intentioned but irrational~\cite{Willink2021}. A much more practical and sensible design can be compatible with Java exception semantics. Unavoidable exceptions such as a network-failure are classified as desirable exceptions that should always be thrown. Programming errors such as collection-index-out-of-bounds are classified as undesirable exceptions that should be eliminated by analysis at compile time. The challenging need for commutative rather than short-circuit \verb|and|/\verb|or| operators that uncrash can be eliminated by commuting the inputs at compile time to guarantee that only the second input can crash.
 
-The OCL validity analysis \cite{Willink2021} is a non-trivial whole program analysis that cannot possibly be done sentence-by-sentence. However the motivation of the analysis is to prove that the OCL is free of undesirable crashes. jfOCL could define all crashes as desirable avoiding the need to catch any exceptions anywhere. It is only necessary to convert \texttt{invalid} to a thrown exception. This is easily done by providing no reification of \texttt{invalid}; exceptions can be thrown from the outset. With no catching of exceptions, a rational implementation of \verb|and|/\verb|or| that computes first argument first will exhibit the familiar short-circuit behaviour.
+The OCL validity analysis \cite{Willink2021} is a non-trivial whole program analysis that cannot possibly be done sentence-by-sentence. However, while the motivation of the analysis is to prove that the OCL is free of undesirable crashes, jfOCL can follow the principles and define all crashes as desirable avoiding the need to catch any exceptions anywhere. It is only necessary to convert \texttt{invalid} to a thrown exception. This is easily done by providing no reification of \texttt{invalid}; exceptions can be thrown from the outset. With no catching of exceptions, a rational implementation of \verb|and|/\verb|or| that computes first argument first will exhibit the familiar short-circuit behaviour.
 
 \subsection{Type / Value}
 
@@ -473,7 +469,7 @@ When we use helper functions to implement each OCL semantic, the values we pass 
 
 Before we examine typical types, we should note one important difference between OCL/UML and Java. UML defines two kinds of Object, Class-typed and DataType-typed. A Class is instantiated as an instance which typically has a unique address and so two distinct class instances are not equal. A DataType defines a value that is often embedded as the attribute of an instance. A DataType does not have a unique address. DataType values are equal when a deep comparison of their information fields finds all are equal.
 
-Java has user-defined Class instances but only built-in primitive DataType values. There is a flexibility to overload \verb|equals()| so that, for instance, a pair of \verb|String| instances can compare equal even when their addresses differ. This is important to avoid the need for \verb|Map| keys to be used without the overhead of interning. This can lead to some surprises whenever \verb|int|, \verb|double|, \verb|Integer| and \verb|Double| are intermixed.
+Java has user-defined Class instances but only built-in primitive DataType values. There is a flexibility to overload \verb|equals()| so that, for instance, a pair of \verb|String| instances can compare equal even when their addresses differ. This is important to avoid the need for \verb|Map| keys to be used without the overhead of interning. However, this can lead to some surprises whenever \verb|int|, \verb|double|, \verb|Integer| and \verb|Double| are intermixed.
 The surprise is demonstrated by the difficulty in transliterating \verb|Set{1, 1.0}->size()| to ensure that the two representations of the one value populate a single-entry Set.
 
 The overt example mixing real and integer literals is perhaps unrealistic so jfOCL could prohibit it. More complex examples might not be apparent to the user, so jfOCL should diagnose them, however the effort required to diagnose them is comparable to the effort required to enforce the common type determined by the regular OCL analysis. jfOCL should really support numeric value uniformity.
@@ -490,9 +486,9 @@ Java has no counterpart to UnlimitedNatural, so a helper type is necessary. Howe
 
 OCL specifies two ideal numeric types \texttt{Real} and \texttt{Integer}, whereas Java specifies many practical types such as \texttt{int}, \texttt{Long} and \texttt{BigInteger} with inconsistently imperfect functionality. A 32 bit integer is sufficient for almost all use cases, but just occasionally position or time calculations need more.
 
-Suppose your salary is represented by a 32 bit integer. Given severe inflation and a persistently generous boss, your salary may grow to the 31 bit threshold. If you are `lucky', your salary may saturate. If `unlucky', a wraparound occurs to negative numbers and you have to pay to work. 
+Suppose a salary is represented by a 32 bit integer. After many generous pay rises, a salary may grow to the 31 bit threshold. At this point, the salary wraps around to a negative number; the employee must now pay to work. 
 
-This is disappointing but OK in Java; it is what the specification says should happen. It is absolutely not OK in OCL for which unbounded integers grow and grow.
+This is OK in Java; it is what the specification says should happen. It is absolutely not OK in OCL for which unbounded integers grow and grow.
 
 An OCL2Java conversion must choose a Java representation for OCL's \texttt{Integer}
 \begin{itemize}
@@ -524,7 +520,7 @@ References to Model Elements can be compatible. Conversely, if they are not, the
 
 Java's Collection types were originally designed as non-template types. These were upgraded to templated classes when Java 5 added generics, but backward compatibility necessitated a concept of type erasure. This means that the actual templating type is not known at run-time preventing expressions such as \verb|new T()|.
 
-OCL's collection types have a magic \verb|T| that behaves in many ways like a template parameter. Once the requirement for UML alignment is respected, the magic \verb|T| can be respecified as a regular template parameter and the rules for collection type conformance revisited to avoid the anomaly that \verb|Set{}->including(4)| is erroneous. The empty \verb|Set{}| is a \verb|Set(OclVoid)|. When the source argument is used to specialize the \verb|Set(T)::including(T)| operation to \verb|Set(OclVoid)::including(OclVoid)| the error arises because \verb|4| does not conform to \verb|OclVoid|. More declaratively, there is an alternative specialization \verb|Set(Integer)::including(Integer)| for which both source and argument are type conformant.
+OCL's collection types have a magic underspecified \verb|T| that behaves in many ways like a template parameter. Once the requirement for UML alignment is respected, the magic \verb|T| can be respecified as a regular template parameter and the rules for collection type conformance revisited to avoid the anomaly that \verb|Set{}->including(4)| is erroneous. The empty \verb|Set{}| is a \verb|Set(OclVoid)|. When the source argument is used to specialize the \verb|Set(T)::including(T)| operation to \verb|Set(OclVoid)::including(OclVoid)| the error arises because \verb|4| does not conform to \verb|OclVoid|. More declaratively, there is an alternative specialization \verb|Set(Integer)::including(Integer)| for which both source and argument are type conformant.
 
 Eclipse OCL applies this declarative philosophy to ensure that the Abstract Syntax is annotated with consistent specializations. The \verb|Operation::type| declaration has the unspecialized type. The invoking \verb|OperationCallExp::type| has the specialized type. 
 These types are propagated and checked throughout the AST. They provide the accuracy necessary to declare variables in Java and to inject the necessary casts from what the OCL analysis guarantees to what the Java declarations require.
@@ -567,7 +563,7 @@ jfOCL may choose to prohibit multiple inheritance and not support OclAny or OclV
 
 OCL's \texttt{null} is very similar to \texttt{null} in Java.
 
-Difficulties can arise if the implementation of a type such as an enumeration fails to provide for a null value,
+Difficulties can arise if the implementation of a type such as an enumeration fails to provide for a null value.
 
 \subsection{Operation}
 
@@ -604,7 +600,7 @@ Some OCL concepts have no direct Java counterpart.
 
 In Java a primary type such as \verb|MyClass<T>| is declared once. Its specialization such as \verb|MyClass<String>| may be `declared' many times with each re-`declaration' sharing  the same specialized type.
 
-OCL does not declare types at all; types are declared elsewhere in some metamodel. Usage of the collection types such as \verb|Bag(String)| behave in a very similar way to a Java specialization, perhaps confirming that the magic \verb|T| that parameterizes them should be modeled as a UML TemplateParameter.
+OCL does not declare types at all; types are declared elsewhere in some metamodel. Usage of the collection types such as \verb|Bag(String)| behave in a similar way to a Java specialization, perhaps confirming that the magic behind the underspecified \verb|T| that parameterizes them should be modeled as a UML TemplateParameter. %Although Java types are similar, it may often be necessary to insert casts to enforce the differing OCL  generics  and inheritance semantics.
 
 An OCL Tuple type has no unique declaration, rather each repetition of the same  set of \{name,type\} pairs is the same type. Java has no corresponding dynamically constructed type, so a code generator must pre-analyze the OCL to aggregate all Tuple declarations and create a conventional Java class for each distinct Tuple type.
 
@@ -625,9 +621,9 @@ OCL's \texttt{oclIsNew()} and OCL's \texttt{@pre} may only be used in post-condi
 
 This is a difficult corner of the OCL specification that jfOCL may reasonably choose to skip.
 
-Eclipse OCL\cite{Eclipse-OCL} with an emphasis on execution has no execution capability for \texttt{oclIsNew()} or \texttt{@pre}. No user has ever complained.
+Eclipse OCL\cite{Eclipse-OCL} with an emphasis on execution has no execution capability for \texttt{oclIsNew()} or \texttt{@pre}. No user has reported this bug.
 
-USE\cite{USE} has an emphasis on simulation and a custom model framework that supports a `filmstrip'~\cite{Desai} of system states. This is able to support \texttt{oclIsNew()} and \texttt{@pre}.
+USE\cite{USE} has an emphasis on simulation and a custom model framework with  built-in \texttt{oclIsNew()} and \texttt{@pre}. This is able to support a `filmstrip'~\cite{Desai} of system states.
 
 In principle, the support for two system states, may require the operation entry code to have a complete copy of the system state. This can be difficult and expensive, but is only necessary when the post-condition's \texttt{@pre} access involves a cascade of collection operations that are too complex to analyze. In practice, the \texttt{@pre} accesses are often trivial making an on-entry copy simple.
 
@@ -645,9 +641,9 @@ OCL's \texttt{allInstances()} has no counterpart in Java. The deficiency can be 
 
 A naive helper implementation may perform a total model search for every \texttt{allInstances()} call. A better implementation may start with a metamodel analysis of the OCL to determine the typically small number of calls that can occur followed by a model analysis to determine all required \texttt{allInstances()} in one model traversal. This may be performed as part of the initial model loading or lazily when the first call occurs.
 
-\subsubsection{Implicit Opposites}\label{Implicit Opposites}
+\subsubsection{Unnavigable Opposites}\label{Implicit Opposites}
 
-OCL's opposite navigation again has no counterpart in Java and like \texttt{allInstances()} can be remedied by a helper function that traverses the whole model searching for the solutions. Again, like \texttt{allInstances()}, a naive implementation may be very costly, but a better implementation may use a metamodel analysis to discover all the \verb|X::y| unnavigable opposites actually in use so that a single traversal of the model can populate a cache of \verb|{X -> X::y}| for constant-time cost during execution. These analyses can be performed at the same time as the \texttt{allInstances()} search.
+OCL's navigation to unnavigable and sometimes implicitly named opposites again has no counterpart in Java and like \texttt{allInstances()} can be remedied by a helper function that traverses the whole model searching for the solutions. Again, like \texttt{allInstances()}, a naive implementation may be very costly, but a better implementation may use a metamodel analysis to discover all the \verb|X::y| unnavigable opposites actually in use so that a single traversal of the model can populate a cache of \verb|{X -> X::y}| for constant-time cost during execution. These analyses can be performed at the same time as the \texttt{allInstances()} search.
 
 \subsubsection{Stereotype}
 
@@ -697,7 +693,7 @@ For the common single iterator iterations, it is well worth generating inline Ja
 
 \subsection{Code Generator Model and Optimization}
 
-The Abstract Syntax Graph is a good model of the OCL semantics, but somewhat distant from the Java semantics. A Code Generator may therefore choose to transform the OCL ASG into a more Object-Oriented Code Generator Model from which generation of Java or C or ... is much easier. In the ASG, every expression term can return a value. In the CGM, every not-inlined expression term may return a Static Single Assignment variable facilitating a synthesis that can always refer to a variable. The expression terms include many extra terms to cast to known types, guard against nulls and convert between representations. The substantial support code to provide conformance tables, or implicit opposite caches can be reified in the CGM reducing the complexity of the eventual CGM to text model-to-text transformation. (For Eclipse OCL a further CGM to JavaModel to JavaText intermediate is planned.) 
+The Abstract Syntax Graph is a good model of the OCL semantics, but somewhat distant from the Java semantics. A Code Generator may therefore choose to transform the OCL ASG into a more Object-Oriented CGM (Code Generator Model) from which generation of Java or C or some other language is much easier. In the ASG, every expression term can return a value. In the CGM, every not-inlined expression term may return a Static Single Assignment variable facilitating a synthesis that can always refer to a variable. The expression terms include many extra terms to cast to known types, guard against nulls and convert between representations. The substantial support code to provide conformance tables, or implicit opposite caches can be reified in the CGM reducing the complexity of the eventual CGM to text model-to-text transformation. For Eclipse OCL a further CGM to JavaModel to JavaText intermediate is planned. 
 
 Once a sensible CGM is in use, support for optimizations such as Common Subexpression Elimination, Constant Folding and Loop Hoisting follows naturally. The Validity Analysis ~\cite{Willink2021} is a significant extension to Constant Folding that once integrated should identify many more candidates for Dead Code Elimination.
 
@@ -712,8 +708,6 @@ A potential OCL tool vendor may reasonably ask why it is so hard to develop OCL 
 	\item lack of standard surrounding model access
 	\item subtly distinct semantics from Java
 \end{itemize}
-
-Unfortunately a jfOCL only addresses some of the distinct semantics.
 
 \begin{table}
 \begin{tabular}{ c | c | c }
@@ -733,7 +727,7 @@ oclType() & supported & prohibited \\
 and/or & commutative & short-circuit \\
 \hline
 allInstances() & supported & prohibited \\
-implicit opposites & supported & prohibited \\
+unnavigable opposites & supported & prohibited \\
 qualified navigation & supported & prohibited \\
 qualified associations & supported & prohibited \\
 qualified navigation & supported & prohibited \\
@@ -753,7 +747,7 @@ Revisiting Figure~\ref{fig:teaser}, the outstanding advantage of OCL is its pote
 
 \section{Related Work}\label{Related Work}
 
-This paper revisits Willink~\cite{Willink2012} in which "An extensible OCL Virtual Machine and Code Generator" was presented. It probably remains as the only extensible code generator for `full' OCL (and QVTc and QVTr). Ten years on, the emphasis on a VM is clearly misleading hype. A VM suggests a JVM-like byte code interpreter, which is possible, but something of a premature optimization. The XMI serialization of the OCL ASG is more appropriate. Compacting it to byte code while saving on file size would needlessly lose readability when debugging. In this paper we draw on 10 years evolution to explain why a `full' code generator is hard so that other authors tempted to develop one can fully appreciate the challenges they face.
+This paper revisits Willink~\cite{Willink2012} in which "An extensible OCL Virtual Machine and Code Generator" was presented. It probably remains as the only extensible code generator for `full' OCL (and QVTc and QVTr). Ten years on, the emphasis on a VM is clearly misleading hype. A VM suggests a JVM-like byte code interpreter, which is possible, but something of a premature optimization. The XMI serialization of the OCL ASG is more appropriate. Compacting it to byte code while saving on file size would needlessly lose readability when debugging. In this paper we draw on 10 years evolution to explain why a `full' code generator is hard so that other authors can fully appreciate the challenges they face.
 
 Many authors have provided a partial OCL code generator demonstrating good characteristics aligned with some research goal. Omission of OCL facilities such as oclIsNew(), @pre,  allInstances(), States, Messages and even Tuples and opposites is common, but in many cases this just represents a pragmatic reduction of scope to facilitate research; these omissions can be rectified by a little more work. Failure to address unbounded numerics, numeric equality, null/invalid propagation, nested Collections and oclType() is a more fundamental challenge to some of the approaches. 
 

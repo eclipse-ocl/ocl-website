@@ -11,20 +11,13 @@
 %% values in them; it is your responsibility as an author to replace
 %% the commands and values with those provided to you when you
 %% complete the rights form.
-\setcopyright{acmcopyright}
 \copyrightyear{2022}
 \acmYear{2022}
-\acmDOI{XXXXXXX.XXXXXXX}
-
-%% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[OCL 2022]{Make sure to enter the correct
-  conference title from your rights confirmation emai}{October 23,
-  2022}{Montreal, Canada}
+\setcopyright{acmlicensed}\acmConference[MODELS '22 Companion]{ACM/IEEE 25th International Conference on Model Driven Engineering Languages and Systems}{October 23--28, 2022}{Montreal, QC, Canada}
+\acmBooktitle{ACM/IEEE 25th International Conference on Model Driven Engineering Languages and Systems (MODELS '22 Companion), October 23--28, 2022, Montreal, QC, Canada}
 \acmPrice{15.00}
-\acmISBN{978-1-4503-XXXX-X/18/06}
-
-%%\acmSubmissionID{123-A56-BU3}
-
+\acmDOI{10.1145/3550356.3561540}
+\acmISBN{978-1-4503-9467-3/22/10}
 %%
 %% For managing citations, it is recommended to use bibliography
 %% files in BibTeX format.
@@ -86,13 +79,13 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  Libraries provide a powerful re-use capability allowing developers of one application to exploit the developments of others. Sadly, OCL has no first class library capability and attempts to use available capabilities have not led to any re-useable libraries. Problems include lack of support for imports, foreign language calls, object creation, maps and inadequate specification of static functionality. We combine previous and new resolutions prototyped in Eclipse OCL to make libraries feasible. 
+  Libraries provide a powerful re-use capability allowing developers of one application to exploit the developments of others. Sadly, OCL has no first class library capability and attempts to use available capabilities have not led to any re-usable libraries. Problems include lack of support for imports, foreign language calls, object creation, maps and inadequate specification of static features. We combine previous and new resolutions prototyped in Eclipse OCL to make libraries feasible. 
 \end{abstract}
 
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{OCL, Library, Native Call, Code Generation, Optimization}
+\keywords{OCL, Library, Native Call, Code Generation, Static Feature}
 
 %%
 %% This command processes the author and affiliation and title
@@ -102,7 +95,7 @@
 \section{Introduction}\label{Introduction}
 Libraries provide a powerful mechanism for providing re-use. The extreme polymorphism of Java's Object and Collection classes and the consequent ease of use demonstrates how libraries can create a virtuous adoption cycle. In contrast, C++ was overtaken as its Standard Template Library arrived over ten years late and was compromised by a need to support bare arrays as collections. In further contrast, OCL has only a built-in library and few users.
   
-The obvious utility of libraries has prompted authors \cite{Baar2011},\cite{Cabot2012} to query where the OCL math library is. There is no answer.
+The obvious utility of libraries has prompted authors \cite{Baar2011},\cite{Cabot2012} to query where the OCL math library is. There is no answer. In this paper, we review the inadequate support for libraries and then  provide the technology to support them. We will find that the non-Object Oriented style of typical mathematical operations requires the semantics of static features in OCL to be resolved.
 
 OCL 2.0~\cite{OCL-2.0} attempts to formalize the intuitive obviousness of OCL 1.x with the aid of models. Unfortunately the formalization never progressed beyond the draft stage and so whenever we look too closely at OCL 2.0 we find incompleteness and inconsistency \cite{Willink2020}. The Abstract Syntax model omits critical classes such as \verb|VariableDeclaration|. There is no model of the library, just many well-intentioned partial specifications.
 
@@ -115,15 +108,15 @@ In \cite{Willink2011}, Eclipse OCL~\cite{Eclipse-OCL} introduced a model and gra
 \label{fig:oclstdlib}
 \end{figure}
 
-Figure~\ref{fig:oclstdlib} shows part of the declaration of the \verb|MapType| with \verb|K| and \verb|V| template parameters. An operation with a \verb|V2| template parameter and an iteration are also shown. The operation demonstrates the fairly strong modeling identifying that the templated argument and return may be null. Additionally the \verb|invalidating| keyword indicates that the result may be \verb|invalid|. The iteration declares its potentially null parameter followed by its body typed as a lambda-expression\footnote{The bodies of iterations are clearly lambda expressions although the OCL specification avoids that terminology.}. The return is a non-null map of potentially null keys and values.
+Figure~\ref{fig:oclstdlib} shows part of the declaration of the \verb|MapType| with \verb|K| and \verb|V| template parameters. An iteration with a \verb|V2| template parameter and an operation are also shown. The operation demonstrates the fairly strong modeling identifying that the templated argument and return may be null. Additionally the \verb|invalidating| keyword indicates that the result may be \verb|invalid|. The iteration declares its potentially null parameter followed by its body typed as a lambda-expression\footnote{The bodies of iterations are lambda expressions in all but name.}. The return is a non-null map of potentially null keys and values.
 
 The figure also demonstrates using \verb|java.util.Map| for the native implementation of the type, and using a custom helper class for each operation and iteration. The helper classes use polymorphism to dispatch \verb|OperationCallExp::referredOperation| rapidly.
 
 Once the OCL Standard Library was modeled, it was possible to separate the OCL Language from the OCL Standard Library allowing a user to provide an alternate or extended library implementation. It was also possible to define additional libraries. A few JUnit tests demonstrated the principle within Eclipse OCL, however an attempt to write a tutorial to show users how to exploit the potential of an additional library demonstrated that the implementation was not ready for prime time\footnote{https://bugs.eclipse.org/bugs/show\_bug.cgi?id=415146}.
 
-The tutorial was stuck on my to-do list until Kevin Lano suggested collaborating on a Masters project to provide an OCL library. Despite the funding falling through, I proceeded to investigate the library problems and long overdue solutions that are reported in this paper.
+%The tutorial was stuck on my to-do list until Kevin Lano suggested collaborating on a Masters project to provide an OCL library. Despite the funding falling through, I proceeded to investigate the library problems and long overdue solutions that are reported in this paper.
 
-We first review the ergonomic issues to be addressed in Section~\ref{Library Ergonomics} then in Section~\ref{Examples} we examine a few examples that motivate exploiting static features whose semantics we examine in Section~\ref{Static Semantics}. In Section~\ref{Status} we describe the status of this work and in Section~\ref{Further Work} we take static properties further. Then in Section~\ref{Related Work}, we look at other work, before concluding in Section~\ref{Conclusion}.
+We first review the ergonomic issues to be solved in Section~\ref{Library Ergonomics} then in Section~\ref{Examples} we examine a few examples that motivate exploiting static features whose semantics we examine in Section~\ref{Static Semantics}. In Section~\ref{Status} we describe the status of this work and in Section~\ref{Further Work} we take static properties further. Then in Section~\ref{Related Work}, we look at other work, before concluding in Section~\ref{Conclusion}.
   
 \section{Library Ergonomics}\label{Library Ergonomics}
  
@@ -138,11 +131,11 @@ In order to make a library useful we need to solve four problems for the user.
 
 \subsection{Import}
  
-The OCL specification~\cite{OCL-2.4} defines a language that can usefully constrain models, but does not specify where the models come from. This provides considerable flexibility but has prevented vendors from providing a general solution. Each tool has its own proprietary solution to solving the relationship between the OCL programming and the models.
+The OCL specification~\cite{OCL-2.4} defines a language that can usefully constrain models, but does not specify where the models come from. This provides considerable flexibility but has prevented vendors from providing a general solution. Each tool has its own proprietary solution to solving the relationship between the OCL programming and the models with their metamodels.
 
 Complete OCL comes closer to being complete in so far as the specification defines a self-standing document with a grammar that can complement a model. However a practical implementation must either add some form of import statement to allow the Complete OCL document to reference its complemented models, or operate in a pre-loaded context with ready to-go models.
 
-A similar import statement or pre-loading will be needed to exploit a library of declarations. This should be just a variation of a proprietary facility that we do not need to address further here.
+A similar import statement or pre-loading will be needed to exploit a library of declarations. This should be just a variation of a proprietary facility that we do not need to address further here. Eclipse OCL supports an import such as:
 
 \begin{verbatim}
 import 'https://git.eclipse.org/r/plugins/gitiles
@@ -152,16 +145,14 @@ import 'https://git.eclipse.org/r/plugins/gitiles
 
 \subsection{Declare}
 
-A Complete OCL document, a UML model or Eclipse OCL's Standard Library model provide adequate mechanisms for declaring many, but perhaps not all, declarations. A minimal \verb|maths.ocl| supporting just the \verb|tan| operation could be declared as\footnote{... denotes functionality that has been omitted in order to focus on a relevant issue.}
-:
+A Complete OCL document, a UML model or Eclipse OCL's Standard Library model provide adequate mechanisms for declaring many, but perhaps not all, declarations. A minimal \verb|maths.ocl| supporting just the \verb|tan| operation could be declared as\footnote{... denotes functionality that has been omitted in order to focus on a relevant issue.}:
 
 \begin{verbatim}
-	package maths
-	context Real
-	def: tan() : Real = ...
-	endpackage
+  package maths
+  context Real
+  def: tan() : Real = ...
+  endpackage
 \end{verbatim} 
-
 
 \subsection{Implement}
 
@@ -169,16 +160,16 @@ OCL is probably Turing complete, see Section~\ref{Turing Complete}, so it is in 
 
 However few users will be keen to transliterate existing implementations from their favorite language in order to use them within OCL. We therefore have a vicious circle whereby the lack of any OCL libraries imposes a significant barrier to development of any OCL libraries.
 
-Even if a good algorithm for \verb|tan| is available, there may be Intellectual Property issues that prevent its re-use. The transliteration must be tested for interesting corner cases.  Transliteration alone is not sufficient.
+Even if a good algorithm for \verb|tan| is available, there may be Intellectual Property issues that prevent its re-use. The transliteration must be tested for interesting corner cases. Transliteration alone is not sufficient.
 
 OCL needs a mechanism to enable re-use of an implementation already available in a foreign language.
 
 \subsection{Invoke}\label{Call}  
 
-If the imported library declarations integrate well with other OCL declarations, the existing call capabilities should be re-useable.
+If the imported library declarations integrate well with other OCL declarations, the existing call capabilities should be re-usable.
 
 \begin{verbatim}
-	2.5e1.tan()
+  2.5e1.tan()
 \end{verbatim} 
 
 However when we come to implement the library declaration we find that we have just moved the problem sideways; we still need a mechanism to invoke a foreign language implementation.
@@ -198,7 +189,7 @@ The existing solution exploits the \verb|_'...'| escape mechanism for identifier
     _'http://org.my.spec/2022#MyPackage'::MyClass)
 \end{verbatim} 
 
-We can generalize this to exploit a Java String function that the OCL String type does not support: 
+We can generalize this to exploit a Java String function that the OCL String type does not support as: 
 
 \begin{verbatim}
 thisString.
@@ -219,41 +210,41 @@ We have so far considered \verb|tan| as an example. We will now change to lookin
 
 \subsection{Math.pow}
 
-Most languages support a functional call of \verb|tan| as \verb|tan(2.5e1)| or \verb|tan 2.5e1| rather than the Object-Oriented \verb|2.5e1.tan()| which can be supported by declaring a regular \verb|Real::tan()| operation. This OO style strange if we require \verb|2.pow(4)| rather than \verb|pow(2, 4)|.
+Most languages support a functional call of \verb|tan| as \verb|tan(2.5e1)| or \verb|tan 2.5e1| rather than the Object-Oriented \verb|2.5e1.tan()| which can be supported by declaring a regular \verb|Real::tan()| operation. This OO style is strange if we want \verb|pow(2, 4)| rather than \verb|2.pow(4)|.
 
-This OO style is not actually necessary since OCL 2.2~\cite{OCL-2.2} added support for a \verb|static| keyword when declaring operations and properties.
+An OO style is not actually necessary since OCL 2.2~\cite{OCL-2.2} added support for a \verb|static| keyword when declaring operations and properties.
 
 We may therefore provide a minimal \verb|maths.ocl| as
 
 \begin{verbatim}
-	package maths
-	context Real
-	static def: pow(mant : Real, expt : Real) : Real
-	    = _'java:java.lang.Math.pow'(mant, expt)
-	endpackage
+  package maths
+  context Real
+  static def: pow(mant : Real, expt : Real) : Real
+    = _'java:java.lang.Math.pow'(mant, expt)
+  endpackage
 \end{verbatim} 
 
 This can support the call from regular OCL as
 
 \begin{verbatim}
-	... maths::Real::pow(2, 4) ...
+  ... maths::Real::pow(2, 4) ...
 \end{verbatim} 
 
-If the proprietary import mechanism exposes the contents of the \verb|maths| package, the \verb|maths::| qualification could be omitted giving a nearly optimal exposition for the call.
+If the proprietary import mechanism exposes the contents of the \verb|maths| package, the \verb|maths::| qualification and perhaps even the \verb|Real::| qualifications can be omitted giving a more optimal exposition for the call.
 
-While OCL 2.2 added the \verb|static| keyword to the grammar, it is hard to characterize the change as more than a me-too catchup to align with UML static features. Very little run-time semantics was provided for OCL, and there is little to infer from UML~\cite{UML-2.5.1}. Section 7.5.10 of the OCL specification provides an example that we shall see in Section~\ref{UniqueId} is not fully implementable in OCL. Whether and how \verb|static| is supported is down to the enthusiasm of the OCL tooling implementer.
+While OCL 2.2 added the \verb|static| keyword to the grammar, it is hard to characterize the change as more than a me-too catch-up to align with UML static features. Very little run-time semantics was provided for OCL, and there is little to infer from UML~\cite{UML-2.5.1}. Section 7.5.10 of the OCL specification provides an example that we shall see in Section~\ref{UniqueId} is not fully implementable in OCL\footnote{Diligent readers of the OCL specification may find a StaticValue class that is nothing to do with the static declaration of a feature. Rather it is a confusing throwback to when UML 1.x referred to the embedded DataType-typed attribute slots of an instance as its static structure.}. Whether and how \verb|static| is supported is down to the enthusiasm of the OCL tooling implementer.
 
 It may be noted that Ecore~\cite{Eclipse-EMF} has no support for static features, so that if a UML model with static feature is converted using UML2Ecore, the \verb|static| keyword is ignored.
 
-The requirement for possibly unsupported static functionality may be avoided by using the OO style:
+Using an OO style:
 
 \begin{verbatim}
     ... 2.pow(4) ...
 \end{verbatim} 
 
-but the underlying Java function is static so we will have to support foreign static calls anyway.
+may workaround the absence of support for static in the grammar, but the underlying Java function is static so internal support for foreign static calls is unavoidable.
 
-Better to ensure that OCL tooling supports static features. For static operations intuitive common sense seems ok. For static properties we need to clarify the semantics in respect of when a `new' static instance is created and initialized. See Section~\ref{Static Semantics}.
+For the semantics of static operations, intuitive common sense seems adequate. For static properties we need to clarify the semantics in respect of when a `new' static instance is created and initialized. See Section~\ref{Static Semantics}.
 
 Once we have a foreign call syntax, the user has a choice. The foreign calls can be used directly avoiding any need for a library at the expense of some clumsiness in the call expressions. Alternatively the foreign calls may be hidden within a library that provides friendly declarations that delegate to the foreign call.
 
@@ -263,23 +254,23 @@ In practice development/prototyping may use the direct call and evolve to use th
 
 The foreign call delegation for \verb|pow| can be appropriate when the types are simple and when the implementation is too complicated to re-implement.
 
-But consider a Complex class, which strangely Java does not provide. But even if there was a Java implementation, we might choose to re-implement since Complex is rather simple. Except that we cannot, since, in general, addition of two complex numbers creates a new complex number. OCL provides no \verb|new| capability since construction of a new object creates a side effect in the memory system. This can be seen by considering how a \verb|new| capability might work
+But consider a Complex class, which strangely Java does not provide. Even if there was a Java implementation, we might choose to re-implement since Complex is rather simple. Except that we cannot, since, in general, addition of two complex numbers creates a new complex number. OCL provides no \verb|new| capability since construction of a new object creates a side effect in the memory system. This can be seen by considering how a \verb|new| capability might work:
 
 \begin{verbatim}
 new Complex{real=2,imag=3} = new Complex{real=2,imag=3}
 \end{verbatim} 
 
-Obviously two same-valued complex numbers should be equal; this is the UML DataType semantics. But complex is a Class and so each call to \verb|new| should create a new object; they should therefore be different in accordance with UML Class semantics. (Java provides alternative \verb|=| and \verb|equals| facilities that allows a free/confusing choice of DataType or Class semantics.)
+Obviously two same-valued complex numbers should be equal; this is the UML DataType semantics. But if Complex is a Class, each call to \verb|new| creates a new instance; they should therefore be different in accordance with UML Class semantics. (Java provides alternative \verb|=| and \verb|equals| facilities that allows a free and confusing choice of DataType or Class semantics.)
 
-This \verb|new| problem was discussed at the Aachen workshop~\cite{OCL-Aachen} where the helpful term `shadow' object was coined for a solution.
+The problem with \verb|new| was discussed at the Aachen workshop~\cite{OCL-Aachen} where the helpful term `shadow' object was coined for the solution~\cite{Willink-Shadow}.
 
-In principle, let all possible instances of all possible classes have a permanent shadow existence, so that whenever the Tuple syntax is used to `create' an object the appropriate shadow instance is returned avoiding the side effect. Rewriting our example
+In principle, let all possible instances of all possible classes have a permanent shadow existence, so that whenever the Tuple syntax is used to `create' an object, the appropriate shadow instance is returned avoiding the side effect. Rewriting our example:
 
 \begin{verbatim}
 Complex{real=2, imag=3} = Complex{real=2, imag=3}
 \end{verbatim} 
 
-the two creations each obtain the same shadow object and so the equality is satisfied. 
+the two creations each return the same immutable shadow object and so the equality is satisfied. 
 
 In practice, creation of all possible instances of all possible classes will run out of time and memory long before any useful computation can be performed. Each required shadow instance must therefore be created lazily. 
 
@@ -302,8 +293,8 @@ This shadow object `creation' is exactly what is needed to enable a library to s
 
 Section 7.5.10 of the OCL specification provides half an example demonstrating how the static \verb|Employee::uniqueID| operation can be used to provide a unique ID for each \verb|Employee|.
 \begin{verbatim}
-context Employee::id : String
-  init: Employee::uniqueID()
+  context Employee::id : String
+    init: Employee::uniqueID()
 \end{verbatim} 
 
 \paragraph{Lazy (Java) Solution}
@@ -315,9 +306,9 @@ public static String uniqueID() {
 }
 \end{verbatim} 
 
-\verb|Employee::uniqueID| can easily be realized in Java by defining a static counter for the IDs and incrementing the counter for each invocation.
+As shown above, \verb|Employee::uniqueID| can easily be realized in Java by defining a static counter for the IDs and incrementing the counter for each invocation.
 
-An alternative eager approach in which all IDs are allocated together is awkward since it requires access to all instances that may need IDs and since IDs cannot be eagerly allocated for instances that have yet to be created.
+An alternative eager approach in which all IDs are allocated together is awkward since it requires access to all instances that may need IDs. This includes those instances that are yet to be created.
 
 \paragraph{Eager (OCL) Solution}
 
@@ -330,17 +321,17 @@ context Employee::id : String
   init: Employee::uniqueID()
 \end{verbatim} 
 
-The lazy approach cannot be written in OCL since the updates to the static counter constitute a side effect that is illegal in OCL. The eager approach is possible since \verb|allInstances()| can find the instances and since the lack of side effects guarantees that no later creation of instances can occur.
+The lazy approach cannot be written in OCL since the updates to the static counter constitute a side effect that is illegal in OCL. The eager approach above is possible since \verb|allInstances()| can find the instances and since the lack of side effects guarantees that no later creation of instances can occur.
 
 The static \verb|Employee::insts| property is initialized once with a sequence of all \verb|Employee| instances. Thereafter each access of the \verb|Employee::uniqueID()| operation is able to compute a distinctive \verb|self|-dependent value by searching for the index of \verb|self| in \verb|Employee::insts|. The derived \verb|Employee::id()| property delegates to \verb|Employee::uniqueID()| for the first access. Subsequent accesses should benefit from a cache.
 
 It seems unreasonable that the simple efficient lazy approach cannot be written in OCL. The semantics of static OCL features is unspecified, so there are opportunities for a resolution. Perhaps the initializer for a static property should be re-evaluated for each access. Alternatively the semantics could be refined so that the \verb|init| initializes on the first access and a \verb|der| updates on subsequent accesses. This would allow the count to evolve, but an unstable static property seems deeply suspect.
 
-It also seems unreasonable that further instances cannot be created after some unique IDs are allocated. But for pure OCL, this is not a problem since OCL has no ability to assign or mutate; the multi-valued counter cannot exist. Once OCL is embedded, perhaps in QVTo~\cite{QVT-1.3}, the imperative capabilities allow successive assigns and so the lazy approach can work. Alternatively when embedded in a strongly declarative context such as QVTr, all instances exist before the `atomic' transformation completes and so it is just a scheduling challenge for the tooling to assign the IDs to the output in a timely fashion that satisfies the write/read dependencies.
+It also seems unreasonable that further instances cannot be created after some unique IDs are allocated. But for pure OCL, this is not a problem since OCL has no ability to assign or mutate; the counter with its incrementing value cannot exist. Once OCL is embedded, perhaps in QVTo~\cite{QVT-1.3}, the imperative capabilities allow successive assigns and so the lazy approach can work. Alternatively when embedded in a strongly declarative context such as QVTr, all instances exist before the `atomic' transformation completes and so it is just a scheduling challenge for the tooling to assign the IDs to the output in a timely fashion that satisfies the write/read dependencies. For pragmatic OCL enriching a model, it is the modeling environment's responsibility to reset all caches before each execution of some OCL-defined functionality; \verb|allInstances()| must be `recomputed' each time the modeling environment makes a significant change to the system state. 
 
 %To complete the OCL specification example, we just need to allocate a distinct ID to each element of an \verb|allInstances()|. We cannot do this within uniqueID since there is no ability for a first call to populate the results for other calls. The `global' \verb|allInstances()| algorithm must be computed and cached `globally' and so must use a static cache populated before OCL execution starts. The individual results are readily accessed from the static \verb|instances| cache. 
 
-Unfortunately the \verb|indexOf()| in our solution contributes to a quadratic implementation cost. We can linearize by using a Map~\cite{Willink-Map}.
+Unfortunately the \verb|indexOf()| in our solution contributes to a quadratic implementation cost. We can linearize the cost by using a Map~\cite{Willink-Map}.
 
 \begin{verbatim}
 static context Employee::inst2id : Map(Employee,String)
@@ -353,9 +344,9 @@ context Employee::id : String
   init: Employee::uniqueID()
 \end{verbatim} 
 
-At start up, or first access, the \verb|Employee::inst2id| initialization computes the sequence of \verb|allInstances()| to the \verb|insts| let-variable. The  \verb|collectBy()| collection-to-map iteration then populates the map result from an iteration over all the instances. The iteration declares, but does not directly use, the primary element iterator \verb|e|. It also declares the co-iterator \verb|i|,  which provides the index of the primary iterator in the ordered source collection. It provides the same value as \verb|insts->indexOf(e)| without the need to re-compute what the iteration evaluation already `knows'. Each map entry is keyed by the iteration element \verb|e| and maps to the iteration body \verb|i.toString()|.
+At start up, or first access, the \verb|Employee::inst2id| initialization computes the sequence of \verb|allInstances()| to the \verb|insts| let-variable. The  \verb|collectBy()| collection-to-map iteration then populates the map result from an iteration over all the instances. The iteration declares, but does not directly use, the primary element iterator \verb|e|. It also declares the co-iterator \verb|i|,  which provides the index of the primary iterator in the ordered source collection. The co-iterator provides the same value as \verb|insts->indexOf(e)| without the need to re-compute what the iteration evaluation already `knows'. Each map entry is keyed by the iteration element \verb|e| and maps to the iteration body \verb|i.toString()|.
 
-We can see that provision of globally coherent static facilities is much easier when each per-element property can be cached as an entry in a global Map.
+We can see that provision of globally coherent static facilities is much easier when each per-element property can be cached as an entry in a static global Map.
 
 \section{Feature Semantics}\label{Static Semantics}
 
@@ -369,15 +360,15 @@ OCL supports two kinds of feature:
 
 \subsection{Regular Features}
 
-Regular features are provided and maintained by the modeling environment to which the OCL contributes. When objects are created/deleted, or properties initialized/updated is nothing to do with OCL. The modeling environment may implement and refresh caches as appropriate.
+Regular features are provided and maintained by the modeling environment to which the OCL contributes. When objects are created/deleted or properties initialized/updated is nothing to do with OCL. The modeling environment may implement and must refresh caches as appropriate.
 
-The modeling environment may invoke an OCL expression when initializing a property. How an OCL expression accesses a property is unspecified. But obviously it must route the access through the modeling environment to ensure that any access protocols are observed.
+The modeling environment may invoke an OCL expression when initializing a property. How an OCL expression evaluation accesses a slot is unspecified. But obviously it must route the access through the modeling environment to ensure that any access protocols are observed.
 
-A modeling environment may similarly invoke an OCL expression when evaluating an operation. How an OCL expression may invoke an operation is also unspecified. Logically it should do so via the modeling environment, which would allow the modeling environment to implement a virtual dispatch policy that is not specified by OCL\footnote{For UML, the lack of a virtual dispatch specification is worked around by defining all the overloads as redefinitions.}. However operations are modeled using an \verb|ExpressionInOCL| to provide bindable parameters so there is a clear intent that OCL should be able to invoke at least OCL operations directly. Eclipse OCL does this and applies a Java-like virtual dispatch.
+A modeling environment may similarly invoke an OCL expression when evaluating an operation. How an OCL expression may invoke an operation is also unspecified. Logically it should do so via the modeling environment, which would allow the modeling environment to implement the virtual dispatch policy that is not specified by OCL\footnote{For UML, the lack of a virtual dispatch specification is worked around by defining all the overrides as redefinitions.}. However operations are modeled using an \verb|ExpressionInOCL| to provide bindable parameters so there is a clear intent that OCL should be able to invoke at least OCL operations directly. Eclipse OCL does this and applies a Java-like virtual dispatch.
 
 \subsection{Static Regular Features}
 
-For regular features, the \verb|static| keyword in OCL just echoes the corresponding declaration in UML to ensure that a Complete OCL complement complements the correct feature. (Ecore does not support static features.)
+For regular features, the \verb|static| keyword in OCL may just echo the corresponding declaration in UML to ensure that a Complete OCL complement complements the correct feature. (Ecore does not support static features.)
 
 With the modeling environment responsible for providing and maintaining the static features, the modeling environment is also responsible for their usage.
 
@@ -385,20 +376,20 @@ For OCL purposes, use of \verb|staticFeature| can be regarded as just syntax sug
 
 \subsection{Additional Features}
 
-A Complete OCL document may complement pre-existing operations and properties by defining missing bodies and initializers. It may also extend pre-existing classes with additional operations and properties. These additions are specified to behave as regular features. (This is necessary to avoid new forms of \verb|PropertyCallExp| and \verb|OperationCallExp| in the Abstract Syntax, but with the additional features not actually part of a regular model, it is unclear where the target of a \verb|PropertyCallExp.referredProperty| may be found.)
+A Complete OCL document may complement pre-existing operations and properties by defining missing bodies and initializers. It may also extend pre-existing classes with additional operations and properties. These additions are specified to behave as regular features. This is necessary to avoid new forms of \verb|PropertyCallExp| and \verb|OperationCallExp| in the Abstract Syntax, but with the additional features not actually part of a regular model, it is unclear where the target of a \verb|PropertyCallExp.referredProperty| may be found.
 
-It is not clear that the modeling environment is aware of the additional features, so it is unclear whether additional properties are lazily or eagerly initialized. There can be no doubt that the additional operations are only invokable from OCL expressions within the transitive closure of Complete OCL documents that import the additional feature definition. Whether caches should be used is neither specified nor configurable.
+It is not clear if the modeling environment is aware of the additional features, so it is unclear whether additional properties are lazily or eagerly initialized. There is no doubt that the additional operations are only invokable from OCL expressions within the transitive closure of Complete OCL documents that import the additional feature definition. Whether caches should be used is neither specified nor configurable.
 
 \subsection{Static Additional Features}
 
-OCL provides no mechanism to update a property value, so an additional static property is almost useless. It can only be a constant since nothing is able to change it. It cannot contribute useful system state.
+OCL provides no mechanism to update a property value, so an additional static property is almost useless. It can only be a constant since nothing is able to change it. It cannot contribute useful system state. However the good practice of localizing magic constant values behind a symbolic name can be supported:
 
 \begin{verbatim}
 	context Real
 	static def PI : Real = 3.14159265359
 \end{verbatim} 
 
-A static additional operation is also rather boring. It differs from a non-static additional operation by requiring no access to a \verb|self| context, and no need to perform a virtual dispatch of overloads.
+A static additional operation is also rather boring. It differs from a non-static additional operation by requiring no access to a \verb|self| context, and no need to perform a virtual dispatch of overloads. Although boring, we have seen in Section~\ref{Examples} that static operations avoid the need for OO-style.
 
 \subsection{Summary}
 
@@ -487,7 +478,7 @@ The solution in Section~\ref{UniqueId} uses a global map to provide overall cohe
 operation lazyAt(key: K, init: Lambda K() : V[?]) : V[?]
 \end{verbatim} 
 
-If the map already contains an entry for \verb|key|, the corresponding value is returned just like \verb|Map::at(key)|. If there is no entry, one is created using the \verb|init| lambda expression to define the value for the new key.
+If the map already contains an entry for \verb|key|, the corresponding value is returned just like \verb|Map::at(key)|. If there is no entry, one is created using the \verb|init| lambda expression to define the value for the new key. The lazy OCL solution could then be:
 
 \begin{verbatim}
 static context Employee::inst2id : Map(Employee,String)
@@ -497,13 +488,13 @@ context Employee::id : String
                         inst2id->size().toString())
 \end{verbatim} 
 
-The \verb|Employee::inst2id| is initially empty, but each access to \verb|Employee::id| uses \verb|lazyAt| to provide a distinct value.
+The \verb|Employee::inst2id| is initially empty, and each access to \verb|Employee::id| uses \verb|lazyAt| to provide a distinct value.
 
-But \verb|Employee::inst2id->size()| can be accessed from anywhere, with unstable results depending upon \verb|Employee::id| access to occurrence. There is an observable side effect. Not OCL.
+\verb|Employee::inst2id->size()| can be accessed from anywhere, with unstable results depending upon \verb|Employee::id| access to occurrence. There is therefore an observable side effect. This is not OCL.
 
 \subsection{Mutable Statics}\label{Mutable Statics}
 
-Implementing the incrementing counter requires an ability to assign diverse values to a variable. This is possible in OCL, but only for the specific case of the result/accumulator of an \verb|iterate| iteration.
+Implementing the incrementing counter requires an ability to assign diverse values to a variable. This is possible in OCL, but only for the specific case of the result/accumulator of an \verb|iterate| iteration:
 
 \begin{verbatim}
 myList->iterate(e; acc = '' | acc + ' ' + e.toString())
@@ -511,9 +502,9 @@ myList->iterate(e; acc = '' | acc + ' ' + e.toString())
 
 The multiple assignments to \verb|acc| do not create a side-effect since the \verb|acc| is private to the \verb|iterate| and only accessible on a per-iterator basis in the body. The prevailing state of \verb|acc| is not arbitrarily visible so the changes are not visible. \verb|acc| is not part of the observable side-effect-free system state.
 
-The example above gives a consistent result, for an ordered source, but could give diverse results for if the source is a set. This is not a side effect; it is a lack of determinism for which \cite{Willink2018} provides solutions.
+The example above gives a consistent result, for an ordered source, but could give diverse results if the source is a set. This is not a side effect; it is a lack of determinism for which \cite{Willink2018} provides solutions.
 
-If we could emulate each step of the \verb|iterate| independently so that we re-assign to our unique counter rather than \verb|acc|, we could discount the unique counter from the observable system state and similarly discount inconsistent step sequencing as a lack of determinism.
+If we could somehow generalize \verb|iterate| to make each step independent, we could re-assign to our unique counter rather than \verb|acc|, discount the unique counter from the observable system state and similarly discount inconsistent step sequencing as a lack of determinism.
 
 There are other mechanisms of assignment in OCL
 \begin{itemize}
@@ -521,9 +512,9 @@ There are other mechanisms of assignment in OCL
 	\item property / part initializer
 	\item iterator initializer
 \end{itemize}
-but each is a single assignment. The assignment that occurs when for instance a new let-variable is created within a loop is not a re-assignment. Can any be the basis of a re-assignment?
+but each is a single assignment. The assignment that occurs, when for instance a new let-variable is created within a loop, is not a re-assignment. Can any of these mechanisms be the basis of a re-assignment?
 
-It was noted in Section~\ref{Static Semantics} that the semantics of statics are poorly specified, so we could be more imaginative and allow private static parts or properties to be changed by constructors.
+It was noted in Section~\ref{Static Semantics} that the semantics of statics are poorly specified, so we could be more imaginative and allow private static parts or properties to be changed by constructors as in the following lazy OCL solution:
 
 \begin{verbatim}
 static context Employee::initTuple : Tuple(id : String) 
@@ -576,15 +567,15 @@ Construction of a shadow object re-uses the Tuple construction syntax and so cou
 
 A foreign feature call was introduced in Section~\ref{Call} enabling OCL expressions to exploit functionality already available in foreign languages. In practice re-use of Java operations is very desirable. However evaluation of an OCL expression must be side-effect free and so any invocation of a Java operation such as \verb|List.add()| has a side-effect that may invalidate the use of OCL.
 
-Introduction of a foreign call is therefore a dangerous compromise between utility and validity. Can the danger be mitigated?
+Introduction of a foreign language call is therefore a dangerous compromise between utility and validity. Can the danger be mitigated?
 
-Compile-time analysis of the invoked functionality will not generally be possible since Java has too many side-effecting mechanisms.
+Compile-time analysis of the invoked functionality will not generally be possible since Java has too many side-effecting mechanisms and too many deep overload alternatives.
 
-At run-time, comparison of the total system state before and after a suspect foreign call is technically possible, but could be unrealistically expensive. Comparison of a hash of the total system state avoids a memory cost expense but remains unrealistic in terms of execution time.
+At run-time, comparison of the total system state before and after a suspect foreign call is technically possible, but could be unrealistically expensive. Less expensive in memory, but not time, could be a comparison of a hash of the total system state.
 
 A less ambitious comparison of shallow rather than transitive state could be feasible to catch obviously unsuitable operations such as \verb|List.add()|. A database of known bad operations could be gradually built-up, but progress would be slow since new entries only appear after a programming violation.
 
-Realistically, observing the no-side-effect rule must be the programmer's responsibility. This is of course already a programmer responsibility when configuring the \verb|Operation::isQuery| property in a UML model.
+Realistically, observing the no-side-effect rule must be the programmer's responsibility. Configuring the \verb|Operation::isQuery| property in a UML model is of course already a programmer responsibility.
 
 \section{Related Work}\label{Related Work}
 
@@ -593,6 +584,8 @@ The inadequacies of the OCL specification make it hard for authors to do more th
 Baar~\cite{Baar2011} argues for a standard mechanism to support OCL re-use but offers no solution. 
 
 Cabot and Gogolla~\cite{Cabot2012} observe that the specified OCL Standard Library is too large for new users, but inadequate for more experienced users. They identify the provision of OCL libraries as a Research Agenda item. 
+
+Lano~\cite{Lano2022} enumerates at least eight different OCL libraries many of which require an imperative extension to OCL.
 
 Willink~\cite{Willink2011} introduces a model, grammar and editor for the OCL Standard Library, but as noted in Section~\ref{Introduction} this has not matured sufficiently to support custom libraries. 
 
@@ -605,18 +598,18 @@ Mandel~\cite{Mandel1999} provided an early assessment of the expressive power of
 An unbreakable iteration that computes some function \verb|f(e, acc)| at each step:
 
 \begin{verbatim}
-	...iterate(e; acc : Acc = ... | f(e, acc)) 
+  ...iterate(e; acc : Acc = ... | f(e, acc)) 
 \end{verbatim} 
 
-may be rewritten with a Tuple to be breakable.
+may be rewritten with a Tuple to be breakable:
 
 \begin{verbatim}
-...iterate(e; acc2 = Tuple{
-                       break : Boolean = false,
-                       acc : Acc = ...
-                     }
-    | if break then acc2
-      else Tuple{
+  ...iterate(e; acc2 = Tuple{
+                           break : Boolean = false,
+                           acc : Acc = ...
+                       }
+      | if break then acc2
+        else Tuple{
              break = ... ,
              acc = f(e, acc)
            }
@@ -624,19 +617,19 @@ may be rewritten with a Tuple to be breakable.
     ) 
 \end{verbatim} 
 
-The data flow associated with the \verb|break| part is very simple; initially false, unchanging once true, never reset to false. Tooling can easily recognize this to terminate promptly.
+The data flow associated with the \verb|break| part is very simple; initially false, unchanging once true, never reset to false. Tooling can easily recognize this to terminate promptly. Perhaps OCL should have a \verb|break| value that may be returned during an ordered iteration to abandon the current and all future steps.
 
-A forever loop is awkward in OCL 2.0, but it can be achieved by a function \verb|f()| that recurses to collect the value of \verb|g()| for each loop element. 
+A forever loop is awkward in OCL 2.0, but it can be achieved by a function \verb|f()| that recurses to collect the value of \verb|g()| for each loop element: 
 
 \begin{verbatim}
-def: f(x : Integer, r : Set(Result)) : Set(Result)
-= f(x+1, r->including(g(x)))
+  def: f(x : Integer, r : Set(Result)) : Set(Result)
+  = f(x+1, r->including(g(x)))
 \end{verbatim} 
 
 This will obviously run out of stack in a naive implementation. As of OCL 2.3~\cite{OCL-2.3} there is a \verb|closure| iteration with which we can write a infinite loop.  
 
 \begin{verbatim}
-	1->closure(e | e+1)
+  1->closure(e | e+1)
 \end{verbatim} 
 
 The closure can be broken after computing something useful by:
@@ -650,12 +643,12 @@ For the harder case of a Sequence or Bag return, a first pass closure can comput
 
 \section{Conclusion}\label{Conclusion}
 
-We have identified the inadequacy of the OCL specification as the primary impediment to provision of OCL libraries. Once we resolve the problems, we find that many facilities not clearly available in OCL 2.4 are necessary to make a library implementation possible.
+We have identified the inadequacy of the OCL specification as the primary impediment to provision of OCL libraries. In resolving the problems, we find that many facilities not clearly available in OCL 2.4 are necessary to make a library implementation possible.
 
 \begin{itemize}
 	\item An import capability loads the library declarations.
 	\item Static features facilitate typical non-OO usage such pow(2,4).
-	\item Foreign operation calls allow direct re-use of Java.
+	\item Foreign operation calls allow direct re-use of e.g. Java.
 	\item Shadow objects allow operations to return `new' objects.
 	\item Maps facilitate coherent all-instances functionality.
 	\item Co-iterators eliminate gratuitous re-calculation.
@@ -664,6 +657,8 @@ and in future
 \begin{itemize}
 	\item Mutable static parts support a typical counter idiom.
 \end{itemize}
+
+The introduction of foreign feature calls and the consideration of static features is new to this paper. Other facilities have been presented before, but their integration to make a custom library feasible is again new to this paper.
 
 %%
 %% The next two lines define the bibliography style to be used, and
