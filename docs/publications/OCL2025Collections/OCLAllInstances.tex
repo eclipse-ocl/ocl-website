@@ -1,0 +1,377 @@
+%% The first command in your LaTeX source must be the \documentclass command.
+%%
+%% Options:
+%% twocolumn : Two column layout.
+%% hf: enable header and footer.
+\documentclass[
+% twocolumn,
+% hf,
+]{ceurart}
+
+%%
+%% One can fix some overfulls
+\sloppy
+\usepackage{graphicx}
+\usepackage{textgreek}
+\usepackage{enumitem}
+%%
+%% Minted listings support 
+%% Need pygment <http://pygments.org/> <http://pypi.python.org/pypi/Pygments>
+\usepackage{listings}
+%% auto break lines
+\lstset{breaklines=true}
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% Rights management information.
+%% CC-BY is default license.
+\copyrightyear{2025}
+\copyrightclause{Copyright for this paper by its authors.
+  Use permitted under Creative Commons License Attribution 4.0
+  International (CC BY 4.0).}
+
+%%
+%% This command is for the conference information
+\conference{OCL 2025 at STAF 2025,
+ 10 - 13 June 2025 Koblenz, Germany}
+
+%%
+%% The "title" command
+\title{OCL Collection Optimization - Part 1 - AllInstances}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+\author[1,2]{Edward D. Willink}[%
+orcid=0000-0003-3124-4019,
+email=ed@willink.me.uk,
+]
+\cormark[1]
+\fnmark[1]
+\address[1]{Willink Transformations Ltd, Reading England}
+\address[2]{Eclipse Foundation}
+
+
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+The allInstances() operation is used by many authors to obtain a source domain for a grandiose invariant. However the use of allInstances() is considered poor practice by many authors. We examine the good and bad features of allInstances and identify caching mechanisms that can mitigate the bad features. Finally we identify compile-time rewrites that can make allInstances() obsolete at run-time but conclude that allInstances() really is a poor practice to be resolved by authors.
+
+\end{abstract}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\begin{keywords}
+  OCL\sep
+  Collection optimization \sep
+  Caches
+\end{keywords}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}
+
+OCL \cite{OCL-2.4} evolved to satisfy UML's \cite{UML-2.5} need for textual model constraints where graphics was not appropriate. Authors more familiar with logic than the niceties of OCL find it convenient to express a grandiose constraint such as:
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\textit{All People have a name.}
+\end{description}
+
+This could transliterate to an OCL invariant as
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!inv PersonHasName:!
+\item ~~~~~~~~\verb!Person.allInstances()->forAll(name <> null)!
+\end{description}
+
+In this paper, in Section~\ref{Problems}, we first review the problems associated with this transliteration. A simplistic recognition of these problems has caused a number of authors including myself \cite{edwBadAllInstances} to strongly discourage use of \verb!allInstances()!. As long ago as 2002, the Amsterdam Manifesto \cite{cook2002amsterdam} identifies \textit{"allInstances" considered dangerous}. Then in Section~\ref{Solutions}, we solve the problems within the scope of typical OCL tooling before identifying caching mechanisms to improve the tooling and rewrites that could make \verb!allInstances()! obsolete. In Section~\ref{Observations}, we make some observations about the usage and performance of the UML 2.5 OCL constraints. Finally we discuss related work in Section~\ref{Related Work} and conclude in Section~\ref{Summary}.
+
+\section{allInstances problems}\label{Problems}
+
+Exploiting the example OCL snippet above as part of a Complete OCL document requires the invariant to have a package and class context. Perhaps:
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!package humans!
+\item ~~~~\verb!context Person!
+\item ~~~~~~~~\verb!inv PersonHasName:!
+\item ~~~~~~~~~~~~\verb!Person.allInstances()->forAll(name <> null)!
+\item ~~~~\verb!endpackage!
+\end{description}
+
+The seemingly redundant \verb!context Person! is pretty ugly. Why can't packages have invariants?\footnote{There is an outstanding OMG OCL issue for package invariants.}
+
+Typical OCL tools interpret the OCL quite literally and so when validating a model, every time an instance of \verb!Person! is encountered, all invariants applicable to a \verb!Person! are validated. With N \verb!Person! instances, the invariant runs N times. But the invariant specifies a loop over all \verb!Person! instances so the \verb!name <> null! body is executed N*N times. This is very inefficient and potentially confusing as each violation is reported N times. Literal execution can be even worse. Each execution of \verb!Person.allInstances()! searches the entire `model' to locate the instances. A single total model search can be expensive. N total model searches is very expensive. The overall cost is worse than O(N*N*N) for what should be an O(N) problem.
+
+Recognition of the multiple causes of poor tooling performance motivates the strong discouragement.
+
+\section{allInstances solutions}\label{Solutions}
+
+\subsection{Package Constraint}
+
+The obvious answer to `Why can't packages have invariants?' is to add support for package constraints/invariants. The UML Abstract Syntax, to which OCL is aligned, supports constraints on any \verb!Namespace! so \verb!Package! constraints are supported by the modelling. However UML constraints are an underspecified dustbin for which the semantics of a few usages are only partially specified. Behind the scenes, any tool vendor is free to recognise that packages have constraints with ill-defined semantics. A sensible implementation may inspire similar support by other tools. For UML, a package constraint can be drawn today. For OCL, a minor enhancement to the Complete OCL grammar is needed parse package invariants. 
+
+\subsection{Practical allIinstances}
+
+The dreadful cubic performance of a naive implementation of \verb!allInstances! is easily improved to quadratic by lazily caching the results from each distinct invocation.
+
+An OCL-based application such as full model validation or model transformation comprises many OCL constraints that can be analyzed once before execution starts. This analysis can identify all the \verb!allInstances! calls (and also all the implicit opposite navigations). These can all be eagerly cached in a single pass following or during model loading.
+
+A further improvement is possible by skipping the eager caches dependent on elements that have no instances in the models. 
+
+The sizes of the caches can be reduced when multiple \verb!allInstances! are used for distinct types with an inheritance relationship.
+
+\subsection{self-less allInstances}
+
+The grandiose example can be categorized as a self-less constraint since there is no use of the self-context in the contraint. It is easily rewritten to use the context class as \verb!self!.
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!context Person!
+\item ~~~~~~~~\verb!inv HasName:!
+\item ~~~~~~~~~~~~\verb!self.name <> null!
+\end{description}
+
+This avoids the need for a total model search and naturally validates the constraint exactly once for each Person instance. A performance speed-up from O(N*N*N) to O(N) should be observed.
+
+The rewrite should be more readable since the \verb!allInstances!, a \verb!forAll!, and iterator can be removed. It is easier to understand a constraint on  one example instance rather than all instances.
+
+\subsection{self-ish allInstances}
+
+When \verb!allInstances! occurs in an OCL expression that also uses the \verb!self! context a rewrite is still possible.
+
+\subsubsection{gratuitous self-ish allInstances}
+
+The UML 2.5 OCL constraints have four redundant usages of \verb!allInstances! such as.
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!context ConnectableElement::end() : Set(ConnectorEnd)!
+\item ~~~~~~~~\verb!body:!
+\item ~~~~~~~~~~~~\verb!ConnectorEnd.allInstances()->select(role = self)!
+\end{description}
+
+It appears that the relevant UML author did not appreciate that all associations are navigable in all directions in OCL. Consequently the constraint just expresses the qualified navigation.
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!context ConnectorEnd!
+\item ~~~~~~~~\verb!body:!
+\item ~~~~~~~~~~~~\verb!self[ConnectorEnd::role].role->includes(self)!
+\end{description}
+
+Since the opposite of role is explicitly defined, we can write
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!context ConnectorEnd!
+\item ~~~~~~~~\verb!body:!
+\item ~~~~~~~~~~~~\verb!self.end.role->includes(self)!
+\end{description}
+
+This provides the redundant textual definition of the \verb!end! property that is already defined `graphically'.
+
+Gratuitous self-ish \verb!allInstances! should be deleted since their sole utility is to confuse the reader.
+
+\subsubsection{other self-ish allInstances}
+
+Other examples of \verb!allInstances! in conjunction with \verb!self! can also be rewritten exploiting the ability to navigate in all directions. Logically since all associations can be navigated in either direction, it must be possible to reverse the navigation. A particular navigation to \verb!self! from the \verb!x! instance returned by an \verb!T.allInstances()!  can be reversed to navigate from \verb!self! to \verb!x.oclIsKindOf(T)!. However, it is unclear whether realistic complex navigation involving helper operations can be inverted without manual help.
+
+The following example from UML 2.5 searches all \verb!Association! instances for the few whose end types are a \verb!UseCase! \verb!self!
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!context uml::UseCases::UseCase!
+\item ~~~~~~~~\verb!inv binary_associations:!
+\item ~~~~~~~~~~~~\verb!Association.allInstances()!
+\item ~~~~~~~~~~~~\verb!->forAll(a |!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~\verb!a.memberEnd.type->includes(self) implies!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~\verb!a.memberEnd->size() = 2)!
+\end{description}
+
+We can start at a \verb!UseCase! \verb!self! and reverse navigate to the relevant \verb!Association!.
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!context uml::UseCases::UseCase!
+\item ~~~~~~~~\verb!inv binary_associations:!
+\item ~~~~~~~~~~~~\verb!let a : Association = self.typedElement.association in!
+\item ~~~~~~~~~~~~\verb!a.memberEnd->size() = 2!
+\end{description}
+
+The rewrite is clearer and faster. It avoids cubic execution costs. A further proportional saving arises from only evaluating the constraints for \verb!UseCase! instances thereby avoiding redundant processing for the many (most) \verb!Association!s that have nothing to do with \verb!UseCase!s.
+
+\subsection{what instances?}
+
+Avoiding the use of a total model search avoids another problem. How and where should the all-instances be located? Clearly it cannot be absolutely all instances since there may be instances behind some firewall somewhere. The search must be restricted to one or perhaps more relevant models in ways that the OCL specification does not define, but which might perhaps relate to a MOF Extent.
+
+OCL is re-used by QVT \cite{QVT-1.3} where there are distinct input and output domains. Which domains does an \verb!allInstances! apply to? Does an execution of \verb!allInstances! have to wait till all output instances are created? 
+
+These problems are avoided by a navigation from a distinct object.
+
+A practical compromise is to search all models transitively referenced from all the input models. For EMF \cite{Eclipse-EMF}, that is all Resources in the ResourceSet, but does it also include metamodels and built-in Resources not in the ResourceSet? When evaluating \verb!Class.allInstances()! for a UML model, are both user and UML classes returned?
+
+\subsection{Instance Cost}
+
+\verb!allInstances()! may return a very large collection of instances. Is there memory to be saved?
+
+A model is a graph of relationships (edges) between model elements (nodes) that are instances of the classes defined by the metamodel. The realization of each relationship involves at least one `pointer' to the target node and often another `pointer' to the source node of the relationship.
+
+Many years ago , these pointers were realized using 16 bits, but that was inadequate for huge models. Paging approaches were needed.
+
+The advent of 32 bit processors removed the problem but was a little wasteful for the many applications for which 65536 model elements is more than adequate. EMF reacted to this wastage by providing an ability to pack many Boolean attribute values into a single \verb!eFlags! byte. 
+
+Now that 64 bit processors are almost universal, the use of 64 bit pointers is even more wasteful. Memories have got much larger so does it matter? At first sight no. But behind the scenes the performance of an application using thousands of model elements is determined by the performance of the memory system and its caches. These caches typically support many cache lines with at most two lines at addresses that share the same least significant bits. If three accesses contend for the same cache line, performance degrades.
+
+The width of cache lines is also increasing, so access to a cache line may make 256 bits available from a single memory access. It is therefore beneficial to contrive to get multiple values from a single cache line. Unfortunately the size of a Java HashNode is too big and so two memory fetches may be required. Memory systems may antipate usage by assuming the next cache line will be needed; this helps the Java Hash Node.
+
+Anyway using smaller model element pointers can be beneficial by improving cache hits.
+
+It is tempting to use 16 bits for perhaps most model applications with a fallback to 24/32/64 bits for large/huge/pathological model sizes. This allows smaller references in models that can be expanded to actual addresses by a simple model-element-index to address lookup. Unfortunately the inverse search to encode an address as a model element index is liable to need a hashtable. The potential memory savings and speedups are very likely to be outweighed by additional calculations and tables.
+
+\section{Observations}\label{Observations}
+
+The many syntactical and semantic errors \cite{wilke2011uml} in the pre UML 2.5 OCL constraints were resolved for UML 2.5 using Eclipse OCL \cite{Eclipse-OCL}. During development of the Eclipse OCL Validity View, the OCL exposition of the UML 2.5 constraints was accidentally executed; in 2013, it was unacceptably slow. By 2017, further development including \verb!allInstances! caches improved the execution time to a couple of minutes. Does \verb!allInstances! need further work for UML?
+
+The UML constraints affecting structural models only have two usages of \verb!allInstances!
+
+\subsection{Node.allInstances()}
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!context Property!
+\item ~~~~~~~~\verb!inv:!
+\item ~~~~~~~~~~~~\verb!deployment->notEmpty() implies!
+\item ~~~~~~~~~~~~~~~~\verb!owner.oclIsKindOf(Node) and!
+\item ~~~~~~~~~~~~~~~~\verb!Node.allInstances()!
+\item ~~~~~~~~~~~~~~~~~~~~\verb!->exists(n | n.part->exists(p | p = self))!
+\end{description}
+
+The UML metamodel has numerous Property instances, but no deployments and no \verb!Node!s. The \verb!deployment->notEmpty()! should be \verb!false! and so the \verb!Node.allInstances()! need never execute. However regular OCL operation calls require source and arguments to be evaluated before the operation is evaluated. When treating \verb!implies! and \verb!and! as regular operations, the guards correctly contribute to results, but they do not inhibit evaluation of their arguments. Hence \verb!Node.allInstances! was needlessly evaluated for every \verb!Property!. Very wasteful when every invocation involved a total model search to locate the zero instances. Only slightly wasteful when repeatedly re-using a cached zero instances. 
+
+\subsection{Classifier.allInstances()}
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\textit{A Stereotype may only generalize or specialize another Stereotype.}
+\item 
+\item ~~~~\verb!context Stereotype!
+\item ~~~~~~~~\verb!inv:!
+\item ~~~~~~~~~~~~\verb!allParents()->forAll(oclIsKindOf(Stereotype)) and!
+\item ~~~~~~~~~~~~\verb!Classifier.allInstances()!
+\item ~~~~~~~~~~~~~~~~~~~~\verb!->forAll(c | c.allParents()!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~~~~~\verb!->exists(oclIsKindOf(Stereotype)) implies!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\verb!c.oclIsKindOf(Stereotype)!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~\verb!)!
+\end{description}
+
+The Standard Profile provides about 30 Stereotype instances for which about 70 Classifier instances are permuted so this constraint is in use and worth optimizing. However it does not fit our categorisation. The first line uses \verb!self! so no rewrite to use \verb!self! is necessary. The later use of \verb!Classifier.allInstances()! suggests a rewrite to a \verb!Classifier! context. The root usage of \verb!and! is a hint that two constraints have been combined with the first perhaps guarding against duplicate / inappropriate diagnosis by the second.
+
+The first part can be paraphrased as `all-super-types are Stereotypes' which is what `A Stereotype may only generalize or specialize another Stereotype' specifies. The remainder of the constraint following the \verb!and! is an extra independent self-less expression needlessly guarded by the actual constraint. It can be paraphrased as `all Classifiers that have a Stereotype super-type are Stereotypes'.
+
+This is an example of a multi-invariant; both halves of the \verb!and! would be clearer if expressed separately.
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~~~~~\verb!inv Part1:!
+\item ~~~~~~~~~~~~\verb!Part1()!
+\item ~~~~~~~~\verb!inv Part2:!
+\item ~~~~~~~~~~~~\verb!Part1() implies Classifier.allInstances()!
+\item ~~~~~~~~~~~~~~~~~~~~\verb!->forAll(c | c.allParents()!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~~~~~\verb!->exists(oclIsKindOf(Stereotype)) implies!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\verb!c.oclIsKindOf(Stereotype)!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~\verb!)!
+\item ~~~~~~~~\verb!context Stereotype::Part1() : Boolean!
+\item ~~~~~~~~~~~~\verb!body: allParents()->forAll(oclIsKindOf(Stereotype))!
+\end{description}
+
+If OCL recognised invariants as operations from \verb!self! to \verb!Boolean!, a constraint would be directly callable:
+
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~~~~~\verb!inv Part1:!
+\item ~~~~~~~~~~~~\verb!allParents()->forAll(oclIsKindOf(Stereotype))!
+\item ~~~~~~~~\verb!inv Part2:!
+\item ~~~~~~~~~~~~\verb!Part1 implies Classifier.allInstances()!
+\item ~~~~~~~~~~~~~~~~~~~~\verb!->forAll(c | c.allParents()!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~~~~~\verb!->exists(oclIsKindOf(Stereotype)) implies!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\verb!c.oclIsKindOf(Stereotype)!
+\item ~~~~~~~~~~~~~~~~~~~~~~~~\verb!)!
+\end{description}
+
+This improves readability for humans and supports finer-grained diagnostics. It helps tooling prioritize inter-dependent constraints and avoid duplicate diagnosis.
+
+A separate \verb!Classifier! constraint for Part2, however, would inflict \verb!Stereotype! functionality on \verb!Classifier!. Better to consider what we are really trying to constrain. We can then write the modular and symmetrical:
+  
+\begin{description}[itemsep=-0.2cm]\small
+\item ~~~~\verb!context Stereotype!
+\item 
+\item ~~~~\textit{A Stereotype may only generalize or specialize another Stereotype.}
+\item 
+\item ~~~~~~~~\verb!inv SuperTypesAreStereotypes:!
+\item ~~~~~~~~~~~~\verb!self.allParents()->forAll(oclIsKindOf(Stereotype))!
+\item 
+\item ~~~~\textit{A generalization or specialization of a Stereotype must be another Stereotype,}
+\item 
+\item ~~~~~~~~\verb!inv SubTypesAreStereotypes:!
+\item ~~~~~~~~~~~~\verb!self.allChildren()->forAll(oclIsKindOf(Stereotype))!
+\item 
+\item ~~~~\verb!context Classifier.allChildren() : Set(Classifier)!
+\item ~~~~~~~~\verb!body: self.generalization.specific->closure(generalization.specific)!
+\item 
+\item ~~~~\verb!context Classifier.allParents() : Set(Classifier)!
+\item ~~~~~~~~\verb!body: self.generalization.general->closure(generalization.general)!
+\item 
+\item ~~~~\verb!context Classifier!
+\item ~~~~~~~~\verb!inv AcyclicSuperTypes:!
+\item ~~~~~~~~~~~~\verb!self.allParents()->excludes(self)!
+\end{description}
+
+In the above, \verb!allParents! rewrites the UML version using \verb!closure! rather than a recursive function call. \verb!allChildren! which is missing from the UML specification uses a similar exposition. The \verb!AcyclicSuperTypes! is a clearer exposition of UML's \verb!no_cycles_in_generalization!; it provides the missing enforcement of `another Stereotype' for \verb!SuperTypesAreStereotypes! and \verb!SubTypesAreStereotypes!.
+
+The above is much more readable, more modular and faster than the UML exposition; it avoids \verb!allInstances!.
+
+\subsection{Recent progress}
+
+Subsequent development to sharpen the OCL to Java generation in Eclipse OCL supported per-operation overloads. Only the source argumnent is evaluated to allow the appropriate overload to be resolved.  Evaluation of arguments is deferred until the operation requires them. A guarding value can therefore provoke an immediate return without unnecessary argument evaluation. In 2025, the execution time is now down to 10 seconds; useable but 1 second or less is desirable to allow validation after every action in an editor.
+
+This paper is the first of a trio of papers on Collection Optimization. The other two papers address the inefficiencies of individual collections  \cite{Willink-Collections2} and of cascades \cite{Willink-Collections3} of collection operations.  Once fully implemented a further improvement in performance is to be expected for collection operations.
+
+Use of the OCL to Java converter in conjunction with a pre-generated OCL Java representation of the UML metamodel should give significant improvements for the general non-collection control flow.
+
+\subsection{Further Work}
+
+Consideration of the usage of \verb!allInstances()! in the UML specification reveals just 12 usages, 4 of which are gratuitous. 7 look straightforward to rewrite with an appropriate context. The remaining constraint is nearly 20 lines. \verb!ActivityPartition.represents_classifier! is probably in need of some intelligent attention. There is therefore little benefit in developing a faithful automated rewrite for a small amount of suspect code.
+
+The strong discouragement of \verb!allInstances! is well justified and should be retained.
+
+\section{Related Work}\label{Related Work}
+
+The Amsterdam Manifesto \cite{cook2002amsterdam} identified two problems with \verb!allInstances!. The need for a finite domain of instances is resolved by the simple expedient of special casing \verb!allInstances! for \verb!Integer!, \verb!Real! and  \verb!String! as \verb!invalid!. The problem of the context in which instances are located remains implementation dependent.
+
+Wei \cite{wei2015efficient} reviews and contrasts \verb!allInstances! caching strategies confirming their utility and assesses a further smart that restricts the eager analysis to relevant containment trees. Disappointing benefits are reported for the extra smart, perhaps because various levels of prolific \verb!allInstances! are assessed rather than the occasional use as in UML. The paper neglects implicit opposites that are amenable to the same analyses and smarts, but not static smarts. Static analysis is not valid if an input model conforms to an extended metamodel.  An almost static dynamic load-time analysis is necessary.
+
+An extension to infinite models is discussed by Tisi \cite{tisi2015lazy}.
+
+Many authors have discouraged use of \verb!allInstances!, many in `informal publications' \cite{edwBadAllInstances}, \cite{mikeBadAllInstances},  \cite{MossakowskiBadAllInstances},  \cite{chimiak2010teaching}, \cite{brucker2002note}.
+
+\section{Summary}\label{Summary}
+
+We have identified that naive execution of \verb!allInstances! may involve cubic costs where a linear cost should be achievable.
+
+We have identified that package constraints can temper the cubic costs to quadratic.
+
+We have identified caches that can differently temper the cubic costs to quadratic.
+
+We have identified that self-full rewrites makes \verb!allInstances! redundant. The cost should be linear and no instance caches are required.
+
+We finally conclude that the best solution for \verb!allInstances! remains to discourage it. Authors should rewrite since development of a foolproof automated rewrite is not justifiable.
+
+%% The declaration on generative AI comes in effect
+%% in Janary 2025. See also
+%% https://ceur-ws.org/GenAI/Policy.html
+\section*{Declaration on Generative AI}
+  The author(s) have not employed any Generative AI tools.
+
+
+%%
+%% Define the bibliography file to be used
+\bibliography{OCLCollections}
+
+\end{document}

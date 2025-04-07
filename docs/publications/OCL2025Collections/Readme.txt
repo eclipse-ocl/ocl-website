@@ -1,0 +1,1 @@
+The Java sources are in /org.eclipse.ocl.doc.ocl2025.tests/src/org/eclipse/ocl/doc/ocl2025/tests/manual/OCL2025_CoCollection_Tests.java where there are also many obsolete droppings.
